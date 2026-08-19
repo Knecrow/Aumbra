@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ─── OBSIDIAN PURE BLACK DARK THEME ────────────────────────────────────
-  static const Color darkBackground = Color(0xFF000000);       // Pure OLED black base
-  static const Color darkSurface = Color(0xFF08080A);          // Deep black surface
-  static const Color darkCard = Color(0xFF0D0D11);             // Sleek matte black card
-  static const Color darkCardElevated = Color(0xFF121217);     // Elevated black card
+  // ─── OBSIDIAN MULTI-LAYER DARK THEME ────────────────────────────────────
+  static const Color darkBackground = Color(0xFF08090C);       // Deep void canvas
+  static const Color darkSurface = Color(0xFF0F1017);          // Slate obsidian surface
+  static const Color darkCard = Color(0xFF11131A);             // Solid dark slate master card
+  static const Color darkCardElevated = Color(0xFF171924);     // Elevated interactive pod layer
   static const Color darkText = Color(0xFFF8F9FA);             // High-contrast crisp white
-  static const Color darkSubText = Color(0xFF7E8299);          // Sleek ash / slate subtext
-  static const Color darkDimText = Color(0xFF4A4E69);          // Tertiary dim text
-  static const Color darkBorder = Color(0xFF1A1A22);           // Subtle card border
+  static const Color darkSubText = Color(0xFF868B9E);          // Sleek ash / slate subtext
+  static const Color darkDimText = Color(0xFF4E5369);          // Tertiary dim text
+  static const Color darkBorder = Color(0x12FFFFFF);           // Hairline micro-stroke (7% alpha white)
   static const Color darkBorderGold = Color(0x3DF5A623);       // Gold-tinted border (24% alpha)
 
   // ─── RADIANT SOLAR GOLD / AMBER ACCENTS ──────────────────────────────────
@@ -33,13 +33,13 @@ class AppColors {
   static RadialGradient buildRankAmbientGradient(Color rankColor) {
     return RadialGradient(
       center: const Alignment(0.0, -0.6),
-      radius: 1.3,
+      radius: 1.35,
       colors: [
-        rankColor.withValues(alpha: 0.12),
-        const Color(0xFF060608),
-        const Color(0xFF000000),
+        rankColor.withValues(alpha: 0.16),
+        const Color(0xFF0D0E15),
+        const Color(0xFF08090C),
       ],
-      stops: const [0.0, 0.45, 1.0],
+      stops: const [0.0, 0.50, 1.0],
     );
   }
 
@@ -83,8 +83,8 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF101015),
-      Color(0xFF09090D),
+      Color(0xFF141622),
+      Color(0xFF0E1017),
     ],
   );
 

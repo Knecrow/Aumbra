@@ -221,6 +221,10 @@ class _MainNavigationState extends State<MainNavigation> {
           ],
         ),
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.06),
+          width: 1.0,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.65),

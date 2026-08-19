@@ -188,6 +188,10 @@ class HallOfFameScreen extends StatelessWidget {
             color: AppColors.darkCard,
             gradient: AppColors.darkCardGradient,
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.06),
+              width: 1.0,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.35),

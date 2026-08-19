@@ -355,6 +355,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: AppColors.darkCard,
         gradient: AppColors.darkCardGradient,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.06),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: child,
     );

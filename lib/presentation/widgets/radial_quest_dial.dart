@@ -196,7 +196,7 @@ class _RadialQuestDialState extends State<RadialQuestDial>
                       ),
                     ),
 
-                    // Orbital Category Rune Nodes along the Ring Perimeter (Border-free)
+                    // Orbital Category Rune Nodes along the Ring Perimeter
                     ...List.generate(totalCount, (i) {
                       final q = widget.quests[i];
                       final isSel = i == _selectedIndex;
@@ -207,27 +207,33 @@ class _RadialQuestDialState extends State<RadialQuestDial>
                       final ny = (dialSize / 2) + (ringRadius * math.sin(midAngle));
 
                       return Positioned(
-                        left: nx - 13,
-                        top: ny - 13,
+                        left: nx - 14,
+                        top: ny - 14,
                         child: GestureDetector(
                           onTap: () => _selectQuest(i),
-                          child: Container(
-                            width: 26,
-                            height: 26,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 28,
+                            height: 28,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: isDone
                                   ? widget.rankColor
-                                  : (isSel ? const Color(0xFF16161E) : const Color(0xFF07070A)),
-                              boxShadow: isSel
-                                  ? [
-                                      BoxShadow(
-                                        color: widget.rankColor.withValues(alpha: 0.45),
-                                        blurRadius: 8,
-                                        spreadRadius: 1,
-                                      ),
-                                    ]
-                                  : null,
+                                  : (isSel ? const Color(0xFF1C1F30) : const Color(0xFF0F1018)),
+                              border: Border.all(
+                                color: isDone
+                                    ? Colors.black.withValues(alpha: 0.8)
+                                    : (isSel ? lightRankColor : Colors.white.withValues(alpha: 0.12)),
+                                width: isSel ? 1.6 : 1.0,
+                              ),
+                              boxShadow: [
+                                if (isSel || isDone)
+                                  BoxShadow(
+                                    color: widget.rankColor.withValues(alpha: isDone ? 0.45 : 0.35),
+                                    blurRadius: 10,
+                                    spreadRadius: 1,
+                                  ),
+                              ],
                             ),
                             child: Center(
                               child: Icon(
@@ -235,7 +241,7 @@ class _RadialQuestDialState extends State<RadialQuestDial>
                                 color: isDone
                                     ? Colors.black
                                     : (isSel ? lightRankColor : AppColors.darkSubText),
-                                size: 13,
+                                size: 14,
                               ),
                             ),
                           ),
@@ -243,26 +249,44 @@ class _RadialQuestDialState extends State<RadialQuestDial>
                       );
                     }),
 
-                    // Center Core: Hero Quest Type Rune (Border-free)
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF07070A),
-                        boxShadow: [
-                          BoxShadow(
-                            color: widget.rankColor.withValues(alpha: 0.25 * pulse),
-                            blurRadius: 16,
-                            spreadRadius: 2,
+                    // Center Core: Hero Quest Type Rune (Sci-Fi Reactor Core)
+                    GestureDetector(
+                      onTap: widget.onCenterTap,
+                      child: Container(
+                        width: 76,
+                        height: 76,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFF0D0F18),
+                          gradient: const RadialGradient(
+                            colors: [
+                              Color(0xFF1A1D2D),
+                              Color(0xFF090A10),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          AppColors.getCategoryIconData(activeQuest.category),
-                          color: widget.rankColor,
-                          size: 36,
+                          border: Border.all(
+                            color: widget.rankColor.withValues(alpha: 0.35 * pulse),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: widget.rankColor.withValues(alpha: 0.30 * pulse),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              blurRadius: 14,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Icon(
+                            AppColors.getCategoryIconData(activeQuest.category),
+                            color: widget.rankColor,
+                            size: 38,
+                          ),
                         ),
                       ),
                     ),
@@ -273,99 +297,131 @@ class _RadialQuestDialState extends State<RadialQuestDial>
           },
         ),
 
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
 
-        // ── 2. DIRECT ACTION CONSOLE ───────────────────────────────────────
+        // ── 2. STRUCTURED DIRECT ACTION CONSOLE DECK ──────────────────────
         FadeTransition(
           opacity: _switchFade,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                // Category Chip
-                Text(
-                  activeQuest.category.toUpperCase(),
-                  style: TextStyle(
-                    color: lightRankColor,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.4,
-                  ),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.darkCard,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.06),
+                  width: 1.0,
                 ),
-
-                const SizedBox(height: 4),
-
-                // Objective Title
-                Text(
-                  activeQuest.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isCurrentCompleted ? AppColors.darkSubText : Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    decoration: isCurrentCompleted ? TextDecoration.lineThrough : null,
-                    decorationColor: AppColors.darkSubText,
-                    height: 1.2,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.40),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                const SizedBox(height: 12),
-
-                // Single Sporty Action Button (Border-free)
-                GestureDetector(
-                  onTap: () {
-                    if (isCurrentCompleted) {
-                      HapticFeedback.lightImpact();
-                      widget.onUncomplete(activeQuest.id);
-                    } else {
-                      _triggerSeal(activeQuest);
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Category Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                     decoration: BoxDecoration(
-                      gradient: isCurrentCompleted
-                          ? null
-                          : AppColors.buildRankGradient(widget.rankColor),
-                      color: isCurrentCompleted ? const Color(0xFF0F111A) : null,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: isCurrentCompleted
-                          ? null
-                          : [
-                              BoxShadow(
-                                color: widget.rankColor.withValues(alpha: 0.35),
-                                blurRadius: 14,
-                                spreadRadius: 1,
-                              ),
-                            ],
+                      color: widget.rankColor.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: widget.rankColor.withValues(alpha: 0.30),
+                        width: 0.8,
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCurrentCompleted ? Icons.lock_rounded : Icons.bolt_rounded,
-                          color: isCurrentCompleted ? lightRankColor : Colors.black,
-                          size: 19,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isCurrentCompleted ? 'SEALED (UNDO)' : 'SEAL OBJECTIVE',
-                          style: TextStyle(
-                            color: isCurrentCompleted ? Colors.white : Colors.black,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.4,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      activeQuest.category.toUpperCase(),
+                      style: TextStyle(
+                        color: lightRankColor,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 6),
+
+                  // Objective Title
+                  Text(
+                    activeQuest.title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isCurrentCompleted ? AppColors.darkSubText : Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      decoration: isCurrentCompleted ? TextDecoration.lineThrough : null,
+                      decorationColor: AppColors.darkSubText,
+                      height: 1.25,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Single Sporty Action Button
+                  GestureDetector(
+                    onTap: () {
+                      if (isCurrentCompleted) {
+                        HapticFeedback.lightImpact();
+                        widget.onUncomplete(activeQuest.id);
+                      } else {
+                        _triggerSeal(activeQuest);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        gradient: isCurrentCompleted
+                            ? null
+                            : AppColors.buildRankGradient(widget.rankColor),
+                        color: isCurrentCompleted ? const Color(0xFF141724) : null,
+                        borderRadius: BorderRadius.circular(14),
+                        border: isCurrentCompleted
+                            ? Border.all(color: widget.rankColor.withValues(alpha: 0.4), width: 1.0)
+                            : null,
+                        boxShadow: isCurrentCompleted
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: widget.rankColor.withValues(alpha: 0.40),
+                                  blurRadius: 14,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCurrentCompleted ? Icons.lock_rounded : Icons.bolt_rounded,
+                            color: isCurrentCompleted ? lightRankColor : Colors.black,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            isCurrentCompleted ? 'SEALED (UNDO)' : 'SEAL OBJECTIVE',
+                            style: TextStyle(
+                              color: isCurrentCompleted ? Colors.white : Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -471,6 +527,19 @@ class _SegmentedEnergyRingPainter extends CustomPainter {
     final segmentSweep = ((2 * math.pi) / count) - gapAngle;
     final lightRankColor = AppColors.getLightVariant(rankColor);
 
+    // 0. Concentric Sci-Fi HUD Guide Rings
+    final guideInnerPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.035)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawCircle(center, radius - 9, guideInnerPaint);
+
+    final guideOuterPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.04)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawCircle(center, radius + 9, guideOuterPaint);
+
     for (int i = 0; i < count; i++) {
       final quest = quests[i];
       final isSelected = i == selectedIndex;
@@ -481,8 +550,8 @@ class _SegmentedEnergyRingPainter extends CustomPainter {
       // 1. Background Arc Track
       final trackPaint = Paint()
         ..color = isCompleted
-            ? rankColor.withValues(alpha: 0.25)
-            : const Color(0xFF0E0E14)
+            ? rankColor.withValues(alpha: 0.22)
+            : const Color(0xFF131520)
         ..style = PaintingStyle.stroke
         ..strokeWidth = isSelected ? strokeWidth + 2 : strokeWidth
         ..strokeCap = StrokeCap.round;
@@ -494,6 +563,25 @@ class _SegmentedEnergyRingPainter extends CustomPainter {
         false,
         trackPaint,
       );
+
+      // Subtle hairline border for incomplete segments
+      if (!isCompleted) {
+        final outlinePaint = Paint()
+          ..color = isSelected
+              ? lightRankColor.withValues(alpha: 0.45)
+              : Colors.white.withValues(alpha: 0.06)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0
+          ..strokeCap = StrokeCap.round;
+
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          startAngle,
+          segmentSweep,
+          false,
+          outlinePaint,
+        );
+      }
 
       // 2. Completed / Active Energy Arc
       if (isCompleted) {
@@ -529,6 +617,23 @@ class _SegmentedEnergyRingPainter extends CustomPainter {
           segmentSweep,
           false,
           fillPaint,
+        );
+      }
+
+      // 3. Selection Indicator Halo Arc
+      if (isSelected) {
+        final selectorPaint = Paint()
+          ..color = (isCompleted ? lightRankColor : rankColor).withValues(alpha: 0.70 * pulse)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.8
+          ..strokeCap = StrokeCap.round;
+
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius + 9),
+          startAngle,
+          segmentSweep,
+          false,
+          selectorPaint,
         );
       }
     }

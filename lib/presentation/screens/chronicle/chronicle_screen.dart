@@ -54,9 +54,14 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
     final userProvider = context.watch<UserProvider>();
     final isDark = context.watch<ThemeProvider>().isDarkMode;
     final user = userProvider.user;
+    final rankInfo = userProvider.currentRankInfo;
     final rankColor = userProvider.currentRankColor;
 
     if (user == null) return const SizedBox.shrink();
+
+    final completionsReq = rankInfo.completionsRequired;
+    final userCompletions = user.rankCompletions;
+    final ascProgress = completionsReq > 0 ? (userCompletions / completionsReq).clamp(0.0, 1.0) : 1.0;
 
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubText : AppColors.lightSubText;
@@ -113,6 +118,10 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                             color: AppColors.darkCard,
                             gradient: AppColors.darkCardGradient,
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.06),
+                              width: 1.0,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.35),
@@ -161,10 +170,10 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                   Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.06)),
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'DAYS TO ABSOLUTE',
-                                      userProvider.estimatedDaysToAbsolute.toString(),
-                                      Icons.workspace_premium_rounded,
-                                      const Color(0xFFE040FB),
+                                      'ASCENSION',
+                                      '${(ascProgress * 100).round()}%',
+                                      Icons.military_tech_rounded,
+                                      rankColor,
                                     ),
                                   ),
                                 ],
@@ -187,6 +196,10 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                             color: AppColors.darkCard,
                             gradient: AppColors.darkCardGradient,
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.06),
+                              width: 1.0,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.35),
@@ -273,6 +286,10 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                             color: AppColors.darkCard,
                             gradient: AppColors.darkCardGradient,
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.06),
+                              width: 1.0,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.35),
