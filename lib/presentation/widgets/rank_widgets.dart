@@ -1,18 +1,23 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../core/constants/ranks.dart';
 import '../../core/constants/app_colors.dart';
 
-/// Animated rank glow badge displayed in the header (styled as a glowing system diamond with dual ring aura)
+/// Animated solar halo badge for rank & avatar display with optional circular ascension progress ring
 class RankGlowBadge extends StatefulWidget {
   final RankInfo rankInfo;
   final double size;
+  final bool showOuterHalo;
+  final double? progress; // 0.0 to 1.0 progress to next rank
 
   const RankGlowBadge({
     super.key,
     required this.rankInfo,
-    this.size = 60,
+    this.size = 64,
+    this.showOuterHalo = true,
+    this.progress,
   });
 
   @override
@@ -20,85 +25,127 @@ class RankGlowBadge extends StatefulWidget {
 }
 
 class _RankGlowBadgeState extends State<RankGlowBadge>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _glowAnimation;
+    with TickerProviderStateMixin {
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnimation;
+  late AnimationController _rotCtrl;
   late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 4),
+    _pulseCtrl = AnimationController(
+      duration: const Duration(milliseconds: 2800),
       vsync: this,
-    )..repeat(reverse: false);
-    _glowAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.82, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOutSine),
     );
-    _rotationAnimation = Tween<double>(begin: 0, end: 6.28318).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.linear),
+
+    _rotCtrl = AnimationController(
+      duration: const Duration(seconds: 18),
+      vsync: this,
+    )..repeat();
+    _rotationAnimation = Tween<double>(begin: 0, end: 2 * math.pi).animate(
+      CurvedAnimation(parent: _rotCtrl, curve: Curves.linear),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pulseCtrl.dispose();
+    _rotCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final color = context.watch<UserProvider>().currentRankColor;
+    final rankColor = widget.rankInfo.color;
+    final lightColor = AppColors.getLightVariant(rankColor);
+    final progressVal = widget.progress;
 
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([_pulseCtrl, _rotCtrl]),
       builder: (context, child) {
+        final glow = _pulseAnimation.value;
         return SizedBox(
           width: widget.size,
           height: widget.size,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Outer rotating halo ring
-              Transform.rotate(
-                angle: _rotationAnimation.value,
-                child: Container(
-                  width: widget.size * 0.9,
-                  height: widget.size * 0.9,
+              // Outer radiant rank ambient aura
+              if (widget.showOuterHalo)
+                Container(
+                  width: widget.size * 0.90,
+                  height: widget.size * 0.90,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: color.withValues(alpha: 0.3 * _glowAnimation.value),
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              // Rotating Diamond Frame
-              Transform.rotate(
-                angle: 3.14159265 / 4, // 45 degrees (Diamond)
-                child: Container(
-                  width: widget.size * 0.68,
-                  height: widget.size * 0.68,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: color, width: 2.2),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withValues(alpha: 0.5 * _glowAnimation.value),
-                        blurRadius: 16,
-                        spreadRadius: 2,
+                        color: rankColor.withValues(alpha: 0.35 * glow),
+                        blurRadius: widget.size * 0.35,
+                        spreadRadius: widget.size * 0.05,
+                      ),
+                      BoxShadow(
+                        color: lightColor.withValues(alpha: 0.20 * glow),
+                        blurRadius: widget.size * 0.5,
+                        spreadRadius: widget.size * 0.1,
                       ),
                     ],
                   ),
                 ),
-              ),
-              // Inner rank symbol icon
-              Icon(
-                _getRankIcon(widget.rankInfo.rankNumber),
-                color: color,
-                size: widget.size * 0.38,
+
+              // ── CIRCULAR ASCENSION PROGRESS RING AROUND PROFILE ──
+              if (progressVal != null)
+                CustomPaint(
+                  size: Size(widget.size, widget.size),
+                  painter: _AscensionProgressRingPainter(
+                    progress: progressVal,
+                    trackColor: Colors.white.withValues(alpha: 0.08),
+                    progressColor: rankColor,
+                    glowColor: lightColor,
+                    strokeWidth: 2.8,
+                  ),
+                )
+              else if (widget.showOuterHalo)
+                // Rotating outer solar ring with gradient stroke
+                Transform.rotate(
+                  angle: _rotationAnimation.value,
+                  child: Container(
+                    width: widget.size * 0.92,
+                    height: widget.size * 0.92,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: lightColor.withValues(alpha: 0.6 * glow),
+                        width: 1.8,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Inner obsidian core disc
+              Container(
+                width: widget.size * (progressVal != null ? 0.72 : 0.70),
+                height: widget.size * (progressVal != null ? 0.72 : 0.70),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF0D0E15),
+                  gradient: RadialGradient(
+                    colors: [
+                      Color(0xFF1E1F2C),
+                      Color(0xFF090A0F),
+                    ],
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    _getRankIcon(widget.rankInfo.rankNumber),
+                    color: lightColor,
+                    size: widget.size * 0.36,
+                  ),
+                ),
               ),
             ],
           ),
@@ -129,7 +176,394 @@ class _RankGlowBadgeState extends State<RankGlowBadge>
   }
 }
 
-/// Animated stat card for metrics display (Gaming HUD panel style)
+/// Custom painter that renders a glowing circular progress track & arc around profile avatar
+class _AscensionProgressRingPainter extends CustomPainter {
+  final double progress;
+  final Color trackColor;
+  final Color progressColor;
+  final Color glowColor;
+  final double strokeWidth;
+
+  const _AscensionProgressRingPainter({
+    required this.progress,
+    required this.trackColor,
+    required this.progressColor,
+    required this.glowColor,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2 * 0.94;
+
+    // Background full circular track
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+    canvas.drawCircle(center, radius, trackPaint);
+
+    if (progress <= 0.0) return;
+
+    final sweepAngle = 2 * math.pi * progress.clamp(0.0, 1.0);
+
+    // Glow blur behind progress arc
+    final glowPaint = Paint()
+      ..color = progressColor.withValues(alpha: 0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth + 2.5
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2,
+      sweepAngle,
+      false,
+      glowPaint,
+    );
+
+    // Foreground sharp gradient progress arc
+    final arcPaint = Paint()
+      ..shader = SweepGradient(
+        startAngle: -math.pi / 2,
+        endAngle: -math.pi / 2 + sweepAngle,
+        colors: [
+          progressColor,
+          glowColor,
+        ],
+      ).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2,
+      sweepAngle,
+      false,
+      arcPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _AscensionProgressRingPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.progressColor != progressColor ||
+        oldDelegate.glowColor != glowColor;
+  }
+}
+
+/// Overall Progress Card with circular radial gauge & attribute list (Matching Dashboard from reference)
+class OverallProgressCard extends StatelessWidget {
+  final double completionRate; // 0.0 to 1.0
+  final int completedQuests;
+  final int totalQuests;
+  final int currentStreak;
+  final int shieldsRemaining;
+  final Color? rankColor;
+
+  const OverallProgressCard({
+    super.key,
+    required this.completionRate,
+    required this.completedQuests,
+    required this.totalQuests,
+    required this.currentStreak,
+    required this.shieldsRemaining,
+    this.rankColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveRankColor = rankColor ?? context.watch<UserProvider>().currentRankColor;
+    final lightColor = AppColors.getLightVariant(effectiveRankColor);
+    final percent = (completionRate * 100).round();
+    final disciplinePct = (percent).clamp(0, 100);
+    final habitPct = totalQuests > 0 ? ((completedQuests / totalQuests) * 100).round() : 0;
+    final mindsetPct = (currentStreak * 12).clamp(20, 100);
+    final healthPct = ((shieldsRemaining / 3) * 100).round();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        gradient: AppColors.darkCardGradient,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'OVERALL PROGRESS',
+            style: TextStyle(
+              color: AppColors.darkSubText,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              // Radial circular gauge
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Background track
+                    const SizedBox(
+                      width: 90,
+                      height: 90,
+                      child: CircularProgressIndicator(
+                        value: 1.0,
+                        strokeWidth: 7,
+                        color: Color(0xFF222533),
+                      ),
+                    ),
+                    // Progress arc
+                    SizedBox(
+                      width: 90,
+                      height: 90,
+                      child: CircularProgressIndicator(
+                        value: completionRate.clamp(0.0, 1.0),
+                        strokeWidth: 7,
+                        strokeCap: StrokeCap.round,
+                        color: effectiveRankColor,
+                      ),
+                    ),
+                    // Center label
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$percent%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const Text(
+                          'COMPLETE',
+                          style: TextStyle(
+                            color: AppColors.darkSubText,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 24),
+
+              // Attribute breakdown column
+              Expanded(
+                child: Column(
+                  children: [
+                    _AttributeRow(label: 'Discipline', value: '$disciplinePct%', color: effectiveRankColor),
+                    const SizedBox(height: 8),
+                    _AttributeRow(label: 'Habits', value: '$habitPct%', color: lightColor),
+                    const SizedBox(height: 8),
+                    _AttributeRow(label: 'Mindset', value: '$mindsetPct%', color: AppColors.goldBright),
+                    const SizedBox(height: 8),
+                    _AttributeRow(label: 'Shields', value: '$healthPct%', color: const Color(0xFF38BDF8)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AttributeRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _AttributeRow({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.5),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.darkSubText,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.darkText,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Focus Streak Card matching the golden droplet widget in the reference image
+class FocusStreakCard extends StatelessWidget {
+  final int streakDays;
+  final int weeklyProgressPercent;
+  final Color? rankColor;
+
+  const FocusStreakCard({
+    super.key,
+    required this.streakDays,
+    this.weeklyProgressPercent = 83,
+    this.rankColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveRankColor = rankColor ?? context.watch<UserProvider>().currentRankColor;
+    final lightColor = AppColors.getLightVariant(effectiveRankColor);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        gradient: AppColors.darkCardGradient,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'DISCIPLINE STREAK',
+                  style: TextStyle(
+                    color: AppColors.darkSubText,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      '$streakDays',
+                      style: TextStyle(
+                        color: effectiveRankColor,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'DAYS',
+                      style: TextStyle(
+                        color: AppColors.darkSubText,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Radiant Rank Orb / Droplet Graphic
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  lightColor.withValues(alpha: 0.4),
+                  effectiveRankColor.withValues(alpha: 0.15),
+                  Colors.transparent,
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: effectiveRankColor.withValues(alpha: 0.35),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Center(
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: AppColors.buildRankGradient(effectiveRankColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: effectiveRankColor.withValues(alpha: 0.5),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.local_fire_department_rounded,
+                  color: Colors.black,
+                  size: 22,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Animated stat card for metrics display (Cyber HUD panel style)
 class StatCard extends StatelessWidget {
   final String value;
   final String label;
@@ -146,45 +580,42 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final valueColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final iconColor = accentColor ?? (isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7));
+    final effectiveAccent = accentColor ?? AppColors.goldPrimary;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        gradient: AppColors.darkCardGradient,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: iconColor, size: 20),
-              const SizedBox(width: 8),
               Text(
-                value,
-                style: TextStyle(
-                  color: valueColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.5,
+                label.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.darkSubText,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
                 ),
               ),
+              Icon(icon, color: effectiveAccent, size: 16),
             ],
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 8),
           Text(
-            label,
-            style: TextStyle(
-              color: labelColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.5,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -192,7 +623,7 @@ class StatCard extends StatelessWidget {
   }
 }
 
-/// Rank progress bar with animated fill (styled like HP/MP/EXP gauge)
+/// Rank progress bar with animated fill (styled with radiant gold glow)
 class RankProgressBar extends StatelessWidget {
   final double progress; // 0.0 to 1.0
   final Color color;
@@ -209,12 +640,7 @@ class RankProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkText : const Color(0xFF0F172A);
-    final subColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final trackColor = isDark
-        ? color.withValues(alpha: 0.1)
-        : color.withValues(alpha: 0.08);
+    final effectiveColor = color == const Color(0xFF00E5FF) ? AppColors.goldPrimary : color;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,17 +650,17 @@ class RankProgressBar extends StatelessWidget {
           children: [
             Text(
               label.toUpperCase(),
-              style: TextStyle(
-                color: subColor, 
-                fontSize: 10, 
+              style: const TextStyle(
+                color: AppColors.darkSubText,
+                fontSize: 10,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.2,
               ),
             ),
             Text(
               value,
-              style: TextStyle(
-                color: textColor,
+              style: const TextStyle(
+                color: Colors.white,
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.8,
@@ -242,16 +668,16 @@ class RankProgressBar extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Container(
           height: 8,
           decoration: BoxDecoration(
-            color: trackColor,
+            color: const Color(0xFF1E202C),
             borderRadius: BorderRadius.circular(4),
           ),
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: progress.clamp(0.0, 1.0)),
-            duration: const Duration(milliseconds: 1000),
+            duration: const Duration(milliseconds: 900),
             curve: Curves.easeOutCubic,
             builder: (context, val, _) {
               return Stack(
@@ -260,19 +686,19 @@ class RankProgressBar extends StatelessWidget {
                     widthFactor: val,
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(4),
                         gradient: LinearGradient(
                           colors: [
-                            color.withValues(alpha: 0.6),
-                            color,
+                            AppColors.goldLight,
+                            effectiveColor,
                           ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: color.withValues(alpha: 0.4),
-                            blurRadius: 6,
+                            color: effectiveColor.withValues(alpha: 0.5),
+                            blurRadius: 8,
                             spreadRadius: 1,
                           ),
                         ],
@@ -288,4 +714,5 @@ class RankProgressBar extends StatelessWidget {
     );
   }
 }
+
 

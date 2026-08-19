@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/quest_provider.dart';
-import '../../../core/constants/ranks.dart';
-import '../../../core/constants/quotes.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../widgets/quest_card.dart';
 import '../../widgets/rank_widgets.dart';
+import '../../widgets/radial_quest_dial.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,10 +21,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _headerCtrl = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _headerAnim = CurvedAnimation(parent: _headerCtrl, curve: Curves.easeOut);
+    _headerAnim = CurvedAnimation(parent: _headerCtrl, curve: Curves.easeOutCubic);
     _headerCtrl.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -44,458 +42,325 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     final questProvider = context.watch<QuestProvider>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final user = userProvider.user;
 
     if (user == null) {
-      return Scaffold(
-        backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-        body: const Center(child: CircularProgressIndicator()),
+      return const Scaffold(
+        backgroundColor: AppColors.darkBackground,
+        body: Center(child: CircularProgressIndicator(color: AppColors.goldPrimary)),
       );
     }
 
     final rankInfo = userProvider.currentRankInfo;
-    final nextRank = userProvider.nextRankInfo;
     final rankColor = userProvider.currentRankColor;
-    final quote = getDailyQuote();
-    final dayNumber = userProvider.daysSinceStart;
+    final lightRankColor = AppColors.getLightVariant(rankColor);
 
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final subColor = isDark ? const Color(0xFF64748B) : AppColors.lightSubText;
-    final dimColor = isDark ? const Color(0xFF334155) : AppColors.lightDimText;
+    final answered = questProvider.oathAnswered;
+    final answerTrue = questProvider.oathAnswer == true;
+    final completionsReq = rankInfo.completionsRequired;
+    final userCompletions = user.rankCompletions;
+    final ascProgress = completionsReq > 0 ? (userCompletions / completionsReq).clamp(0.0, 1.0) : 1.0;
+    final daysAwakened = user.startDate != null
+        ? DateTime.now().difference(user.startDate!).inDays + 1
+        : 1;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor: AppColors.darkBackground,
       body: Container(
-        decoration: isDark
-            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
-            : null,
-        child: FadeTransition(
-          opacity: _headerAnim,
-          child: CustomScrollView(
-            slivers: [
-              // ── SECTION 1: PROFILE HEADER ──
-              SliverToBoxAdapter(
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+        decoration: BoxDecoration(
+          gradient: AppColors.buildRankAmbientGradient(rankColor),
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: FadeTransition(
+            opacity: _headerAnim,
+            child: Column(
+              children: [
+                // ── 1. LARGE & PROMINENT TOP PODS (IDENTITY LEFT + TELEMETRY RIGHT) ──
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // ── LEFT TOP: LARGE IDENTITY POD ──
+                      GestureDetector(
+                        onTap: () => _showEditProfileModal(context, userProvider),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Left: Avatar + identity
-                            RankGlowBadge(rankInfo: rankInfo, size: 54),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => _showEditProfileModal(context, userProvider),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            user.name.toUpperCase(),
-                                            style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: 0.8,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Icon(Icons.edit_note_rounded, color: rankColor, size: 16),
-                                      ],
+                            RankGlowBadge(
+                              rankInfo: rankInfo,
+                              size: 52,
+                              progress: ascProgress,
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      user.name.toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
+                                      ),
                                     ),
+                                    const SizedBox(width: 6),
+                                    Icon(Icons.edit_outlined, color: rankColor.withValues(alpha: 0.7), size: 14),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                                  decoration: BoxDecoration(
+                                    color: rankColor.withValues(alpha: 0.16),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
+                                  child: Text(
                                     rankInfo.name.toUpperCase(),
                                     style: TextStyle(
-                                      color: rankColor,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 1.2,
+                                      color: lightRankColor,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 1.0,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            // Right: Sleek horizontal stats capsule
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0x880C1020),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _MiniStat(value: '${user.currentStreak}', icon: Icons.local_fire_department_rounded, color: const Color(0xFFFF6D00)),
-                                  const SizedBox(width: 8),
-                                  Container(width: 1, height: 12, color: isDark ? const Color(0x22FFFFFF) : const Color(0x22000000)),
-                                  const SizedBox(width: 8),
-                                  _MiniStat(value: '${user.shieldsRemaining}/3', icon: Icons.shield_rounded, color: const Color(0xFF38BDF8)),
-                                  const SizedBox(width: 8),
-                                  Container(width: 1, height: 12, color: isDark ? const Color(0x22FFFFFF) : const Color(0x22000000)),
-                                  const SizedBox(width: 8),
-                                  _MiniStat(value: 'D$dayNumber', icon: Icons.bolt_rounded, color: const Color(0xFF10B981)),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                      ),
+
+                      // ── RIGHT TOP: LARGE TELEMETRY POD (STREAK, DAYS, SHIELDS) ──
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Streak & Days Row
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Days Awakened
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF08080C),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '⚡ ${daysAwakened}d',
+                                  style: const TextStyle(
+                                    color: AppColors.darkSubText,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+
+                              // Streak Flame Pill
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF08080C),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.local_fire_department_rounded, color: rankColor, size: 15),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${user.currentStreak}d',
+                                      style: TextStyle(
+                                        color: lightRankColor,
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          // Shields & Info Row
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF08080C),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: List.generate(3, (i) {
+                                    final available = i < user.shieldsRemaining;
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 1.5),
+                                      child: Icon(
+                                        available ? Icons.shield_rounded : Icons.shield_outlined,
+                                        color: available ? rankColor : AppColors.darkDimText.withValues(alpha: 0.25),
+                                        size: 14,
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              GestureDetector(
+                                onTap: () => _showRankLoreModal(context, userProvider),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF08080C),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.info_outline_rounded, color: rankColor, size: 15),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ── 2. HERO CENTERPIECE: RADIAL ENERGY WHEEL (70% ATTENTION) ──
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: RadialQuestDial(
+                          quests: questProvider.todayQuests,
+                          bossQuest: questProvider.bossQuest,
+                          bossQuestUnlocked: questProvider.bossQuestUnlocked,
+                          rankColor: rankColor,
+                          rankInfo: rankInfo,
+                          ascProgress: ascProgress,
+                          onComplete: (id) => questProvider.completeQuest(id),
+                          onUncomplete: (id) => questProvider.uncompleteQuest(id),
+                          onBossChallenge: () => _showBossQuestDialog(questProvider, rankColor),
+                          onCenterTap: () => _showRankLoreModal(context, userProvider),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ── 3. MINIMAL 1-LINE DAILY INTEGRITY OATH TRIGGER ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkCard,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.verified_user_rounded,
+                          color: answered
+                              ? (answerTrue ? AppColors.emeraldPrimary : AppColors.darkSubText)
+                              : rankColor,
+                          size: 15,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            answered
+                                ? (answerTrue ? 'INTEGRITY: HONOR KEPT' : 'INTEGRITY: REFLECTION LOGGED')
+                                : 'INTEGRITY: HONEST WORK TODAY?',
+                            style: TextStyle(
+                              color: answered
+                                  ? (answerTrue ? AppColors.emeraldPrimary : AppColors.darkSubText)
+                                  : Colors.white,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                        ),
+                        if (!answered) ...[
+                          _CompactOathButton(
+                            label: 'YES',
+                            color: rankColor,
+                            onTap: () => questProvider.answerOath(true),
+                          ),
+                          const SizedBox(width: 6),
+                          _CompactOathButton(
+                            label: 'NO',
+                            color: AppColors.darkSubText,
+                            onTap: () => _showOathReflectionDialog(context, rankColor),
+                          ),
+                        ] else
+                          Icon(
+                            answerTrue ? Icons.shield_rounded : Icons.info_outline_rounded,
+                            color: answerTrue ? AppColors.emeraldPrimary : AppColors.darkSubText,
+                            size: 16,
+                          ),
                       ],
                     ),
                   ),
                 ),
-              ),
 
-              // ── RANK PROGRESS (inline, no card) ──
-              if (nextRank != null)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                    child: _buildRankProgress(
-                      rankInfo, nextRank, rankColor, user, subColor, textColor, dimColor),
-                  ),
-                ),
-
-              // ── MANTRA (borderless) ──
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: _buildMantra(quote, dayNumber, rankColor, subColor),
-                ),
-              ),
-
-              // ── QUEST HEADER ──
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                  child: Row(
-                    children: [
-                      Text(
-                        "Today's Quests",
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const Spacer(),
-                      if (questProvider.state == QuestLoadingState.loaded)
-                        Text(
-                          '${questProvider.completedCount} / ${questProvider.totalCount}',
-                          style: TextStyle(
-                            color: subColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ── QUEST LIST ──
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _buildQuestList(questProvider, rankColor),
-                ),
-              ),
-
-              // ── SECTION 5: OATH ──
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  child: _buildOathSection(questProvider),
-                ),
-              ),
-
-              // ── SECTION 6: BOSS QUEST ──
-              if (questProvider.bossQuest != null)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: _buildBossQuestButton(questProvider, rankColor),
-                  ),
-                ),
-
-              // ── BOTTOM PADDING ──
-              const SliverToBoxAdapter(child: SizedBox(height: 110)),
-            ],
+                // Floating Nav Dock spacing
+                const SizedBox(height: 80),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ── RANK PROGRESS (borderless inline) ─────────────────────────────────────
-  Widget _buildRankProgress(RankInfo rankInfo, RankInfo nextRank, Color rankColor,
-      dynamic user, Color subColor, Color textColor, Color dimColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: RankProgressBar(
-                progress: rankInfo.completionsRequired > 0
-                    ? user.rankCompletions / rankInfo.completionsRequired
-                    : 1.0,
-                color: rankColor,
-                label: 'Completions',
-                value: '${user.rankCompletions}/${rankInfo.completionsRequired}',
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: RankProgressBar(
-                progress: rankInfo.streakRequired > 0
-                    ? user.currentStreak / rankInfo.streakRequired
-                    : 1.0,
-                color: rankColor.withValues(alpha: 0.75),
-                label: 'Streak',
-                value: '${user.currentStreak}/${rankInfo.streakRequired}',
-              ),
-            ),
-          ],
-        ),
-        if (context.read<QuestProvider>().bossQuestUnlocked) ...[
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Text('⚔️', style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 6),
-              Text(
-                'Boss encounter unlocked — scroll down',
-                style: TextStyle(
-                  color: rankColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildMantra(dynamic quote, int dayNumber, Color rankColor, Color subColor) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 2,
-          height: 36,
-          decoration: BoxDecoration(
-            color: rankColor.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(1),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            '"${quote.text}"',
-            style: TextStyle(
-              color: subColor,
-              fontSize: 13,
-              fontStyle: FontStyle.italic,
-              height: 1.5,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ── QUEST LIST ──────────────────────────────────────────────────────────
-  Widget _buildQuestList(QuestProvider questProvider, Color rankColor) {
-    if (questProvider.state == QuestLoadingState.loading) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40),
-        child: Column(
-          children: [
-            CircularProgressIndicator(color: rankColor, strokeWidth: 2),
-            const SizedBox(height: 16),
-            const Text(
-              'System is loading your quests...',
-              style: TextStyle(color: Color(0xFF666666), fontSize: 13),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (questProvider.todayQuests.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      children: List.generate(questProvider.todayQuests.length, (index) {
-        final quest = questProvider.todayQuests[index];
-        return QuestCard(
-          quest: quest,
-          index: index,
-          onComplete: () => context.read<QuestProvider>().completeQuest(quest.id),
-          onUncomplete: () => context.read<QuestProvider>().uncompleteQuest(quest.id),
-        );
-      }),
-    );
-  }
-
-  // ── OATH SECTION (borderless) ─────────────────────────────────────────────
-  Widget _buildOathSection(QuestProvider questProvider) {
-    final answered = questProvider.oathAnswered;
-    final answerTrue = questProvider.oathAnswer == true;
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final subColor = isDark ? const Color(0xFF64748B) : AppColors.lightSubText;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Were you honest today?',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 12),
-        if (!answered)
-          Row(
-            children: [
-              Expanded(
-                child: _OathButton(
-                  label: 'Yes',
-                  icon: Icons.check_rounded,
-                  color: const Color(0xFF00E5FF),
-                  onTap: () => context.read<QuestProvider>().answerOath(true),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _OathButton(
-                  label: 'No',
-                  icon: Icons.close_rounded,
-                  color: subColor,
-                  onTap: () => _showOathReflectionDialog(context),
-                ),
-              ),
-            ],
-          )
-        else
-          Text(
-            answerTrue
-                ? '✓ Integrity logged — your word stands.'
-                : '— Noted. Reflection is growth.',
-            style: TextStyle(
-              color: answerTrue ? const Color(0xFF00E5FF) : subColor,
-              fontSize: 13,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-      ],
-    );
-  }
-
-  // ── BOSS QUEST BUTTON ──────────────────────────────────────────────────────
-  Widget _buildBossQuestButton(QuestProvider questProvider, Color rankColor) {
-    final unlocked = questProvider.bossQuestUnlocked;
-    if (!unlocked) return const SizedBox.shrink();
-
-    return GestureDetector(
-      onTap: () => _showBossQuestDialog(questProvider, rankColor),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: rankColor.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: rankColor.withValues(alpha: 0.2),
-              blurRadius: 20,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('⚔️', style: TextStyle(fontSize: 18)),
-            const SizedBox(width: 10),
-            Text(
-              'Boss Quest — Challenge Now',
-              style: TextStyle(
-                color: rankColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showOathReflectionDialog(BuildContext context) {
+  void _showOathReflectionDialog(BuildContext context, Color rankColor) {
     final controller = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF111111),
+        backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0x22FFFFFF), width: 1),
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: rankColor.withValues(alpha: 0.3), width: 1),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.auto_stories_rounded, color: Color(0xFF00E5FF), size: 18),
-            SizedBox(width: 8),
-            Text('Reflection',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+            Icon(Icons.auto_stories_rounded, color: rankColor, size: 20),
+            const SizedBox(width: 8),
+            const Text('Daily Reflection',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'The system respects your honesty. What will you do differently tomorrow?',
-              style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13, height: 1.5),
+              'Honesty is the foundation of discipline. What will you conquer differently tomorrow?',
+              style: TextStyle(color: AppColors.darkSubText, fontSize: 13, height: 1.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             TextField(
               controller: controller,
               maxLines: 3,
               style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Your reflection...',
-                hintStyle: const TextStyle(color: Color(0xFF555555)),
-                filled: true,
-                fillColor: const Color(0x0DFFFFFF),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  borderSide: const BorderSide(color: Color(0x14FFFFFF)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  borderSide: const BorderSide(color: Color(0x14FFFFFF)),
-                ),
               ),
             ),
           ],
@@ -506,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               Navigator.pop(ctx);
               context.read<QuestProvider>().answerOath(false);
             },
-            child: const Text('Submit', style: TextStyle(color: Color(0xFFFF6B6B))),
+            child: Text('SUBMIT', style: TextStyle(color: rankColor, fontWeight: FontWeight.w800)),
           ),
         ],
       ),
@@ -516,341 +381,264 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void _showEditProfileModal(BuildContext context, UserProvider userProvider) {
     final user = userProvider.user;
     if (user == null) return;
+    final rankColor = userProvider.currentRankColor;
+    final lightRankColor = AppColors.getLightVariant(rankColor);
+    final controller = TextEditingController(text: user.name);
 
-    final nameCtrl = TextEditingController(text: user.name);
-    final careerCtrl = TextEditingController(text: user.career);
-    final interestsCtrl = TextEditingController(text: user.interests);
-    double fitness = user.fitnessLevel.toDouble();
-    bool hasComp = user.hasComputer;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.darkSurface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: rankColor.withValues(alpha: 0.15),
+                blurRadius: 24,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.darkSubText.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'EDIT CODENAME',
+                style: TextStyle(
+                  color: lightRankColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                decoration: InputDecoration(
+                  hintText: 'Enter new codename...',
+                  filled: true,
+                  fillColor: const Color(0xFF0D0E16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: rankColor, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final newName = controller.text.trim();
+                    if (newName.isNotEmpty) {
+                      await userProvider.updateProfile(name: newName);
+                    }
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: rankColor,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: const Text('SAVE IDENTITY', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRankLoreModal(BuildContext context, UserProvider userProvider) {
+    final rankInfo = userProvider.currentRankInfo;
     final rankColor = userProvider.currentRankColor;
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF0F1123) : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.darkSurface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: rankColor.withValues(alpha: 0.2),
+              blurRadius: 30,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.darkSubText.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'PLAYER DOSSIER',
-                          style: TextStyle(
-                            color: rankColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          onPressed: () => Navigator.pop(ctx),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: nameCtrl,
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                      decoration: InputDecoration(
-                        labelText: 'Codename / Name',
-                        labelStyle: TextStyle(color: rankColor),
-                        filled: true,
-                        fillColor: isDark ? const Color(0x0DFFFFFF) : const Color(0x0D000000),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: careerCtrl,
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                      decoration: InputDecoration(
-                        labelText: 'Career / Field of Study',
-                        labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-                        filled: true,
-                        fillColor: isDark ? const Color(0x0DFFFFFF) : const Color(0x0D000000),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: interestsCtrl,
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                      decoration: InputDecoration(
-                        labelText: 'Interests & Focus Areas',
-                        labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-                        filled: true,
-                        fillColor: isDark ? const Color(0x0DFFFFFF) : const Color(0x0D000000),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text('Fitness Level: ${fitness.round()}/10',
-                        style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
-                    Slider(
-                      value: fitness,
-                      min: 1,
-                      max: 10,
-                      divisions: 9,
-                      activeColor: rankColor,
-                      onChanged: (val) => setModalState(() => fitness = val),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Computer Access',
-                            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 13)),
-                        Switch(
-                          value: hasComp,
-                          activeThumbColor: rankColor,
-                          onChanged: (val) => setModalState(() => hasComp = val),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: rankColor,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                        ),
-                        onPressed: () async {
-                          await userProvider.updateProfile(
-                            name: nameCtrl.text.trim(),
-                            career: careerCtrl.text.trim(),
-                            interests: interestsCtrl.text.trim(),
-                            fitnessLevel: fitness.round(),
-                            hasComputer: hasComp,
-                          );
-                          if (ctx.mounted) Navigator.pop(ctx);
-                        },
-                        child: const Text('UPDATE DOSSIER', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2)),
-                      ),
-                    ),
-                  ],
+            ),
+            const SizedBox(height: 18),
+            RankGlowBadge(rankInfo: rankInfo, size: 68),
+            const SizedBox(height: 14),
+            Text(
+              'RANK ${rankInfo.rankNumber}: ${rankInfo.name.toUpperCase()}',
+              style: TextStyle(
+                color: AppColors.getLightVariant(rankColor),
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'DEPTH LEVEL: ${rankInfo.depthLevel.toUpperCase()}',
+              style: const TextStyle(
+                color: AppColors.darkSubText,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Requires ${rankInfo.taskCount} daily discipline objectives across Mind, Body, Soul, and Ascendance.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.darkText, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: rankColor,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
+                child: const Text('DISMISS', style: TextStyle(fontWeight: FontWeight.w900)),
               ),
-            );
-          },
-        );
-      },
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
     );
   }
 
   void _showBossQuestDialog(QuestProvider questProvider, Color rankColor) {
-    final quest = questProvider.bossQuest;
-    if (quest == null) return;
+    final boss = questProvider.bossQuest;
+    if (boss == null) return;
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0A0A0A),
+        backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: rankColor.withValues(alpha: 0.4), width: 1),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: rankColor, width: 1.5),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            Text('⚔️ BOSS QUEST',
-                style: TextStyle(color: rankColor, fontSize: 11, letterSpacing: 2)),
-            const SizedBox(height: 6),
-            Text(quest.title,
-                style: const TextStyle(
-                    color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+            Icon(Icons.bolt_rounded, color: rankColor, size: 24),
+            const SizedBox(width: 8),
+            const Text('BOSS ENCOUNTER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
           ],
         ),
-        content: Text(
-          quest.description,
-          style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 13, height: 1.6),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              boss.title,
+              style: TextStyle(color: rankColor, fontSize: 16, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              boss.description,
+              style: const TextStyle(color: AppColors.darkSubText, fontSize: 13, height: 1.4),
+            ),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Later', style: TextStyle(color: rankColor.withValues(alpha: 0.6))),
+            child: const Text('CANCEL', style: TextStyle(color: AppColors.darkSubText)),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _showRankUpCelebration(questProvider, rankColor);
+              questProvider.completeBossQuest();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: rankColor,
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
             ),
-            child: const Text('COMPLETE ⚡', style: TextStyle(fontWeight: FontWeight.w900)),
+            child: const Text('CONQUER', style: TextStyle(fontWeight: FontWeight.w900)),
           ),
         ],
       ),
     );
   }
-
-  void _showRankUpCelebration(QuestProvider questProvider, Color rankColor) {
-    final nextRank = context.read<UserProvider>().nextRankInfo;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: nextRank?.color ?? rankColor, width: 2),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 16),
-            TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.elasticOut,
-              builder: (ctx, v, child) => Transform.scale(scale: v, child: child),
-              child: Icon(Icons.workspace_premium_rounded, size: 64, color: nextRank?.color ?? rankColor),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'RANK UP!',
-              style: TextStyle(
-                color: nextRank?.color ?? rankColor,
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 4,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'You are now ${nextRank?.name ?? "ABSOLUTE"}',
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                context.read<QuestProvider>().completeBossQuest();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: nextRank?.color ?? rankColor,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: const Text('ACCEPT ASCENSION',
-                  style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-// ── HELPER WIDGETS ──────────────────────────────────────────────────────────
-
-
-class _MiniStat extends StatelessWidget {
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _MiniStat({required this.value, required this.icon, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 12, color: color),
-        const SizedBox(width: 4),
-        Text(
-          value,
-          style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w700),
-        ),
-      ],
-    );
-  }
-}
-
-class _OathButton extends StatefulWidget {
+// ── COMPACT OATH ACTION BUTTON ───────────────────────────────────────────────
+class _CompactOathButton extends StatelessWidget {
   final String label;
-  final IconData icon;
   final Color color;
   final VoidCallback onTap;
 
-  const _OathButton({required this.label, required this.icon, required this.color, required this.onTap});
-
-  @override
-  State<_OathButton> createState() => _OathButtonState();
-}
-
-class _OathButtonState extends State<_OathButton> with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(duration: const Duration(milliseconds: 90), vsync: this);
-    _scale = Tween<double>(begin: 1.0, end: 0.95).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+  const _CompactOathButton({
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scale,
-      child: GestureDetector(
-        onTapDown: (_) => _ctrl.forward(),
-        onTapUp: (_) => _ctrl.reverse(),
-        onTapCancel: () => _ctrl.reverse(),
-        onTap: widget.onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: widget.color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(widget.icon, color: widget.color, size: 16),
-              const SizedBox(width: 6),
-              Text(
-                widget.label,
-                style: TextStyle(
-                  color: widget.color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.5,
           ),
         ),
       ),

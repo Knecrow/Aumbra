@@ -5,9 +5,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../providers/user_provider.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/services/local_storage_service.dart';
+import '../../../core/constants/app_colors.dart';
 
 // ── Onboarding accent colour ─────────────────────────────────────────────────
-const _kAccent = Color(0xFF6C63FF); // electric indigo – no rank yet at this stage
+const _kAccent = AppColors.goldPrimary; // Solar gold
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -84,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       final uid = 'local_${DateTime.now().millisecondsSinceEpoch}';
       final user = UserModel(
         uid: uid,
-        name: _nameController.text.trim().isEmpty ? 'Warrior' : _nameController.text.trim(),
+        name: _nameController.text.trim().isEmpty ? 'NOVA' : _nameController.text.trim(),
         career: _careerController.text.trim().isEmpty ? 'Student' : _careerController.text.trim(),
         interests: _interestsController.text.trim().isEmpty ? 'Self-improvement' : _interestsController.text.trim(),
         fitnessLevel: _fitnessLevel.round(),
@@ -107,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF070A14),
+      backgroundColor: AppColors.darkBackground,
       body: Stack(
         children: [
           // ── Ambient background glow ──────────────────────────────────────
@@ -145,14 +146,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     duration: const Duration(milliseconds: 250),
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     width: i == _currentPage ? 20 : 6,
-                    height: 6,
+                    height: 5,
                     decoration: BoxDecoration(
                       color: i == _currentPage
                           ? _kAccent
-                          : _kAccent.withValues(alpha: 0.25),
+                          : Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: i == _currentPage
-                          ? [BoxShadow(color: _kAccent.withValues(alpha: 0.5), blurRadius: 8)]
+                          ? [BoxShadow(color: _kAccent.withValues(alpha: 0.6), blurRadius: 8)]
                           : null,
                     ),
                   );
@@ -187,92 +188,92 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   children: [
                     // Glow ring
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 110,
+                      height: 110,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: _kAccent.withValues(alpha: 0.35),
+                            color: _kAccent.withValues(alpha: 0.4),
                             blurRadius: 40,
                             spreadRadius: 10,
                           ),
                         ],
                       ),
                     ),
-                    // Diamond
+                    // Golden solar halo
                     Transform.rotate(
                       angle: 3.14159 / 4,
                       child: Container(
-                        width: 72,
-                        height: 72,
+                        width: 76,
+                        height: 76,
                         decoration: BoxDecoration(
-                          color: _kAccent.withValues(alpha: 0.12),
+                          color: _kAccent.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: _kAccent.withValues(alpha: 0.4),
+                            color: _kAccent,
                             width: 1.5,
                           ),
                         ),
                       ),
                     ),
-                    const Icon(Icons.auto_awesome_rounded, color: Color(0xFF00E5FF), size: 32),
+                    const Icon(Icons.bolt_rounded, color: AppColors.goldLight, size: 36),
                   ],
                 ),
               ),
               const SizedBox(height: 36),
               // Title
               ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFF9B8FFF), Color(0xFF00E5FF)],
-                ).createShader(bounds),
+                shaderCallback: (bounds) => AppColors.goldGradient.createShader(bounds),
                 child: const Text(
                   'AUMBRA',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 44,
+                    fontSize: 42,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 10,
+                    letterSpacing: 12,
                   ),
                 ),
               ),
               const SizedBox(height: 10),
               Text(
-                'Awaken your destiny.',
+                'DISCIPLINE · POWER · ASCENSION',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
-                  fontSize: 15,
-                  letterSpacing: 2.5,
-                  fontWeight: FontWeight.w400,
+                  color: AppColors.goldLight.withValues(alpha: 0.7),
+                  fontSize: 12,
+                  letterSpacing: 3.0,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 52),
+              const SizedBox(height: 48),
               // Glass info card
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.04),
+                  color: AppColors.darkCard,
+                  gradient: AppColors.darkCardGradient,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'You\'ve been asleep long enough.\nIt\'s time to awaken.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontSize: 18,
+                        color: Colors.white,
+                        fontSize: 17,
                         height: 1.6,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Divider(color: Colors.white.withValues(alpha: 0.08)),
+                    Divider(color: Colors.white.withValues(alpha: 0.06)),
                     const SizedBox(height: 12),
-                    Text(
-                      'No competition. No leaderboards.\nNo subscriptions. Just you.',
+                    const Text(
+                      'No competition. No subscriptions.\nOnly unwavering self-discipline.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.35),
+                        color: AppColors.darkSubText,
                         fontSize: 13,
                         height: 1.5,
                       ),
@@ -281,7 +282,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
               ),
               const Spacer(),
-              _buildNextButton('Begin Awakening'),
+              _buildNextButton('BEGIN AWAKENING'),
               const SizedBox(height: 40),
             ],
           ),
@@ -293,20 +294,20 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   // ── Input pages ─────────────────────────────────────────────────────────────
   Widget _buildNamePage() => _buildInputPage(
         icon: Icons.person_rounded,
-        title: 'What shall we\ncall you?',
-        subtitle: 'Your name in the system. You can skip this.',
+        title: 'What is your\nCodename?',
+        subtitle: 'Your identifier in the system archive.',
         child: _glassTextField(
           controller: _nameController,
-          hint: 'Your name (optional)',
+          hint: 'e.g. NOVA, SHADOW, TITAN',
           icon: Icons.person_outline_rounded,
-          capitalization: TextCapitalization.words,
+          capitalization: TextCapitalization.characters,
         ),
       );
 
   Widget _buildCareerPage() => _buildInputPage(
         icon: Icons.work_rounded,
         title: 'What is\nyour path?',
-        subtitle: 'Your career, study, or field. Helps craft relevant quests.',
+        subtitle: 'Your career, field, or main craft. Helps calibrate daily quests.',
         child: _glassTextField(
           controller: _careerController,
           hint: 'e.g. Software Engineer, Medical Student, Artist',
@@ -318,10 +319,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget _buildInterestsPage() => _buildInputPage(
         icon: Icons.auto_awesome_rounded,
         title: 'What fuels\nyour soul?',
-        subtitle: 'Hobbies and interests — the more detail, the better your quests.',
+        subtitle: 'Hobbies and focus areas — the more specific, the sharper your quests.',
         child: _glassTextField(
           controller: _interestsController,
-          hint: 'e.g. Guitar, running, anime, cooking, photography',
+          hint: 'e.g. Strength training, coding, reading, languages',
           icon: Icons.favorite_outline_rounded,
           maxLines: 3,
           capitalization: TextCapitalization.sentences,
@@ -330,27 +331,27 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Widget _buildFitnessPage() => _buildInputPage(
         icon: Icons.fitness_center_rounded,
-        title: 'How is\nyour body?',
-        subtitle: 'Rate your current fitness level to calibrate Body quests.',
+        title: 'Discipline &\nFitness Level',
+        subtitle: 'Rate your baseline physical endurance.',
         child: Column(
           children: [
             const SizedBox(height: 16),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Couch potato',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
-                Text('Athletic beast',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
+                Text('Beginner',
+                    style: TextStyle(color: AppColors.darkSubText, fontSize: 12)),
+                Text('Apex Disciplined',
+                    style: TextStyle(color: AppColors.goldLight, fontSize: 12, fontWeight: FontWeight.w700)),
               ],
             ),
             const SizedBox(height: 8),
             SliderTheme(
               data: SliderThemeData(
-                activeTrackColor: const Color(0xFFFF6B6B),
-                inactiveTrackColor: const Color(0xFFFF6B6B).withValues(alpha: 0.15),
-                thumbColor: const Color(0xFFFF6B6B),
-                overlayColor: const Color(0xFFFF6B6B).withValues(alpha: 0.2),
+                activeTrackColor: AppColors.goldPrimary,
+                inactiveTrackColor: AppColors.goldPrimary.withValues(alpha: 0.15),
+                thumbColor: AppColors.goldPrimary,
+                overlayColor: AppColors.goldPrimary.withValues(alpha: 0.2),
                 trackHeight: 4,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
               ),
@@ -368,15 +369,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B6B).withValues(alpha: 0.12),
+                  color: AppColors.goldPrimary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.goldPrimary.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   '${_fitnessLevel.round()} / 10',
                   style: const TextStyle(
-                    color: Color(0xFFFF6B6B),
+                    color: AppColors.goldLight,
                     fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
@@ -386,17 +388,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       );
 
   Widget _buildDailyTimePage() {
-    final labels = {'15': '15 min', '30': '30 min', '60': '1 hour', '120': '2+ hours'};
+    final labels = {'15': '15 MIN', '30': '30 MIN', '60': '1 HOUR', '120': '2+ HOURS'};
     final sublabels = {
-      '15': 'Quick wins only',
-      '30': 'Balanced growth',
-      '60': 'Serious grind',
-      '120': 'Full ascension mode',
+      '15': 'Quick daily wins',
+      '30': 'Balanced standard growth',
+      '60': 'Serious intense grind',
+      '120': 'Full protocol ascension',
     };
     return _buildInputPage(
       icon: Icons.schedule_rounded,
-      title: 'How much time\ndo you have?',
-      subtitle: 'Daily free time for self-improvement quests.',
+      title: 'Daily Protocol\nTime Allocation',
+      subtitle: 'Target time dedicated to daily quests.',
       child: Column(
         children: _dailyTimes.map((time) {
           final isSelected = _dailyTime == time;
@@ -408,9 +410,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? _kAccent.withValues(alpha: 0.15)
-                    : Colors.white.withValues(alpha: 0.04),
+                    ? AppColors.goldPrimary.withValues(alpha: 0.14)
+                    : AppColors.darkCard,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected ? AppColors.goldPrimary.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.05),
+                ),
               ),
               child: Row(
                 children: [
@@ -420,15 +425,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       Text(
                         labels[time] ?? '',
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.6),
-                          fontSize: 16,
-                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w400,
+                          color: isSelected ? AppColors.goldLight : Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         sublabels[time] ?? '',
                         style: TextStyle(
-                          color: isSelected ? _kAccent : Colors.white.withValues(alpha: 0.3),
+                          color: isSelected ? AppColors.goldPrimary : AppColors.darkSubText,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -442,14 +449,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: Container(
                       width: 22,
                       height: 22,
-                      decoration: BoxDecoration(
-                        color: _kAccent,
+                      decoration: const BoxDecoration(
+                        color: AppColors.goldPrimary,
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: _kAccent.withValues(alpha: 0.4), blurRadius: 8),
-                        ],
                       ),
-                      child: const Icon(Icons.check, color: Colors.white, size: 14),
+                      child: const Icon(Icons.check, color: Colors.black, size: 14),
                     ),
                   ),
                 ],
@@ -463,8 +467,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Widget _buildComputerPage() => _buildInputPage(
         icon: Icons.laptop_mac_rounded,
-        title: 'Do you have\na computer?',
-        subtitle: 'Ensures quests are physically accessible to you.',
+        title: 'Terminal / PC\nAccess',
+        subtitle: 'Ensures objectives are compatible with your setup.',
         child: Column(
           children: [
             const SizedBox(height: 16),
@@ -478,26 +482,28 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: _hasComputer
-                            ? const Color(0xFF10B981).withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.04),
+                            ? AppColors.goldPrimary.withValues(alpha: 0.14)
+                            : AppColors.darkCard,
                         borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _hasComputer ? AppColors.goldPrimary.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             Icons.laptop_mac_rounded,
                             size: 32,
-                            color: _hasComputer ? const Color(0xFF10B981) : Colors.white.withValues(alpha: 0.4),
+                            color: _hasComputer ? AppColors.goldPrimary : AppColors.darkSubText,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Yes',
+                            'YES',
                             style: TextStyle(
-                              color: _hasComputer
-                                  ? const Color(0xFF10B981)
-                                  : Colors.white.withValues(alpha: 0.5),
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
+                              color: _hasComputer ? AppColors.goldLight : AppColors.darkSubText,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 15,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ],
@@ -514,26 +520,28 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: !_hasComputer
-                            ? const Color(0xFFFF6B6B).withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.04),
+                            ? AppColors.goldPrimary.withValues(alpha: 0.14)
+                            : AppColors.darkCard,
                         borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: !_hasComputer ? AppColors.goldPrimary.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             Icons.smartphone_rounded,
                             size: 32,
-                            color: !_hasComputer ? const Color(0xFFFF6B6B) : Colors.white.withValues(alpha: 0.4),
+                            color: !_hasComputer ? AppColors.goldPrimary : AppColors.darkSubText,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'No',
+                            'MOBILE ONLY',
                             style: TextStyle(
-                              color: !_hasComputer
-                                  ? const Color(0xFFFF6B6B)
-                                  : Colors.white.withValues(alpha: 0.5),
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
+                              color: !_hasComputer ? AppColors.goldLight : AppColors.darkSubText,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ],
@@ -549,8 +557,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Widget _buildApiKeyPage() => _buildInputPage(
         icon: Icons.key_rounded,
-        title: 'Your Gemini\nAPI Key',
-        subtitle: 'Stored locally only. Powers personalized AI quests.',
+        title: 'Gemini AI Core\nKey (Optional)',
+        subtitle: 'Stored strictly on-device. Generates intelligent tailored quests.',
         showNext: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -558,19 +566,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             // Key field
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.darkCard,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: TextField(
                 controller: _apiKeyController,
                 obscureText: true,
                 style: const TextStyle(color: Colors.white, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'AIza...',
-                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-                  prefixIcon: Icon(Icons.key_outlined, color: _kAccent.withValues(alpha: 0.7)),
+                decoration: const InputDecoration(
+                  hintText: 'AIzaSy...',
+                  hintStyle: TextStyle(color: AppColors.darkDimText),
+                  prefixIcon: Icon(Icons.key_outlined, color: AppColors.goldPrimary, size: 20),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
             ),
@@ -578,15 +586,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             // Link text
             RichText(
               text: TextSpan(
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 13),
+                style: const TextStyle(color: AppColors.darkSubText, fontSize: 13),
                 children: [
                   const TextSpan(text: 'Get your free API key at '),
                   TextSpan(
                     text: 'aistudio.google.com',
-                    style: TextStyle(
-                      color: _kAccent.withValues(alpha: 0.9),
+                    style: const TextStyle(
+                      color: AppColors.goldPrimary,
                       decoration: TextDecoration.underline,
-                      decorationColor: _kAccent,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => launchUrl(Uri.parse('https://aistudio.google.com')),
@@ -594,23 +601,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             // Skip note
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.04),
+                color: AppColors.darkCard,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  Icon(Icons.info_outline, color: _kAccent.withValues(alpha: 0.6), size: 16),
-                  const SizedBox(width: 10),
+                  Icon(Icons.info_outline, color: AppColors.goldPrimary, size: 16),
+                  SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'You can skip this and add your key later in Settings. Without a key, you\'ll get great generic quests.',
+                      'You can skip this and add your key anytime in Settings.',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: AppColors.darkSubText,
                         fontSize: 12,
                         height: 1.5,
                       ),
@@ -619,28 +626,28 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
             // Final AWAKEN button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _completeOnboarding,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _kAccent,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.goldPrimary,
+                  foregroundColor: Colors.black,
                   padding: const EdgeInsets.all(18),
                   elevation: 8,
-                  shadowColor: _kAccent.withValues(alpha: 0.5),
+                  shadowColor: AppColors.goldPrimary.withValues(alpha: 0.4),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: const Text(
-                  'AWAKEN',
+                  'AWAKEN PROTOCOL',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 3,
+                    letterSpacing: 2,
                   ),
                 ),
               ),
@@ -670,10 +677,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: _kAccent.withValues(alpha: 0.12),
+                  color: AppColors.goldPrimary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: _kAccent, size: 22),
+                child: Icon(icon, color: AppColors.goldPrimary, size: 22),
               ),
               const SizedBox(height: 20),
               // Title
@@ -681,18 +688,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 title,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: 26,
                   fontWeight: FontWeight.w900,
                   height: 1.2,
+                  letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: 8),
               // Subtitle
               Text(
                 subtitle,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
-                  fontSize: 14,
+                style: const TextStyle(
+                  color: AppColors.darkSubText,
+                  fontSize: 13,
                   height: 1.5,
                 ),
               ),
@@ -705,7 +713,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              if (showNext) _buildNextButton('Continue'),
+              if (showNext) _buildNextButton('CONTINUE'),
             ],
           ),
         ),
@@ -723,7 +731,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(14),
       ),
       child: TextField(
@@ -731,11 +739,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         autofocus: true,
         maxLines: maxLines,
         textCapitalization: capitalization,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+        style: const TextStyle(color: Colors.white, fontSize: 15),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14),
-          prefixIcon: Icon(icon, color: _kAccent.withValues(alpha: 0.7), size: 20),
+          hintStyle: const TextStyle(color: AppColors.darkDimText, fontSize: 14),
+          prefixIcon: Icon(icon, color: AppColors.goldPrimary, size: 20),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
@@ -750,16 +758,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       child: ElevatedButton(
         onPressed: _nextPage,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _kAccent,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.all(18),
-          elevation: 8,
-          shadowColor: _kAccent.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: AppColors.goldPrimary,
+          foregroundColor: Colors.black,
+          padding: const EdgeInsets.all(16),
+          elevation: 6,
+          shadowColor: AppColors.goldPrimary.withValues(alpha: 0.3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
         child: Text(
           label,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.5),
         ),
       ),
     );
@@ -770,31 +778,32 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 class _AmbientPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Deep space dark fill
+    // Deep obsidian dark fill
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFF070A14),
+      Paint()..color = AppColors.darkBackground,
     );
 
-    // Top-left indigo glow
+    // Top-center solar gold glow
     canvas.drawCircle(
-      Offset(size.width * 0.15, size.height * 0.1),
+      Offset(size.width * 0.5, size.height * 0.15),
       size.width * 0.55,
       Paint()
-        ..color = const Color(0xFF6C63FF).withValues(alpha: 0.07)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 80),
+        ..color = AppColors.goldPrimary.withValues(alpha: 0.06)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 90),
     );
 
-    // Bottom-right accent glow
+    // Bottom-center ambient amber glow
     canvas.drawCircle(
-      Offset(size.width * 0.85, size.height * 0.85),
+      Offset(size.width * 0.5, size.height * 0.85),
       size.width * 0.45,
       Paint()
-        ..color = const Color(0xFF00E5FF).withValues(alpha: 0.05)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 70),
+        ..color = AppColors.goldDark.withValues(alpha: 0.05)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 80),
     );
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+

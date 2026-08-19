@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
@@ -32,25 +31,24 @@ class GlassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
-    final reduce = themeProvider.reduceEffects;
 
     final defaultBorder = isDark
-        ? AppColors.darkGlassBorder
+        ? Colors.white.withValues(alpha: 0.06)
         : AppColors.lightGlassBorder;
     final effectiveBorder = borderColor ?? defaultBorder;
-    const defaultBg = Color(0x880C1020);
+    final defaultBg = isDark ? AppColors.darkCard : const Color(0xFFF1F5F9);
 
     final List<BoxShadow> shadows = glowColor != null
         ? [
             BoxShadow(
-              color: glowColor!.withValues(alpha: 0.3),
+              color: glowColor!.withValues(alpha: 0.25),
               blurRadius: 20,
-              spreadRadius: 2,
+              spreadRadius: 1,
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
               blurRadius: 12,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -61,7 +59,7 @@ class GlassCard extends StatelessWidget {
       margin: margin,
       decoration: BoxDecoration(
         color: gradient == null ? defaultBg : null,
-        gradient: gradient,
+        gradient: gradient ?? (isDark ? AppColors.darkCardGradient : null),
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: shadows,
       ),
@@ -96,16 +94,6 @@ class GlassCard extends StatelessWidget {
         ],
       ),
     );
-
-    if (!reduce) {
-      containerWidget = ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: containerWidget,
-        ),
-      );
-    }
 
     if (onTap != null) {
       return GestureDetector(

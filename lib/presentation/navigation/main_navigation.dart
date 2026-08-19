@@ -1,8 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../core/constants/app_colors.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/chronicle/chronicle_screen.dart';
 import '../screens/hall_of_fame/hall_of_fame_screen.dart';
@@ -16,51 +16,162 @@ class MainNavigation extends StatefulWidget {
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation>
-    with SingleTickerProviderStateMixin {
+class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
-  late AnimationController _fadeCtrl;
-  late Animation<double> _fadeAnim;
-
-  static const _tabs = [
-    _TabItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'HUD'),
-    _TabItem(icon: Icons.show_chart_rounded, activeIcon: Icons.show_chart_rounded, label: 'STATS'),
-    _TabItem(icon: Icons.workspace_premium_rounded, activeIcon: Icons.workspace_premium_rounded, label: 'TITLES'),
-    _TabItem(icon: Icons.tune_rounded, activeIcon: Icons.tune_rounded, label: 'SYSTEM'),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _fadeCtrl = AnimationController(
-      duration: const Duration(milliseconds: 180),
-      vsync: this,
-    );
-    _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeIn);
-    _fadeCtrl.value = 1.0;
-  }
-
-  @override
-  void dispose() {
-    _fadeCtrl.dispose();
-    super.dispose();
-  }
 
   void _onTabTap(int index) {
     if (index == _currentIndex) return;
-    _fadeCtrl.reverse().then((_) {
-      setState(() => _currentIndex = index);
-      _fadeCtrl.forward();
-    });
+    setState(() => _currentIndex = index);
   }
+
+  void _onCenterEmblemTap() {
+    if (_currentIndex != 0) {
+      _onTabTap(0);
+    } else {
+      _showRankLoreModal(context);
+    }
+  }
+
+  void _showRankLoreModal(BuildContext context) {
+    final userProvider = context.read<UserProvider>();
+    final rankInfo = userProvider.currentRankInfo;
+    final rankColor = userProvider.currentRankColor;
+    final user = userProvider.user;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.darkSurface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              boxShadow: [
+                BoxShadow(
+                  color: rankColor.withValues(alpha: 0.2),
+                  blurRadius: 30,
+                  spreadRadius: 4,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.darkSubText.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: AppColors.buildRankGradient(rankColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: rankColor.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Icon(Icons.change_history_rounded, color: Colors.black, size: 36),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'RANK ${rankInfo.rankNumber}: ${rankInfo.name.toUpperCase()}',
+                style: TextStyle(
+                  color: AppColors.getLightVariant(rankColor),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2.0,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'DEPTH LEVEL: ${rankInfo.depthLevel.toUpperCase()}',
+                style: const TextStyle(
+                  color: AppColors.darkSubText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'Daily Quests: ${rankInfo.taskCount} objectives across ${rankInfo.categories.length} discipline domains.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.darkText,
+                  fontSize: 13,
+                  height: 1.5,
+                ),
+              ),
+              if (user != null && rankInfo.completionsRequired > 0) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D0E16),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Completions: ${user.rankCompletions}/${rankInfo.completionsRequired}',
+                        style: const TextStyle(color: AppColors.darkSubText, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        'Streak: ${user.currentStreak}/${rankInfo.streakRequired}d',
+                        style: const TextStyle(color: AppColors.darkSubText, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: rankColor,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: const Text(
+                    'DISMISS',
+                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildPage(int index) {
     switch (index) {
-      case 0: return const HomeScreen();
-      case 1: return const ChronicleScreen();
-      case 2: return const HallOfFameScreen();
-      case 3: return SettingsScreen(onSignOut: widget.onSignOut);
-      default: return const HomeScreen();
+      case 0: return const HomeScreen(key: ValueKey('home'));
+      case 1: return const ChronicleScreen(key: ValueKey('chronicle'));
+      case 2: return const HallOfFameScreen(key: ValueKey('hall_of_fame'));
+      case 3: return SettingsScreen(key: const ValueKey('settings'), onSignOut: widget.onSignOut);
+      default: return const HomeScreen(key: ValueKey('home'));
     }
   }
 
@@ -72,103 +183,114 @@ class _MainNavigationState extends State<MainNavigation>
     final rankColor = userProvider.currentRankColor;
 
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _fadeAnim,
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 0.985, end: 1.0).animate(_fadeAnim),
-          child: IndexedStack(
-            index: _currentIndex,
-            children: List.generate(4, (i) => _buildPage(i)),
-          ),
-        ),
+      backgroundColor: AppColors.darkBackground,
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 260),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.985, end: 1.0).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _buildPage(_currentIndex),
       ),
       extendBody: true,
-      bottomNavigationBar: _buildBottomNav(reduce, rankColor),
+      bottomNavigationBar: _buildBottomDock(reduce, rankColor),
     );
   }
 
-  Widget _buildBottomNav(bool reduce, Color rankColor) {
-    final isDark = context.watch<ThemeProvider>().isDarkMode;
-    final inactiveColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+  Widget _buildBottomDock(bool reduce, Color rankColor) {
+    const inactiveColor = Color(0xFF72768E);
+    final lightRankColor = AppColors.getLightVariant(rankColor);
 
     final navContent = Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xDC0B0E1A),
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF0D0D12),
+            Color.lerp(const Color(0xFF050508), rankColor, 0.14)!,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? rankColor.withValues(alpha: 0.15)
-                : Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: 0.65),
+            blurRadius: 28,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: rankColor.withValues(alpha: 0.30),
             blurRadius: 20,
-            spreadRadius: 2,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 60,
-          child: Stack(
+          height: 56,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Smooth sliding indicator pill
-              AnimatedAlign(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                alignment: Alignment(-1.0 + (_currentIndex * (2.0 / (_tabs.length - 1))), 0),
-                child: FractionallySizedBox(
-                  widthFactor: 1.0 / _tabs.length,
-                  heightFactor: 0.8,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    decoration: BoxDecoration(
-                      color: rankColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: rankColor.withValues(alpha: 0.15),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              // 1. HUD / Home
+              _NavTabItem(
+                icon: Icons.space_dashboard_outlined,
+                activeIcon: Icons.space_dashboard_rounded,
+                isSelected: _currentIndex == 0,
+                onTap: () => _onTabTap(0),
+                activeColor: lightRankColor,
+                rankColor: rankColor,
+                inactiveColor: inactiveColor,
               ),
 
-              // Tab items row
-              Row(
-                children: List.generate(_tabs.length, (i) {
-                  final isSelected = i == _currentIndex;
-                  return Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => _onTabTap(i),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _tabs[i].icon,
-                            color: isSelected ? rankColor : inactiveColor,
-                            size: 19,
-                          ),
-                          const SizedBox(height: 3),
-                          AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 200),
-                            style: TextStyle(
-                              color: isSelected ? rankColor : inactiveColor,
-                              fontSize: 10,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                              letterSpacing: 0.4,
-                            ),
-                            child: Text(_tabs[i].label),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
+              // 2. Stats / Habits
+              _NavTabItem(
+                icon: Icons.query_stats_rounded,
+                activeIcon: Icons.query_stats_rounded,
+                isSelected: _currentIndex == 1,
+                onTap: () => _onTabTap(1),
+                activeColor: lightRankColor,
+                rankColor: rankColor,
+                inactiveColor: inactiveColor,
+              ),
+
+              // 3. Center Glowing Rank Emblem Button
+              _CenterEmblemButton(
+                rankColor: rankColor,
+                lightRankColor: lightRankColor,
+                onTap: _onCenterEmblemTap,
+              ),
+
+              // 4. Titles / Badges
+              _NavTabItem(
+                icon: Icons.military_tech_outlined,
+                activeIcon: Icons.military_tech_rounded,
+                isSelected: _currentIndex == 2,
+                onTap: () => _onTabTap(2),
+                activeColor: lightRankColor,
+                rankColor: rankColor,
+                inactiveColor: inactiveColor,
+              ),
+
+              // 5. System / Settings
+              _NavTabItem(
+                icon: Icons.tune_rounded,
+                activeIcon: Icons.tune_rounded,
+                isSelected: _currentIndex == 3,
+                onTap: () => _onTabTap(3),
+                activeColor: lightRankColor,
+                rankColor: rankColor,
+                inactiveColor: inactiveColor,
               ),
             ],
           ),
@@ -176,21 +298,188 @@ class _MainNavigationState extends State<MainNavigation>
       ),
     );
 
-    if (reduce) return Padding(padding: const EdgeInsets.only(bottom: 0), child: navContent);
+    return navContent;
+  }
+}
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: navContent,
+// ── ONE UI FLUID TACTILE NAV TAB ITEM ──────────────────────────────────────────
+class _NavTabItem extends StatefulWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Color activeColor;
+  final Color rankColor;
+  final Color inactiveColor;
+
+  const _NavTabItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.isSelected,
+    required this.onTap,
+    required this.activeColor,
+    required this.rankColor,
+    required this.inactiveColor,
+  });
+
+  @override
+  State<_NavTabItem> createState() => _NavTabItemState();
+}
+
+class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderStateMixin {
+  late AnimationController _touchCtrl;
+  late Animation<double> _touchScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _touchCtrl = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _touchScale = Tween<double>(begin: 1.0, end: 0.88).animate(
+      CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _touchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => _touchCtrl.forward(),
+        onTapUp: (_) {
+          _touchCtrl.reverse();
+          widget.onTap();
+        },
+        onTapCancel: () => _touchCtrl.reverse(),
+        child: ScaleTransition(
+          scale: _touchScale,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: widget.isSelected
+                    ? widget.rankColor.withValues(alpha: 0.20)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: widget.isSelected
+                    ? [
+                        BoxShadow(
+                          color: widget.rankColor.withValues(alpha: 0.35),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: AnimatedScale(
+                duration: const Duration(milliseconds: 240),
+                scale: widget.isSelected ? 1.08 : 1.0,
+                curve: Curves.easeOutBack,
+                child: Icon(
+                  widget.isSelected ? widget.activeIcon : widget.icon,
+                  color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _TabItem {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  const _TabItem({required this.icon, required this.activeIcon, required this.label});
+// ── TACTILE CENTER EMBLEM BUTTON ──────────────────────────────────────────────
+class _CenterEmblemButton extends StatefulWidget {
+  final Color rankColor;
+  final Color lightRankColor;
+  final VoidCallback onTap;
+
+  const _CenterEmblemButton({
+    required this.rankColor,
+    required this.lightRankColor,
+    required this.onTap,
+  });
+
+  @override
+  State<_CenterEmblemButton> createState() => _CenterEmblemButtonState();
 }
+
+class _CenterEmblemButtonState extends State<_CenterEmblemButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _touchCtrl;
+  late Animation<double> _touchScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _touchCtrl = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _touchScale = Tween<double>(begin: 1.0, end: 0.90).animate(
+      CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _touchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _touchCtrl.forward(),
+      onTapUp: (_) {
+        _touchCtrl.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _touchCtrl.reverse(),
+      behavior: HitTestBehavior.opaque,
+      child: ScaleTransition(
+        scale: _touchScale,
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: AppColors.buildRankGradient(widget.rankColor),
+            boxShadow: [
+              BoxShadow(
+                color: widget.rankColor.withValues(alpha: 0.5),
+                blurRadius: 16,
+                spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: widget.lightRankColor.withValues(alpha: 0.3),
+                blurRadius: 24,
+                spreadRadius: 4,
+              ),
+            ],
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.change_history_rounded,
+              color: Colors.black,
+              size: 26,
+              weight: 800,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

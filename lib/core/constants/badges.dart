@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
+
 // Badge definitions
 class BadgeInfo {
   final String id;
   final String name;
   final String description;
   final String icon;
+  final IconData iconData;
   final String category;
 
   const BadgeInfo({
@@ -11,6 +14,7 @@ class BadgeInfo {
     required this.name,
     required this.description,
     required this.icon,
+    required this.iconData,
     required this.category,
   });
 }
@@ -22,6 +26,7 @@ const List<BadgeInfo> kBadges = [
     name: 'First Flame',
     description: 'Maintain a 7-day streak',
     icon: '🔥',
+    iconData: Icons.local_fire_department_rounded,
     category: 'Streak',
   ),
   BadgeInfo(
@@ -29,6 +34,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Iron Will',
     description: 'Maintain a 30-day streak',
     icon: '⚔️',
+    iconData: Icons.military_tech_rounded,
     category: 'Streak',
   ),
   BadgeInfo(
@@ -36,6 +42,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Unbreakable',
     description: 'Maintain a 100-day streak',
     icon: '💎',
+    iconData: Icons.diamond_rounded,
     category: 'Streak',
   ),
 
@@ -45,6 +52,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Initiate',
     description: 'Complete 10 quests',
     icon: '⚡',
+    iconData: Icons.bolt_rounded,
     category: 'Volume',
   ),
   BadgeInfo(
@@ -52,6 +60,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Grinder',
     description: 'Complete 100 quests',
     icon: '🏋️',
+    iconData: Icons.fitness_center_rounded,
     category: 'Volume',
   ),
   BadgeInfo(
@@ -59,6 +68,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Ascetic',
     description: 'Complete 500 quests',
     icon: '🌟',
+    iconData: Icons.star_rounded,
     category: 'Volume',
   ),
 
@@ -68,6 +78,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Awakened One',
     description: 'Reach the Seeker rank',
     icon: '👁️',
+    iconData: Icons.visibility_rounded,
     category: 'Rank',
   ),
   BadgeInfo(
@@ -75,6 +86,7 @@ const List<BadgeInfo> kBadges = [
     name: "Sage's Wisdom",
     description: 'Reach the Sage rank',
     icon: '🔮',
+    iconData: Icons.psychology_rounded,
     category: 'Rank',
   ),
   BadgeInfo(
@@ -82,6 +94,7 @@ const List<BadgeInfo> kBadges = [
     name: 'Absolute God',
     description: 'Reach the Absolute rank',
     icon: '👑',
+    iconData: Icons.workspace_premium_rounded,
     category: 'Rank',
   ),
 
@@ -91,6 +104,7 @@ const List<BadgeInfo> kBadges = [
     name: 'The Honest',
     description: 'Maintain a 7-day Oath streak',
     icon: '🤝',
+    iconData: Icons.verified_user_rounded,
     category: 'Integrity',
   ),
   BadgeInfo(
@@ -98,6 +112,7 @@ const List<BadgeInfo> kBadges = [
     name: 'True to Self',
     description: 'Maintain a 30-day Oath streak',
     icon: '🪞',
+    iconData: Icons.center_focus_strong_rounded,
     category: 'Integrity',
   ),
 
@@ -107,6 +122,7 @@ const List<BadgeInfo> kBadges = [
     name: 'The Resilient',
     description: 'Use all 3 shields in a month and still rank up',
     icon: '🛡️',
+    iconData: Icons.shield_rounded,
     category: 'Shield',
   ),
 ];

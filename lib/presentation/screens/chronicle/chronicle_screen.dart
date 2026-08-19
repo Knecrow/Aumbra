@@ -6,7 +6,6 @@ import '../../../providers/user_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../data/models/history_entry.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../widgets/rank_widgets.dart';
 
 class ChronicleScreen extends StatefulWidget {
   const ChronicleScreen({super.key});
@@ -17,7 +16,6 @@ class ChronicleScreen extends StatefulWidget {
 
 class _ChronicleScreenState extends State<ChronicleScreen> {
   List<HistoryEntry> _history = [];
-  Map<String, int> _categoryBreakdown = {};
   List<Map<String, dynamic>> _streakHistory = [];
   bool _loading = true;
   bool _isRefreshing = false;
@@ -39,13 +37,11 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
     _isRefreshing = true;
     final up = context.read<UserProvider>();
     final history = await up.getHistory();
-    final cat = await up.getCategoryBreakdown();
     final streak = await up.getStreakHistory();
 
     if (mounted) {
       setState(() {
         _history = history;
-        _categoryBreakdown = cat;
         _streakHistory = streak;
         _loading = false;
         _isRefreshing = false;
@@ -76,222 +72,17 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
           child: _loading
               ? Center(child: CircularProgressIndicator(color: rankColor))
               : CustomScrollView(
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                   slivers: [
-                    // Title
+                    // ─── TITLE ────────────────────────────────────────────────────────
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('STATS',
-                                style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.0)),
-                            const SizedBox(height: 2),
-                            Text('Activity, attributes & history',
-                                style: TextStyle(
-                                    color: subColor,
-                                    fontSize: 12)),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // ─── STAT CARDS ───────────────────────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: StatCard(
-                                    value: user.totalQuestsCompleted.toString(),
-                                    label: 'Total Quests',
-                                    icon: Icons.check_circle_rounded,
-                                    accentColor: rankColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: StatCard(
-                                    value: user.longestStreak.toString(),
-                                    label: 'Longest Streak',
-                                    icon: Icons.local_fire_department_rounded,
-                                    accentColor: const Color(0xFFFF9100),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: StatCard(
-                                    value: userProvider.daysSinceStart.toString(),
-                                    label: 'Days Awakened',
-                                    icon: Icons.bolt_rounded,
-                                    accentColor: const Color(0xFF00E676),
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: StatCard(
-                                    value: userProvider.estimatedDaysToAbsolute.toString(),
-                                    label: 'Days to Absolute',
-                                    icon: Icons.workspace_premium_rounded,
-                                    accentColor: const Color(0xFFE040FB),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-                    // ─── WEEKLY ACTIVITY GRAPH ──────────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: _buildActivityChart(rankColor, isDark, subColor, textColor),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-                    // ─── STREAK HISTORY LINE CHART ─────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Streak Record',
-                              style: TextStyle(
-                                color: textColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text('Daily streak progress over time',
-                                style: TextStyle(color: subColor, fontSize: 11)),
-                            const SizedBox(height: 12),
-                            Container(
-                              height: 160,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0x880C1020),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: _buildStreakChart(rankColor, isDark),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-                    // ─── CATEGORY ATTRIBUTES DONUT ─────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Category Attributes',
-                              style: TextStyle(
-                                color: textColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text('Quest completion by category',
-                                style: TextStyle(color: subColor, fontSize: 11)),
-                            const SizedBox(height: 12),
-                            Container(
-                              height: 210,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0x880C1020),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: _buildCategoryDonut(textColor),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
-
-                    // ─── THE MIRROR ───────────────────────────────────────────
-                    if (_history.isNotEmpty) ...[
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('The Mirror',
-                                  style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800)),
-                              const SizedBox(height: 2),
-                              Text('First vs most recent',
-                                  style: TextStyle(color: subColor, fontSize: 11)),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildMirrorCard(
-                                      'First Quest',
-                                      _history.last,
-                                      isDark,
-                                      textColor,
-                                      subColor,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: _buildMirrorCard(
-                                      'Most Recent',
-                                      _history.first,
-                                      isDark,
-                                      textColor,
-                                      subColor,
-                                      isRecent: true,
-                                      rankColor: rankColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-
-                    // ─── HISTORY TIMELINE ────────────────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
                         child: Row(
                           children: [
                             Container(
                               width: 3,
-                              height: 14,
+                              height: 16,
                               decoration: BoxDecoration(
                                 color: rankColor,
                                 borderRadius: BorderRadius.circular(2),
@@ -299,79 +90,261 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'QUEST RECORDS',
+                              'CHRONICLE',
                               style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 13,
-                                  letterSpacing: 2,
-                                  fontWeight: FontWeight.w900),
+                                color: textColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
 
-                    _history.isEmpty
-                        ? SliverToBoxAdapter(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(60),
-                                child: Column(
-                                  children: [
-                                    Icon(Icons.auto_stories_rounded,
-                                        size: 40,
-                                        color: rankColor.withValues(alpha: 0.6)),
-                                    const SizedBox(height: 16),
-                                    Text('Your chronicle is empty.',
-                                        style: TextStyle(
-                                            color: subColor, fontSize: 14, fontWeight: FontWeight.w600)),
-                                    const SizedBox(height: 6),
-                                    Text('Complete your first quest to begin.',
-                                        style: TextStyle(
-                                            color: subColor.withValues(alpha: 0.6),
-                                            fontSize: 12)),
-                                  ],
-                                ),
+                    // ─── PANEL 1: UNIFIED 4-METRIC COMMAND DECK ───────────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppColors.darkCard,
+                            gradient: AppColors.darkCardGradient,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
                               ),
-                            ),
-                          )
-                        : SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final entry = _history[index];
-                                final isNewDay = index == 0 ||
-                                    DateFormat('yyyy-MM-dd').format(entry.completedDate) !=
-                                        DateFormat('yyyy-MM-dd').format(_history[index - 1].completedDate);
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildMetricTile(
+                                      'TOTAL QUESTS',
+                                      user.totalQuestsCompleted.toString(),
+                                      Icons.verified_rounded,
+                                      rankColor,
+                                    ),
+                                  ),
+                                  Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.06)),
+                                  Expanded(
+                                    child: _buildMetricTile(
+                                      'LONGEST STREAK',
+                                      '${user.longestStreak}d',
+                                      Icons.local_fire_department_rounded,
+                                      const Color(0xFFFF9100),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildMetricTile(
+                                      'DAYS AWAKENED',
+                                      userProvider.daysSinceStart.toString(),
+                                      Icons.bolt_rounded,
+                                      const Color(0xFF00E676),
+                                    ),
+                                  ),
+                                  Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.06)),
+                                  Expanded(
+                                    child: _buildMetricTile(
+                                      'DAYS TO ABSOLUTE',
+                                      userProvider.estimatedDaysToAbsolute.toString(),
+                                      Icons.workspace_premium_rounded,
+                                      const Color(0xFFE040FB),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
 
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 3),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                    const SliverToBoxAdapter(child: SizedBox(height: 18)),
+
+                    // ─── PANEL 2: UNIFIED ACTIVITY & STREAK TRENDS ────────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppColors.darkCard,
+                            gradient: AppColors.darkCardGradient,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
                                     children: [
-                                      if (isNewDay) ...[
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 6),
-                                          child: Text(
-                                            DateFormat('MMM d').format(entry.completedDate).toUpperCase(),
-                                            style: TextStyle(
-                                              color: subColor,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                              letterSpacing: 1.0,
-                                            ),
-                                          ),
+                                      Icon(Icons.query_stats_rounded, color: rankColor, size: 16),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        'TRAJECTORY',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 1.2,
                                         ),
-                                      ],
-                                      _buildHistoryItem(
-                                          entry, isDark, textColor, subColor, rankColor),
+                                      ),
                                     ],
                                   ),
-                                );
-                              },
-                              childCount: _history.length,
-                            ),
+                                  Text(
+                                    'LAST 7 DAYS',
+                                    style: TextStyle(
+                                      color: AppColors.getLightVariant(rankColor),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                height: 160,
+                                child: _buildActivityChart(rankColor, isDark, subColor, textColor),
+                              ),
+                              const SizedBox(height: 16),
+                              Divider(height: 1, color: Colors.white.withValues(alpha: 0.05)),
+                              const SizedBox(height: 14),
+                              Row(
+                                children: [
+                                  Icon(Icons.show_chart_rounded, color: rankColor, size: 15),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'STREAK GROWTH',
+                                    style: TextStyle(
+                                      color: AppColors.darkSubText,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 120,
+                                child: _buildStreakChart(rankColor, isDark),
+                              ),
+                            ],
                           ),
+                        ),
+                      ),
+                    ),
+
+                    const SliverToBoxAdapter(child: SizedBox(height: 18)),
+
+                    // ─── PANEL 3: UNIFIED MISSION ARCHIVE & MIRROR ────────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppColors.darkCard,
+                            gradient: AppColors.darkCardGradient,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.auto_stories_rounded, color: rankColor, size: 16),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        'ARCHIVE',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 1.2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${_history.length} LOGGED',
+                                    style: TextStyle(
+                                      color: AppColors.getLightVariant(rankColor),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              // Grouped History entries
+                              if (_history.isEmpty)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 24),
+                                  child: Center(
+                                    child: Text(
+                                      'No mission entries logged yet.',
+                                      style: TextStyle(color: AppColors.darkSubText, fontSize: 12),
+                                    ),
+                                  ),
+                                )
+                              else
+                                Column(
+                                  children: List.generate(_history.length.clamp(0, 10), (i) {
+                                    final entry = _history[i];
+                                    return Column(
+                                      children: [
+                                        _buildHistoryRow(entry, isDark, textColor, subColor, rankColor),
+                                        if (i < _history.length.clamp(0, 10) - 1)
+                                          Divider(height: 1, color: Colors.white.withValues(alpha: 0.04)),
+                                      ],
+                                    );
+                                  }),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
 
                     const SliverToBoxAdapter(child: SizedBox(height: 110)),
                   ],
@@ -381,88 +354,57 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
     );
   }
 
-  Widget _buildMirrorCard(
-    String label,
-    HistoryEntry entry,
-    bool isDark,
-    Color textColor,
-    Color subColor, {
-    bool isRecent = false,
-    Color? rankColor,
-  }) {
-    final color = isRecent ? (rankColor ?? const Color(0xFF94A3B8)) : const Color(0xFF94A3B8);
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isRecent ? (rankColor ?? const Color(0xFF94A3B8)).withValues(alpha: 0.12) : const Color(0x880C1020),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-                color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.0),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            entry.questTitle,
-            style: TextStyle(
-                color: textColor, fontSize: 13, fontWeight: FontWeight.w700, height: 1.3),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            DateFormat('MMM d, yyyy').format(entry.completedDate),
-            style: TextStyle(color: subColor, fontSize: 11),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(6),
+  Widget _buildMetricTile(String label, String value, IconData icon, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.darkSubText,
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+              ),
             ),
-            child: Text(
-              entry.rankAtTime,
-              style: TextStyle(
-                  color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
-            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.5,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildHistoryItem(
-      HistoryEntry entry, bool isDark, Color textColor, Color subColor, Color rankColor) {
+  Widget _buildHistoryRow(
+    HistoryEntry entry,
+    bool isDark,
+    Color textColor,
+    Color subColor,
+    Color rankColor,
+  ) {
     final categoryColor = AppColors.getCategoryColor(entry.questCategory);
     final categoryIcon = AppColors.getCategoryIconData(entry.questCategory);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0x880C1020),
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: categoryColor.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              categoryIcon,
-              color: categoryColor,
-              size: 16,
-            ),
+          Icon(
+            categoryIcon,
+            color: categoryColor,
+            size: 18,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -471,24 +413,37 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
               children: [
                 Text(
                   entry.questTitle,
-                  style: TextStyle(
-                      color: textColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${entry.questCategory.toUpperCase()} · ${entry.rankAtTime}',
-                  style: TextStyle(color: subColor, fontSize: 10, fontWeight: FontWeight.w500),
+                  '${entry.questCategory.toUpperCase()} · ${DateFormat('MMM d, h:mm a').format(entry.completedDate)}',
+                  style: const TextStyle(color: AppColors.darkSubText, fontSize: 10),
                 ),
               ],
             ),
           ),
-          Text(
-            DateFormat('h:mm a').format(entry.completedDate),
-            style: TextStyle(color: subColor, fontSize: 11, fontWeight: FontWeight.w500),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+            decoration: BoxDecoration(
+              color: rankColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              entry.rankAtTime.toUpperCase(),
+              style: TextStyle(
+                color: AppColors.getLightVariant(rankColor),
+                fontSize: 9,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.5,
+              ),
+            ),
           ),
         ],
       ),
@@ -516,113 +471,85 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
       if (count > maxY) maxY = count.toDouble();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Weekly Activity',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: maxY + 1,
+        barTouchData: BarTouchData(
+          enabled: true,
+          touchTooltipData: BarTouchTooltipData(
+            getTooltipColor: (_) => const Color(0xFF14141A),
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              return BarTooltipItem(
+                '${rod.toY.round()} quests',
+                TextStyle(color: AppColors.getLightVariant(rankColor), fontSize: 11, fontWeight: FontWeight.bold),
+              );
+            },
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          'Quests completed over the last 7 days',
-          style: TextStyle(color: subColor, fontSize: 11),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          height: 170,
-          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
-          decoration: BoxDecoration(
-            color: const Color(0x880C1020),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              maxY: maxY + 1,
-              barTouchData: BarTouchData(
-                enabled: true,
-                touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (_) => isDark ? const Color(0xFF1E2036) : Colors.black87,
-                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                    return BarTooltipItem(
-                      '${rod.toY.round()} quests',
-                      const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                    );
-                  },
-                ),
-              ),
-              titlesData: FlTitlesData(
-                show: true,
-                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (val, meta) {
-                      final idx = val.toInt();
-                      if (idx < 0 || idx >= last7Days.length) return const SizedBox.shrink();
-                      final day = last7Days[idx];
-                      final isToday = day.day == now.day && day.month == now.month;
-                      final label = isToday ? 'TODAY' : DateFormat('E').format(day).toUpperCase();
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            color: isToday ? rankColor : subColor,
-                            fontSize: 9,
-                            fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              gridData: const FlGridData(show: false),
-              borderData: FlBorderData(show: false),
-              barGroups: List.generate(last7Days.length, (i) {
-                final day = last7Days[i];
-                final key = DateFormat('yyyy-MM-dd').format(day);
-                final count = (dayCounts[key] ?? 0).toDouble();
+        titlesData: FlTitlesData(
+          show: true,
+          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (val, meta) {
+                final idx = val.toInt();
+                if (idx < 0 || idx >= last7Days.length) return const SizedBox.shrink();
+                final day = last7Days[idx];
                 final isToday = day.day == now.day && day.month == now.month;
-
-                return BarChartGroupData(
-                  x: i,
-                  barRods: [
-                    BarChartRodData(
-                      toY: count,
-                      gradient: count > 0
-                          ? LinearGradient(
-                              colors: [
-                                isToday ? rankColor : rankColor.withValues(alpha: 0.9),
-                                isToday ? rankColor.withValues(alpha: 0.4) : rankColor.withValues(alpha: 0.2),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            )
-                          : null,
-                      color: count > 0
-                          ? null
-                          : (isDark ? const Color(0xFF141828) : const Color(0xFFE2E8F0)),
-                      width: 16,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                final label = isToday ? 'TODAY' : DateFormat('E').format(day).toUpperCase();
+                return Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isToday ? rankColor : AppColors.darkSubText,
+                      fontSize: 9,
+                      fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
                     ),
-                  ],
+                  ),
                 );
-              }),
+              },
             ),
           ),
         ),
-      ],
+        gridData: const FlGridData(show: false),
+        borderData: FlBorderData(show: false),
+        barGroups: List.generate(last7Days.length, (i) {
+          final day = last7Days[i];
+          final key = DateFormat('yyyy-MM-dd').format(day);
+          final count = (dayCounts[key] ?? 0).toDouble();
+          final isToday = day.day == now.day && day.month == now.month;
+
+          return BarChartGroupData(
+            x: i,
+            barRods: [
+              BarChartRodData(
+                toY: count,
+                gradient: count > 0
+                    ? LinearGradient(
+                        colors: [
+                          isToday ? AppColors.getLightVariant(rankColor) : rankColor,
+                          isToday ? rankColor : AppColors.getDeepVariant(rankColor),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      )
+                    : null,
+                color: count > 0 ? null : const Color(0xFF0E0E14),
+                width: 16,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+              ),
+            ],
+          );
+        }),
+      ),
     );
   }
+
   Widget _buildStreakChart(Color rankColor, bool isDark) {
     final spots = <FlSpot>[];
     if (_streakHistory.isEmpty) {
@@ -656,8 +583,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
               reservedSize: 28,
               getTitlesWidget: (val, meta) => Text(
                 val.toInt().toString(),
-                style: TextStyle(
-                    color: isDark ? Colors.white38 : Colors.black38, fontSize: 10),
+                style: const TextStyle(color: AppColors.darkSubText, fontSize: 10),
               ),
             ),
           ),
@@ -670,83 +596,24 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            color: rankColor,
-            barWidth: 2.5,
+            gradient: AppColors.buildRankGradient(rankColor),
+            barWidth: 3.0,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: rankColor.withValues(alpha: 0.1),
+              gradient: LinearGradient(
+                colors: [
+                  rankColor.withValues(alpha: 0.25),
+                  rankColor.withValues(alpha: 0.0),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildCategoryDonut(Color textColor) {
-    final data = _categoryBreakdown.isEmpty
-        ? {'Mind': 1, 'Body': 1, 'Soul': 1, 'Environment': 1, 'Oath': 1}
-        : _categoryBreakdown;
-
-    final sections = <PieChartSectionData>[];
-    final total = data.values.fold(0, (a, b) => a + b);
-
-    data.forEach((cat, count) {
-      final color = AppColors.getCategoryColor(cat);
-      final pct = (count / total * 100).toStringAsFixed(0);
-      sections.add(PieChartSectionData(
-        color: color,
-        value: count.toDouble(),
-        title: '$pct%',
-        radius: 50,
-        titleStyle: const TextStyle(
-            color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
-      ));
-    });
-
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: PieChart(PieChartData(
-            sections: sections,
-            centerSpaceRadius: 36,
-            sectionsSpace: 2,
-          )),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          flex: 2,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: data.entries.map((e) {
-              final color = AppColors.getCategoryColor(e.key);
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                          color: color, shape: BoxShape.circle),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        '${e.key} (${e.value})',
-                        style: TextStyle(color: textColor, fontSize: 11),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
 }
+

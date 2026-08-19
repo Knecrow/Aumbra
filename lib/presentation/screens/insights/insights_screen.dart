@@ -54,7 +54,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubText : AppColors.lightSubText;
     final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    const cardBg = Color(0x880C1020);
+    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -66,6 +66,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
           child: _loading
               ? Center(child: CircularProgressIndicator(color: rankColor))
               : CustomScrollView(
+                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                   slivers: [
                     // Title
                     SliverToBoxAdapter(
@@ -74,16 +75,38 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('INSIGHTS',
-                                style: TextStyle(
+                            Row(
+                              children: [
+                                Container(
+                                  width: 3,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: rankColor,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'INSIGHTS',
+                                  style: TextStyle(
                                     color: textColor,
-                                    fontSize: 24,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.0)),
-                            const SizedBox(height: 2),
-                            Text('Attributes & performance',
-                                style: TextStyle(color: subColor, fontSize: 12)),
-                            const SizedBox(height: 20),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Attributes & Performance Telemetry',
+                              style: TextStyle(
+                                color: AppColors.getLightVariant(rankColor),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
                           ],
                         ),
                       ),

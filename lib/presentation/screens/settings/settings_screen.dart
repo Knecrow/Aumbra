@@ -8,7 +8,6 @@ import '../../../providers/theme_provider.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/firebase_service.dart';
 import '../../../core/constants/app_colors.dart';
-// glass_card removed — settings uses native containers
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback onSignOut;
@@ -58,8 +57,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubText : AppColors.lightSubText;
     final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final sectionBg = isDark ? const Color(0x990E1424) : const Color(0xFFF1F5F9);
-    final sectionBorder = isDark ? rankColor.withValues(alpha: 0.2) : AppColors.lightBorder;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -70,275 +67,255 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 110),
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             children: [
-              // Title
-              Text('SYSTEM PREFERENCES',
-                  style: TextStyle(
+              // ─── TITLE ──────────────────────────────────────────────────────
+              Row(
+                children: [
+                  Container(
+                    width: 3,
+                    height: 16,
+                    decoration: BoxDecoration(
                       color: rankColor,
-                      fontSize: 11,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'SETTINGS',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
                       letterSpacing: 1.5,
-                      fontWeight: FontWeight.w800)),
-              const SizedBox(height: 4),
-              Text('SETTINGS & CONFIG',
-                  style: TextStyle(
-                      color: textColor, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
-              const SizedBox(height: 24),
-
-              // ─── GEMINI API KEY ─────────────────────────────────────────────
-            _sectionHeader('GEMINI API KEY', subColor),
-            _settingsCard(
-              isDark,
-              sectionBg,
-              sectionBorder,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Stored locally only. Never sent to any server.',
-                    style: TextStyle(color: subColor, fontSize: 12),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _apiKeyCtrl,
-                    obscureText: !_apiKeyVisible,
-                    style: TextStyle(color: textColor, fontSize: 13),
-                    decoration: InputDecoration(
-                      hintText: 'AIza...',
-                      hintStyle: TextStyle(color: subColor),
-                      filled: true,
-                      fillColor: isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.black.withValues(alpha: 0.03),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.08)
-                                : Colors.black.withValues(alpha: 0.06), width: 1.2),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.08)
-                                : Colors.black.withValues(alpha: 0.06), width: 1.2),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _apiKeyVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: subColor,
-                          size: 18,
-                        ),
-                        onPressed: () =>
-                            setState(() => _apiKeyVisible = !_apiKeyVisible),
-                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _saveApiKey,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: rankColor,
-                            side: BorderSide(color: rankColor),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // ─── PANEL 1: AI CORE & CLOUD SYNC HUB ──────────────────────────
+              _sectionHeader('AI & CLOUD', subColor, rankColor),
+              _settingsCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.memory_rounded, color: rankColor, size: 16),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'GEMINI AI API KEY',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
                           ),
-                          child: const Text('Save Key'),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _clearApiKey,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFFFF6B6B),
-                            side: const BorderSide(color: Color(0xFFFF6B6B)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _apiKeyCtrl,
+                      obscureText: !_apiKeyVisible,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: InputDecoration(
+                        hintText: 'AIzaSy...',
+                        hintStyle: const TextStyle(color: AppColors.darkDimText),
+                        filled: true,
+                        fillColor: const Color(0xFF090A10),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.08), width: 1.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.08), width: 1.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                              color: rankColor.withValues(alpha: 0.6), width: 1.2),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _apiKeyVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.darkSubText,
+                            size: 18,
                           ),
-                          child: const Text('Clear Key'),
+                          onPressed: () =>
+                              setState(() => _apiKeyVisible = !_apiKeyVisible),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ─── CLOUD BACKUP ───────────────────────────────────────────────
-            _sectionHeader('CLOUD BACKUP', subColor),
-            _settingsCard(
-              isDark,
-              sectionBg,
-              sectionBorder,
-              child: Column(
-                children: [
-                  _settingRowWithWidget(
-                    'Cloud Backup (Firebase)',
-                    textColor,
-                    subColor,
-                    Switch(
-                      value: user.cloudBackupEnabled,
-                      activeThumbColor: rankColor,
-                      onChanged: (v) =>
-                          userProvider.toggleCloudBackup(v),
                     ),
-                  ),
-                  const Divider(height: 20),
-                  _settingRow(
-                    'Export Chronicle as JSON',
-                    Icons.file_download_outlined,
-                    textColor,
-                    subColor,
-                    onTap: _exportData,
-                  ),
-                  if (!FirebaseService().isSignedIn) ...[
-                    const Divider(height: 20),
-                    _settingRow(
-                      'Sign in with Google',
-                      Icons.login_rounded,
-                      textColor,
-                      subColor,
-                      onTap: _signInWithGoogle,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ─── APPEARANCE ─────────────────────────────────────────────────
-            _sectionHeader('APPEARANCE', subColor),
-            _settingsCard(
-              isDark,
-              sectionBg,
-              sectionBorder,
-              child: Column(
-                children: [
-                  _settingRowWithWidget(
-                    'Reduce Effects',
-                    textColor,
-                    subColor,
-                    Switch(
-                      value: themeProvider.reduceEffects,
-                      activeThumbColor: rankColor,
-                      onChanged: (v) => themeProvider.setReduceEffects(v),
-                    ),
-                  ),
-                  // Aura color picker (Absolute rank only)
-                  if (user.currentRank >= 15) ...[
-                    const Divider(height: 20),
-                    _settingRow(
-                      'Aura Color (Absolute)',
-                      Icons.palette_outlined,
-                      textColor,
-                      subColor,
-                      trailing: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: userProvider.currentRankColor,
-                          border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3)),
-                        ),
-                      ),
-                      onTap: () => _showAuraPicker(context, userProvider),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ─── SHIELDS ────────────────────────────────────────────────────
-            _sectionHeader('SHIELDS', subColor),
-            _settingsCard(
-              isDark,
-              sectionBg,
-              sectionBorder,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Shields this month',
-                          style: TextStyle(color: textColor, fontSize: 14)),
-                      Row(
-                        children: List.generate(3, (i) {
-                          final available = i < user.shieldsRemaining;
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 6),
-                            child: Icon(
-                              available ? Icons.shield_rounded : Icons.shield_outlined,
-                              color: available ? const Color(0xFF38BDF8) : subColor.withValues(alpha: 0.3),
-                              size: 20,
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _saveApiKey,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: rankColor,
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                             ),
-                          );
-                        }),
+                            child: const Text('SAVE KEY', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _clearApiKey,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFFFF6B6B),
+                              side: const BorderSide(color: Color(0xFFFF6B6B), width: 1),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                            child: const Text('CLEAR', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(height: 1, color: Colors.white.withValues(alpha: 0.05)),
+                    const SizedBox(height: 14),
+
+                    // Cloud Sync Row
+                    _settingRowWithWidget(
+                      'Cloud Sync (Firebase)',
+                      textColor,
+                      subColor,
+                      Switch(
+                        value: user.cloudBackupEnabled,
+                        activeThumbColor: rankColor,
+                        onChanged: (v) =>
+                            userProvider.toggleCloudBackup(v),
+                      ),
+                    ),
+                    Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                    _settingRow(
+                      'Export Chronicle as JSON',
+                      Icons.file_download_outlined,
+                      textColor,
+                      subColor,
+                      onTap: _exportData,
+                    ),
+                    if (!FirebaseService().isSignedIn) ...[
+                      Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                      _settingRow(
+                        'Sign in with Google',
+                        Icons.login_rounded,
+                        textColor,
+                        subColor,
+                        onTap: _signInWithGoogle,
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${user.shieldsRemaining} / 3 remaining · Resets on the 1st of each month',
-                    style: TextStyle(color: subColor, fontSize: 12),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
-            // ─── ACCOUNT ────────────────────────────────────────────────────
-            _sectionHeader('ACCOUNT', subColor),
-            _settingsCard(
-              isDark,
-              sectionBg,
-              sectionBorder,
-              child: Column(
-                children: [
-                  _settingRow('Sign Out', Icons.logout_rounded, textColor, subColor,
-                      onTap: _confirmSignOut),
-                  const Divider(height: 20),
-                  _settingRow('Delete All Data', Icons.delete_forever_rounded,
-                      const Color(0xFFFF6B6B), subColor,
-                      onTap: _confirmDeleteAll,
-                      textColor: const Color(0xFFFF6B6B)),
-                ],
+              // ─── PANEL 2: APPEARANCE & SHIELDS HUB ──────────────────────────
+              _sectionHeader('APPEARANCE & SHIELDS', subColor, rankColor),
+              _settingsCard(
+                child: Column(
+                  children: [
+                    _settingRowWithWidget(
+                      'Reduce Visual Effects',
+                      textColor,
+                      subColor,
+                      Switch(
+                        value: themeProvider.reduceEffects,
+                        activeThumbColor: rankColor,
+                        onChanged: (v) => themeProvider.setReduceEffects(v),
+                      ),
+                    ),
+                    if (user.currentRank >= 15) ...[
+                      Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                      _settingRow(
+                        'Aura Color',
+                        Icons.palette_outlined,
+                        textColor,
+                        subColor,
+                        trailing: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: userProvider.currentRankColor,
+                          ),
+                        ),
+                        onTap: () => _showAuraPicker(context, userProvider),
+                      ),
+                    ],
+                    Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Integrity Shields',
+                                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                              SizedBox(height: 2),
+                              Text('Prevents streak loss (3/mo)',
+                                  style: TextStyle(color: AppColors.darkSubText, fontSize: 11)),
+                            ],
+                          ),
+                          Row(
+                            children: List.generate(3, (i) {
+                              final available = i < user.shieldsRemaining;
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 6),
+                                child: Icon(
+                                  available ? Icons.shield_rounded : Icons.shield_outlined,
+                                  color: available ? rankColor : AppColors.darkDimText.withValues(alpha: 0.3),
+                                  size: 18,
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
-            // ─── ABOUT ──────────────────────────────────────────────────────
-            _sectionHeader('ABOUT', subColor),
-            _settingsCard(
-              isDark,
-              sectionBg,
-              sectionBorder,
-              child: Column(
-                children: [
-                  _settingRow('Aumbra v1.0.0', Icons.info_outline_rounded, textColor, subColor),
-                  const Divider(height: 20),
-                  _settingRow('100% Free. No ads. No paywalls.', Icons.favorite_rounded, textColor, subColor),
-                  const Divider(height: 20),
-                  _settingRow('Privacy Policy', Icons.privacy_tip_outlined, textColor, subColor,
-                      onTap: () {}),
-                  const Divider(height: 20),
-                  _settingRow('Terms of Service', Icons.description_outlined, textColor, subColor,
-                      onTap: () {}),
-                  const Divider(height: 20),
-                  _settingRow('Contact Support', Icons.mail_outline_rounded, textColor, subColor,
-                      onTap: () {}),
-                ],
+              // ─── PANEL 3: DOSSIER & SECURITY HUB ────────────────────────────
+              _sectionHeader('SECURITY & DATA', subColor, rankColor),
+              _settingsCard(
+                child: Column(
+                  children: [
+                    _settingRow('Aumbra Protocol v1.0.0', Icons.terminal_rounded, textColor, subColor),
+                    Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                    _settingRow('Privacy Policy', Icons.security_rounded, textColor, subColor, onTap: () {}),
+                    Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                    _settingRow('Terms of Service', Icons.description_rounded, textColor, subColor, onTap: () {}),
+                    Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                    _settingRow('Sign Out', Icons.logout_rounded, textColor, subColor,
+                        onTap: _confirmSignOut),
+                    Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
+                    _settingRow('Purge All Data', Icons.delete_sweep_rounded,
+                        const Color(0xFFFF6B6B), subColor,
+                        onTap: _confirmDeleteAll,
+                        textColor: const Color(0xFFFF6B6B)),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -346,26 +323,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
   );
   }
 
-  Widget _sectionHeader(String label, Color subColor) {
+  Widget _sectionHeader(String label, Color subColor, Color rankColor) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(label,
-          style: TextStyle(
-              color: subColor,
-              fontSize: 11,
-              letterSpacing: 1.0,
-              fontWeight: FontWeight.w700)),
+      padding: const EdgeInsets.only(bottom: 8, left: 2),
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: 12,
+            decoration: BoxDecoration(
+              color: rankColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(label,
+              style: const TextStyle(
+                  color: AppColors.darkSubText,
+                  fontSize: 10,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.w900)),
+        ],
+      ),
     );
   }
 
-  Widget _settingsCard(bool isDark, Color bg, Color border,
-      {required Widget child}) {
+  Widget _settingsCard({required Widget child}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0x880C1020),
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.darkCard,
+        gradient: AppColors.darkCardGradient,
+        borderRadius: BorderRadius.circular(18),
       ),
       child: child,
     );
@@ -376,7 +365,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: textColor, fontSize: 14)),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
         trailing,
       ],
     );
@@ -387,20 +376,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: textColor ?? subColor),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(label,
-                style: TextStyle(
-                    color: textColor ?? labelColor, fontSize: 14)),
-          ),
-          if (trailing != null) trailing,
-          if (onTap != null && trailing == null)
-            Icon(Icons.chevron_right_rounded,
-                color: subColor.withValues(alpha: 0.5), size: 18),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: textColor ?? AppColors.goldPrimary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(label,
+                  style: TextStyle(
+                      color: textColor ?? Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+            ),
+            if (trailing != null) trailing,
+            if (onTap != null && trailing == null)
+              Icon(Icons.chevron_right_rounded,
+                  color: AppColors.darkSubText.withValues(alpha: 0.5), size: 18),
+          ],
+        ),
       ),
     );
   }
@@ -411,7 +403,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _localStorage.setGeminiApiKey(_apiKeyCtrl.text.trim());
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('API key saved locally.')),
+        const SnackBar(content: Text('AI Core Key Saved.')),
       );
     }
   }
@@ -421,7 +413,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _apiKeyCtrl.clear();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('API key cleared.')),
+        const SnackBar(content: Text('AI Core Key Cleared.')),
       );
     }
   }
@@ -461,20 +453,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('You will stay in offline mode. Your local data is safe.'),
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.goldPrimary.withValues(alpha: 0.3)),
+        ),
+        title: const Text('Sign Out', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        content: const Text('You will stay in offline mode. Your local data is safe.',
+            style: TextStyle(color: AppColors.darkSubText, fontSize: 13)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel')),
+              child: const Text('CANCEL', style: TextStyle(color: AppColors.darkSubText))),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<UserProvider>().signOut();
               widget.onSignOut();
             },
-            child: const Text('Sign Out',
-                style: TextStyle(color: Color(0xFFFF6B6B))),
+            child: const Text('SIGN OUT',
+                style: TextStyle(color: Color(0xFFFF6B6B), fontWeight: FontWeight.w800)),
           ),
         ],
       ),
@@ -485,17 +483,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF111111),
-        title: const Text('Delete All Data',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFFF6B6B), width: 1.2),
+        ),
+        title: const Text('Purge All Data',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
         content: const Text(
-          'This will permanently delete all your progress, history, badges, and account. This cannot be undone.',
-          style: TextStyle(color: Color(0xFF9E9E9E)),
+          'This will permanently delete all your progress, history, badges, and account. This action cannot be reversed.',
+          style: TextStyle(color: AppColors.darkSubText, fontSize: 13, height: 1.5),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white))),
+              child: const Text('CANCEL', style: TextStyle(color: AppColors.darkSubText))),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -506,7 +508,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               backgroundColor: const Color(0xFFFF6B6B),
               foregroundColor: Colors.white,
             ),
-            child: const Text('DELETE EVERYTHING'),
+            child: const Text('PURGE EVERYTHING', style: TextStyle(fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -523,9 +525,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF111111),
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.goldPrimary.withValues(alpha: 0.4)),
+        ),
         title: const Text('Choose Your Aura',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         content: Wrap(
           spacing: 12,
           runSpacing: 12,
@@ -541,7 +547,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 decoration: BoxDecoration(
                   color: c,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                 ),
               ),
             );
@@ -551,3 +556,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+
