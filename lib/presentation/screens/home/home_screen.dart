@@ -68,88 +68,88 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       body: Container(
         decoration: isDark
-            ? BoxDecoration(gradient: AppColors.darkBackgroundGradient)
+            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
             : null,
         child: FadeTransition(
           opacity: _headerAnim,
           child: CustomScrollView(
             slivers: [
-              // ── SAFE AREA TOP PADDING ──
-              const SliverToBoxAdapter(child: SizedBox(height: 0)),
-
               // ── SECTION 1: PROFILE HEADER ──
               SliverToBoxAdapter(
                 child: SafeArea(
                   bottom: false,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Column(
                       children: [
-                        // ── Left: Avatar + identity ──
-                        RankGlowBadge(rankInfo: rankInfo, size: 58),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () => _showEditProfileModal(context, userProvider),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        user.name.toUpperCase(),
-                                        style: TextStyle(
-                                          color: rankColor,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 2.0,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Icon(Icons.edit_note, color: rankColor.withValues(alpha: 0.7), size: 16),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Left: Avatar + identity
+                            RankGlowBadge(rankInfo: rankInfo, size: 54),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: rankColor.withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(3),
-                                      border: Border.all(color: rankColor.withValues(alpha: 0.35)),
+                                  GestureDetector(
+                                    onTap: () => _showEditProfileModal(context, userProvider),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            user.name.toUpperCase(),
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 0.8,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Icon(Icons.edit_note_rounded, color: rankColor, size: 16),
+                                      ],
                                     ),
-                                    child: Text(
-                                      rankInfo.name.toUpperCase(),
-                                      style: TextStyle(
-                                        color: rankColor,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1.5,
-                                      ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    rankInfo.name.toUpperCase(),
+                                    style: TextStyle(
+                                      color: rankColor,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.2,
                                     ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                        // ── Right: Stats ──
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            _MiniStat(value: '${user.currentStreak}', icon: Icons.local_fire_department, color: const Color(0xFFFF6D00)),
-                            const SizedBox(height: 6),
-                            _MiniStat(value: '${user.shieldsRemaining}/3', icon: Icons.shield_outlined, color: const Color(0xFF38BDF8)),
-                            const SizedBox(height: 6),
-                            _MiniStat(value: '$dayNumber', icon: Icons.calendar_today_outlined, color: const Color(0xFF10B981)),
+                            ),
+                            // Right: Sleek horizontal stats capsule
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0x880C1020),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _MiniStat(value: '${user.currentStreak}', icon: Icons.local_fire_department_rounded, color: const Color(0xFFFF6D00)),
+                                  const SizedBox(width: 8),
+                                  Container(width: 1, height: 12, color: isDark ? const Color(0x22FFFFFF) : const Color(0x22000000)),
+                                  const SizedBox(width: 8),
+                                  _MiniStat(value: '${user.shieldsRemaining}/3', icon: Icons.shield_rounded, color: const Color(0xFF38BDF8)),
+                                  const SizedBox(width: 8),
+                                  Container(width: 1, height: 12, color: isDark ? const Color(0x22FFFFFF) : const Color(0x22000000)),
+                                  const SizedBox(width: 8),
+                                  _MiniStat(value: 'D$dayNumber', icon: Icons.bolt_rounded, color: const Color(0xFF10B981)),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -158,8 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
 
-
-              // ── SECTION 2: COMPACT RANK PROGRESS ──
+              // ── RANK PROGRESS (inline, no card) ──
               if (nextRank != null)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -169,55 +168,36 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                 ),
 
-              // ── SECTION 3: DAILY MANTRA DIRECTIVE ──
+              // ── MANTRA (borderless) ──
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: _buildMantra(quote, dayNumber, rankColor, subColor),
                 ),
               ),
 
-              // ── SECTION 4: QUEST HEADER ──
+              // ── QUEST HEADER ──
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 22, 16, 10),
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                   child: Row(
                     children: [
-                      Container(
-                        width: 3,
-                        height: 14,
-                        decoration: BoxDecoration(
-                          color: rankColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
                       Text(
                         "Today's Quests",
                         style: TextStyle(
-                          color: const Color(0xFF64748B),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                          color: textColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                       const Spacer(),
                       if (questProvider.state == QuestLoadingState.loaded)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: rankColor.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: rankColor.withValues(alpha: 0.3)),
-                          ),
-                          child: Text(
-                            '${questProvider.completedCount} / ${questProvider.totalCount}',
-                            style: TextStyle(
-                              color: rankColor,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                            ),
+                        Text(
+                          '${questProvider.completedCount} / ${questProvider.totalCount}',
+                          style: TextStyle(
+                            color: subColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                     ],
@@ -225,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
 
-              // ── SECTION 4: QUEST LIST ──
+              // ── QUEST LIST ──
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -259,101 +239,85 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  // ── RANK PROGRESS ──────────────────────────────────────────────────────────
+  // ── RANK PROGRESS (borderless inline) ─────────────────────────────────────
   Widget _buildRankProgress(RankInfo rankInfo, RankInfo nextRank, Color rankColor,
       dynamic user, Color subColor, Color textColor, Color dimColor) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: rankColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: RankProgressBar(
+                progress: rankInfo.completionsRequired > 0
+                    ? user.rankCompletions / rankInfo.completionsRequired
+                    : 1.0,
+                color: rankColor,
+                label: 'Completions',
+                value: '${user.rankCompletions}/${rankInfo.completionsRequired}',
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: RankProgressBar(
+                progress: rankInfo.streakRequired > 0
+                    ? user.currentStreak / rankInfo.streakRequired
+                    : 1.0,
+                color: rankColor.withValues(alpha: 0.75),
+                label: 'Streak',
+                value: '${user.currentStreak}/${rankInfo.streakRequired}',
+              ),
+            ),
+          ],
+        ),
+        if (context.read<QuestProvider>().bossQuestUnlocked) ...[
+          const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(
-                child: RankProgressBar(
-                  progress: rankInfo.completionsRequired > 0
-                      ? user.rankCompletions / rankInfo.completionsRequired
-                      : 1.0,
+              const Text('⚔️', style: TextStyle(fontSize: 12)),
+              const SizedBox(width: 6),
+              Text(
+                'Boss encounter unlocked — scroll down',
+                style: TextStyle(
                   color: rankColor,
-                  label: 'Completions',
-                  value: '${user.rankCompletions}/${rankInfo.completionsRequired}',
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: RankProgressBar(
-                  progress: rankInfo.streakRequired > 0
-                      ? user.currentStreak / rankInfo.streakRequired
-                      : 1.0,
-                  color: rankColor.withValues(alpha: 0.75),
-                  label: 'Streak',
-                  value: '${user.currentStreak}/${rankInfo.streakRequired}',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
-          // Boss quest unlock hint
-          if (context.read<QuestProvider>().bossQuestUnlocked) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: rankColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: rankColor.withValues(alpha: 0.35)),
-              ),
-              child: Row(
-                children: [
-                  const Text('⚔️', style: TextStyle(fontSize: 13)),
-                  const SizedBox(width: 8),
-                  Text(
-                    'BOSS ENCOUNTER UNLOCKED — Scroll down to challenge',
-                    style: TextStyle(
-                      color: rankColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
-      ),
+      ],
     );
   }
 
   Widget _buildMantra(dynamic quote, int dayNumber, Color rankColor, Color subColor) {
-    const goldAccent = Color(0xFFFFD54F);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: goldAccent.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: goldAccent.withValues(alpha: 0.35),
-          width: 1,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 2,
+          height: 36,
+          decoration: BoxDecoration(
+            color: rankColor.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(1),
+          ),
         ),
-      ),
-      child: Text(
-        '"${quote.text}"',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          fontStyle: FontStyle.italic,
-          fontWeight: FontWeight.w500,
-          height: 1.45,
-          letterSpacing: 0.3,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            '"${quote.text}"',
+            style: TextStyle(
+              color: subColor,
+              fontSize: 13,
+              fontStyle: FontStyle.italic,
+              height: 1.5,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
-      ),
+      ],
     );
   }
 
@@ -380,17 +344,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
 
     return Column(
-      children: questProvider.todayQuests.map((quest) {
+      children: List.generate(questProvider.todayQuests.length, (index) {
+        final quest = questProvider.todayQuests[index];
         return QuestCard(
           quest: quest,
+          index: index,
           onComplete: () => context.read<QuestProvider>().completeQuest(quest.id),
           onUncomplete: () => context.read<QuestProvider>().uncompleteQuest(quest.id),
         );
-      }).toList(),
+      }),
     );
   }
 
-  // ── OATH SECTION ──────────────────────────────────────────────────────────
+  // ── OATH SECTION (borderless) ─────────────────────────────────────────────
   Widget _buildOathSection(QuestProvider questProvider) {
     final answered = questProvider.oathAnswered;
     final answerTrue = questProvider.oathAnswer == true;
@@ -398,131 +364,90 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? const Color(0xFF64748B) : AppColors.lightSubText;
-    final bgColor = isDark ? const Color(0xFF0B0E1A) : const Color(0xFFF1F5F9);
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Were you honest today?',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (!answered)
           Row(
             children: [
-              Icon(Icons.balance, color: subColor, size: 16),
-              const SizedBox(width: 8),
-              Text(
-                'Were you honest today?',
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.2,
+              Expanded(
+                child: _OathButton(
+                  label: 'Yes',
+                  icon: Icons.check_rounded,
+                  color: const Color(0xFF00E5FF),
+                  onTap: () => context.read<QuestProvider>().answerOath(true),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _OathButton(
+                  label: 'No',
+                  icon: Icons.close_rounded,
+                  color: subColor,
+                  onTap: () => _showOathReflectionDialog(context),
                 ),
               ),
             ],
+          )
+        else
+          Text(
+            answerTrue
+                ? '✓ Integrity logged — your word stands.'
+                : '— Noted. Reflection is growth.',
+            style: TextStyle(
+              color: answerTrue ? const Color(0xFF00E5FF) : subColor,
+              fontSize: 13,
+              fontStyle: FontStyle.italic,
+            ),
           ),
-          if (!answered) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _OathButton(
-                    label: 'Yes',
-                    icon: Icons.check,
-                    color: const Color(0xFF00F0FF), // Electric Cyan
-                    onTap: () => context.read<QuestProvider>().answerOath(true),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _OathButton(
-                    label: 'No',
-                    icon: Icons.close,
-                    color: const Color(0xFF475569), // Muted Steel Slate
-                    onTap: () => _showOathReflectionDialog(context),
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: (answerTrue ? const Color(0xFF00F0FF) : const Color(0xFF475569)).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(4),
-                border: Border(
-                  left: BorderSide(
-                    color: answerTrue ? const Color(0xFF00F0FF) : const Color(0xFF475569),
-                    width: 3,
-                  ),
-                ),
-              ),
-              child: Text(
-                answerTrue
-                    ? 'You honor your word. The system acknowledges your integrity.'
-                    : 'Honesty noted. Reflection is growth.',
-                style: TextStyle(
-                  color: answerTrue ? const Color(0xFF00F0FF) : const Color(0xFF94A3B8),
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+      ],
     );
   }
 
   // ── BOSS QUEST BUTTON ──────────────────────────────────────────────────────
   Widget _buildBossQuestButton(QuestProvider questProvider, Color rankColor) {
     final unlocked = questProvider.bossQuestUnlocked;
+    if (!unlocked) return const SizedBox.shrink();
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.98, end: 1.02),
-      duration: const Duration(seconds: 1),
-      curve: Curves.easeInOut,
-      builder: (context, scale, child) {
-        return Transform.scale(
-          scale: unlocked ? scale : 1.0,
-          child: child,
-        );
-      },
-      child: GestureDetector(
-        onTap: unlocked ? () => _showBossQuestDialog(questProvider, rankColor) : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: unlocked ? rankColor.withValues(alpha: 0.1) : const Color(0x0AFFFFFF),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: unlocked ? rankColor.withValues(alpha: 0.5) : const Color(0x14FFFFFF),
-              width: unlocked ? 1.5 : 1,
+    return GestureDetector(
+      onTap: () => _showBossQuestDialog(questProvider, rankColor),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: rankColor.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: rankColor.withValues(alpha: 0.2),
+              blurRadius: 20,
+              spreadRadius: 0,
             ),
-            boxShadow: unlocked
-                ? [BoxShadow(color: rankColor.withValues(alpha: 0.25), blurRadius: 20, spreadRadius: 2)]
-                : null,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('⚔️', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 10),
-              Text(
-                unlocked ? 'CHALLENGE BOSS QUEST' : 'BOSS QUEST — LOCKED',
-                style: TextStyle(
-                  color: unlocked ? rankColor : const Color(0xFF555555),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
-                ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('⚔️', style: TextStyle(fontSize: 18)),
+            const SizedBox(width: 10),
+            Text(
+              'Boss Quest — Challenge Now',
+              style: TextStyle(
+                color: rankColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -535,11 +460,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF111111),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: Color(0x33FFFFFF), width: 1),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0x22FFFFFF), width: 1),
         ),
-        title: const Text('⚠️ Reflection',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+        title: const Row(
+          children: [
+            Icon(Icons.auto_stories_rounded, color: Color(0xFF00E5FF), size: 18),
+            SizedBox(width: 8),
+            Text('Reflection',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -796,7 +727,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               duration: const Duration(milliseconds: 800),
               curve: Curves.elasticOut,
               builder: (ctx, v, child) => Transform.scale(scale: v, child: child),
-              child: const Text('👑', style: TextStyle(fontSize: 64)),
+              child: Icon(Icons.workspace_premium_rounded, size: 64, color: nextRank?.color ?? rankColor),
             ),
             const SizedBox(height: 20),
             Text(
@@ -903,9 +834,8 @@ class _OathButtonState extends State<_OathButton> with SingleTickerProviderState
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: widget.color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: widget.color.withValues(alpha: 0.3), width: 1),
+            color: widget.color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

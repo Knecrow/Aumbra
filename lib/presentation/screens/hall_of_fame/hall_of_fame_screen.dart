@@ -26,7 +26,7 @@ class HallOfFameScreen extends StatelessWidget {
       backgroundColor: bgColor,
       body: Container(
         decoration: isDark
-            ? const BoxDecoration(gradient: AppColors.darkBackgroundGradient)
+            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
             : null,
         child: SafeArea(
           child: CustomScrollView(
@@ -38,15 +38,15 @@ class HallOfFameScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('TITLES',
+                      Text('TITLES & BADGES',
                           style: TextStyle(
                               color: textColor,
-                              fontSize: 22,
+                              fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5)),
+                              letterSpacing: 1.0)),
                       const SizedBox(height: 2),
                       Text(
-                        '${user.unlockedBadges.length}/${kBadges.length} badges  ·  ${user.unlockedTitles.length}/${kTitles.length} titles',
+                        '${user.unlockedBadges.length}/${kBadges.length} badges  ·  ${user.unlockedTitles.length}/${kTitles.length} titles unlocked',
                         style: TextStyle(color: subColor, fontSize: 12),
                       ),
                       const SizedBox(height: 20),
@@ -118,12 +118,12 @@ class HallOfFameScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                  child: Text('[ SYSTEM CLASSIFICATIONS ]',
+                  child: Text('SYSTEM CLASSIFICATIONS',
                       style: TextStyle(
                           color: subColor,
                           fontSize: 11,
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w900)),
+                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.w700)),
                 ),
               ),
               _buildRankColorGrid(context, user.currentRank, isDark, textColor, subColor),
@@ -183,53 +183,50 @@ class HallOfFameScreen extends StatelessWidget {
                   itemBuilder: (ctx, i) {
                     final badge = catBadges[i];
                     final earned = unlocked.contains(badge.id);
-                    final bgColor = earned
-                        ? rankColor.withValues(alpha: 0.15)
-                        : (isDark ? const Color(0xFF090A16) : const Color(0xFFF1F5F9));
-                    final borderColor = earned
-                        ? rankColor.withValues(alpha: 0.5)
-                        : (isDark ? const Color(0xFF1E2036) : const Color(0xFFE2E8F0));
-
-                    return Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: borderColor, width: 1),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            badge.icon,
-                            style: TextStyle(
-                                fontSize: 26,
-                                color: earned ? null : Colors.white.withValues(alpha: 0.15)),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            badge.name,
-                            style: TextStyle(
-                              color: earned ? textColor : subColor.withValues(alpha: 0.5),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
+                    return GestureDetector(
+                      onTap: () => _showBadgeDetailModal(context, badge, earned, rankColor, isDark),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: earned
+                              ? rankColor.withValues(alpha: 0.15)
+                              : const Color(0x880C1020),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              badge.icon,
+                              style: TextStyle(
+                                  fontSize: 26,
+                                  color: earned ? null : Colors.white.withValues(alpha: 0.15)),
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            badge.description,
-                            style: TextStyle(
-                              color: earned
-                                  ? subColor
-                                  : subColor.withValues(alpha: 0.4),
-                              fontSize: 9,
+                            const SizedBox(height: 6),
+                            Text(
+                              badge.name,
+                              style: TextStyle(
+                                color: earned ? textColor : subColor.withValues(alpha: 0.5),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              badge.description,
+                              style: TextStyle(
+                                color: earned
+                                    ? subColor
+                                    : subColor.withValues(alpha: 0.4),
+                                fontSize: 9,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -257,20 +254,14 @@ class HallOfFameScreen extends StatelessWidget {
         child: Column(
           children: kTitles.map((title) {
             final earned = unlocked.contains(title.id);
-            final bgColor = earned
-                ? rankColor.withValues(alpha: 0.12)
-                : (isDark ? const Color(0xFF090A16) : const Color(0xFFF1F5F9));
-            final borderColor = earned
-                ? rankColor.withValues(alpha: 0.4)
-                : (isDark ? const Color(0xFF1E2036) : const Color(0xFFE2E8F0));
-
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: borderColor, width: earned ? 1.5 : 1.0),
+                color: earned
+                    ? rankColor.withValues(alpha: 0.12)
+                    : const Color(0x880C1020),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
@@ -312,8 +303,7 @@ class HallOfFameScreen extends StatelessWidget {
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: rankColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(2),
-                        border: Border.all(color: rankColor.withValues(alpha: 0.3), width: 1),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         'EARNED',
@@ -321,7 +311,7 @@ class HallOfFameScreen extends StatelessWidget {
                           color: rankColor,
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
-                          letterSpacing: 1,
+                          letterSpacing: 0.8,
                         ),
                       ),
                     )
@@ -371,24 +361,9 @@ class HallOfFameScreen extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: isReached
-                        ? color.withValues(alpha: 0.3)
-                        : const Color(0x0DFFFFFF),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: isReached
-                          ? color.withValues(alpha: 0.5)
-                          : const Color(0x14FFFFFF),
-                      width: currentRank == rank.rankNumber ? 1.8 : 1,
-                    ),
-                    boxShadow: isReached
-                        ? [
-                            BoxShadow(
-                              color: color.withValues(alpha: 0.2),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            )
-                          ]
-                        : null,
+                        ? color.withValues(alpha: 0.2)
+                        : const Color(0x880C1020),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
                     child: Container(
@@ -402,21 +377,106 @@ class HallOfFameScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  rank.name,
-                  style: TextStyle(
-                    color: isReached ? color : subColor.withValues(alpha: 0.4),
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
+                  Text(
+                    rank.name,
+                    style: TextStyle(
+                      color: isReached ? color : subColor.withValues(alpha: 0.4),
+                      fontSize: 8,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
         ),
+      ),
+    );
+  }
+
+  void _showBadgeDetailModal(
+    BuildContext context,
+    BadgeInfo badge,
+    bool earned,
+    Color rankColor,
+    bool isDark,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF0F1222) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: earned ? rankColor.withValues(alpha: 0.15) : (isDark ? const Color(0x14FFFFFF) : const Color(0x14000000)),
+              ),
+              child: Center(
+                child: Text(
+                  badge.icon,
+                  style: TextStyle(
+                    fontSize: 34,
+                    color: earned ? null : Colors.white.withValues(alpha: 0.2),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              badge.name,
+              style: TextStyle(
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: earned ? rankColor.withValues(alpha: 0.15) : const Color(0x15FFFFFF),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                earned ? 'UNLOCKED' : 'LOCKED',
+                style: TextStyle(
+                  color: earned ? rankColor : const Color(0xFF94A3B8),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              badge.description,
+              style: TextStyle(
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                fontSize: 13,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Close', style: TextStyle(color: rankColor, fontWeight: FontWeight.w700)),
+          ),
+        ],
       ),
     );
   }

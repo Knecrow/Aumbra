@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
@@ -22,7 +22,7 @@ class GlassCard extends StatelessWidget {
     this.margin,
     this.borderColor,
     this.glowColor,
-    this.borderRadius = 10,
+    this.borderRadius = 16.0,
     this.showCornerBrackets = false,
     this.gradient,
     this.onTap,
@@ -38,17 +38,24 @@ class GlassCard extends StatelessWidget {
         ? AppColors.darkGlassBorder
         : AppColors.lightGlassBorder;
     final effectiveBorder = borderColor ?? defaultBorder;
-    final defaultBg = isDark ? AppColors.darkGlass : AppColors.lightGlass;
+    const defaultBg = Color(0x880C1020);
 
-    final List<BoxShadow>? shadows = glowColor != null
+    final List<BoxShadow> shadows = glowColor != null
         ? [
             BoxShadow(
-              color: glowColor!.withValues(alpha: 0.25),
-              blurRadius: 16,
-              spreadRadius: 1,
+              color: glowColor!.withValues(alpha: 0.3),
+              blurRadius: 20,
+              spreadRadius: 2,
             ),
           ]
-        : null;
+        : [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+              blurRadius: 12,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+          ];
 
     Widget containerWidget = Container(
       margin: margin,
@@ -56,7 +63,6 @@ class GlassCard extends StatelessWidget {
         color: gradient == null ? defaultBg : null,
         gradient: gradient,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: effectiveBorder, width: 1.2),
         boxShadow: shadows,
       ),
       child: Stack(

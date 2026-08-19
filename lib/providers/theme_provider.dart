@@ -4,30 +4,16 @@ import '../../data/services/local_storage_service.dart';
 class ThemeProvider extends ChangeNotifier {
   final LocalStorageService _localStorage;
 
-  bool _isDarkMode = true;
   bool _reduceEffects = false;
 
-  bool get isDarkMode => _isDarkMode;
+  bool get isDarkMode => true;
   bool get reduceEffects => _reduceEffects;
 
   ThemeProvider({required LocalStorageService localStorage})
       : _localStorage = localStorage;
 
   Future<void> loadThemePreference() async {
-    _isDarkMode = await _localStorage.isDarkMode();
     _reduceEffects = await _localStorage.getReduceEffects();
-    notifyListeners();
-  }
-
-  Future<void> toggleDarkMode() async {
-    _isDarkMode = !_isDarkMode;
-    await _localStorage.setDarkMode(_isDarkMode);
-    notifyListeners();
-  }
-
-  Future<void> setDarkMode(bool value) async {
-    _isDarkMode = value;
-    await _localStorage.setDarkMode(value);
     notifyListeners();
   }
 

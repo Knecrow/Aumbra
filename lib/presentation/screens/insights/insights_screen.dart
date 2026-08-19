@@ -54,14 +54,13 @@ class _InsightsScreenState extends State<InsightsScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubText : AppColors.lightSubText;
     final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final cardBg = isDark ? const Color(0xFF0A0C1A) : const Color(0xFFF1F5F9);
-    final cardBorder = isDark ? const Color(0xFF1E2036) : const Color(0xFFE2E8F0);
+    const cardBg = Color(0x880C1020);
 
     return Scaffold(
       backgroundColor: bgColor,
       body: Container(
         decoration: isDark
-            ? BoxDecoration(gradient: AppColors.darkBackgroundGradient)
+            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
             : null,
         child: SafeArea(
           child: _loading
@@ -75,12 +74,12 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('STATS',
+                            Text('INSIGHTS',
                                 style: TextStyle(
                                     color: textColor,
-                                    fontSize: 22,
+                                    fontSize: 24,
                                     fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.5)),
+                                    letterSpacing: 1.0)),
                             const SizedBox(height: 2),
                             Text('Attributes & performance',
                                 style: TextStyle(color: subColor, fontSize: 12)),
@@ -94,34 +93,51 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 1.45,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
                           children: [
-                            StatCard(
-                                value: user.totalQuestsCompleted.toString(),
-                                label: 'Total Completed',
-                                icon: Icons.check_circle_outline,
-                                accentColor: rankColor),
-                            StatCard(
-                                value: user.longestStreak.toString(),
-                                label: 'Longest Streak',
-                                icon: Icons.local_fire_department_outlined,
-                                accentColor: const Color(0xFFFF9100)),
-                            StatCard(
-                                value: userProvider.daysSinceStart.toString(),
-                                label: 'Days Active',
-                                icon: Icons.calendar_today_outlined,
-                                accentColor: const Color(0xFF00E676)),
-                            StatCard(
-                                value: userProvider.estimatedDaysToAbsolute.toString(),
-                                label: 'Days to Absolute',
-                                icon: Icons.flag_outlined,
-                                accentColor: const Color(0xFFE040FB)),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: StatCard(
+                                    value: user.totalQuestsCompleted.toString(),
+                                    label: 'Total Completed',
+                                    icon: Icons.check_circle_rounded,
+                                    accentColor: rankColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: StatCard(
+                                    value: user.longestStreak.toString(),
+                                    label: 'Longest Streak',
+                                    icon: Icons.local_fire_department_rounded,
+                                    accentColor: const Color(0xFFFF9100),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: StatCard(
+                                    value: userProvider.daysSinceStart.toString(),
+                                    label: 'Days Active',
+                                    icon: Icons.bolt_rounded,
+                                    accentColor: const Color(0xFF00E676),
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: StatCard(
+                                    value: userProvider.estimatedDaysToAbsolute.toString(),
+                                    label: 'Days to Absolute',
+                                    icon: Icons.workspace_premium_rounded,
+                                    accentColor: const Color(0xFFE040FB),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -137,20 +153,18 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('[ STREAK RECORDS ]',
+                            Text('Streak Record',
                                 style: TextStyle(
-                                    color: subColor,
-                                    fontSize: 11,
-                                    letterSpacing: 2,
+                                    color: textColor,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w800)),
                             const SizedBox(height: 12),
                             Container(
                               height: 160,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                  color: cardBg,
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: cardBorder, width: 1.2),
+                                color: cardBg,
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: _buildStreakChart(rankColor, isDark),
                             ),
@@ -167,23 +181,21 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('[ COMPLETION INDEX ]',
-                              style: TextStyle(
-                                  color: subColor,
-                                  fontSize: 11,
-                                  letterSpacing: 2,
-                                  fontWeight: FontWeight.w800)),
-                          const SizedBox(height: 12),
-                          Container(
-                            height: 160,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: cardBg,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: cardBorder, width: 1.2),
+                            Text('Completion Heatmap',
+                                style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800)),
+                            const SizedBox(height: 12),
+                            Container(
+                              height: 160,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: cardBg,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: _buildHeatmap(rankColor, isDark, subColor),
                             ),
-                            child: _buildHeatmap(rankColor, isDark, subColor),
-                          ),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -198,11 +210,10 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('[ CATEGORY ATTRIBUTES ]',
+                            Text('Category Attributes',
                                 style: TextStyle(
-                                    color: subColor,
-                                    fontSize: 11,
-                                    letterSpacing: 2,
+                                    color: textColor,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w800)),
                             const SizedBox(height: 12),
                             Container(
@@ -210,8 +221,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: cardBg,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: cardBorder, width: 1.2),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: _buildCategoryDonut(textColor),
                             ),
@@ -228,19 +238,17 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('[ RANK PROGRESSION ]',
+                          Text('Rank Progression',
                               style: TextStyle(
-                                  color: subColor,
-                                  fontSize: 11,
-                                  letterSpacing: 2,
+                                  color: textColor,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w800)),
                           const SizedBox(height: 12),
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: cardBg,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: cardBorder, width: 1.2),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

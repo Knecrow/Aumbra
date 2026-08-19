@@ -5,7 +5,6 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../data/models/history_entry.dart';
-import '../../../core/constants/ranks.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../widgets/rank_widgets.dart';
 
@@ -71,7 +70,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
       backgroundColor: bgColor,
       body: Container(
         decoration: isDark
-            ? const BoxDecoration(gradient: AppColors.darkBackgroundGradient)
+            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
             : null,
         child: SafeArea(
           child: _loading
@@ -88,9 +87,9 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                             Text('STATS',
                                 style: TextStyle(
                                     color: textColor,
-                                    fontSize: 22,
+                                    fontSize: 24,
                                     fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.5)),
+                                    letterSpacing: 1.0)),
                             const SizedBox(height: 2),
                             Text('Activity, attributes & history',
                                 style: TextStyle(
@@ -106,37 +105,50 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 2.3,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
                           children: [
-                            StatCard(
-                              value: user.totalQuestsCompleted.toString(),
-                              label: 'Total Quests',
-                              icon: Icons.check_circle_outline,
-                              accentColor: rankColor,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: StatCard(
+                                    value: user.totalQuestsCompleted.toString(),
+                                    label: 'Total Quests',
+                                    icon: Icons.check_circle_rounded,
+                                    accentColor: rankColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: StatCard(
+                                    value: user.longestStreak.toString(),
+                                    label: 'Longest Streak',
+                                    icon: Icons.local_fire_department_rounded,
+                                    accentColor: const Color(0xFFFF9100),
+                                  ),
+                                ),
+                              ],
                             ),
-                            StatCard(
-                              value: user.longestStreak.toString(),
-                              label: 'Longest Streak',
-                              icon: Icons.local_fire_department_outlined,
-                              accentColor: const Color(0xFFFF9100),
-                            ),
-                            StatCard(
-                              value: userProvider.daysSinceStart.toString(),
-                              label: 'Days Awakened',
-                              icon: Icons.calendar_today_outlined,
-                              accentColor: const Color(0xFF00E676),
-                            ),
-                            StatCard(
-                              value: userProvider.estimatedDaysToAbsolute.toString(),
-                              label: 'Days to Absolute',
-                              icon: Icons.flag_outlined,
-                              accentColor: const Color(0xFFE040FB),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: StatCard(
+                                    value: userProvider.daysSinceStart.toString(),
+                                    label: 'Days Awakened',
+                                    icon: Icons.bolt_rounded,
+                                    accentColor: const Color(0xFF00E676),
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: StatCard(
+                                    value: userProvider.estimatedDaysToAbsolute.toString(),
+                                    label: 'Days to Absolute',
+                                    icon: Icons.workspace_premium_rounded,
+                                    accentColor: const Color(0xFFE040FB),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -177,8 +189,8 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                               height: 160,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF090A16) : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(8),
+                                color: const Color(0x880C1020),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: _buildStreakChart(rankColor, isDark),
                             ),
@@ -211,8 +223,8 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                               height: 210,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF090A16) : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(8),
+                                color: const Color(0x880C1020),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: _buildCategoryDonut(textColor),
                             ),
@@ -306,13 +318,14 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                 padding: const EdgeInsets.all(60),
                                 child: Column(
                                   children: [
-                                    const Text('📜',
-                                        style: TextStyle(fontSize: 48)),
+                                    Icon(Icons.auto_stories_rounded,
+                                        size: 40,
+                                        color: rankColor.withValues(alpha: 0.6)),
                                     const SizedBox(height: 16),
                                     Text('Your chronicle is empty.',
                                         style: TextStyle(
                                             color: subColor, fontSize: 14, fontWeight: FontWeight.w600)),
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 6),
                                     Text('Complete your first quest to begin.',
                                         style: TextStyle(
                                             color: subColor.withValues(alpha: 0.6),
@@ -378,21 +391,12 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
     Color? rankColor,
   }) {
     final color = isRecent ? (rankColor ?? const Color(0xFF94A3B8)) : const Color(0xFF94A3B8);
-    final bgColor = isDark ? const Color(0xFF0A0C1A) : const Color(0xFFF1F5F9);
-    final borderColor = isDark ? const Color(0xFF1E2036) : const Color(0xFFE2E8F0);
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isRecent ? color.withValues(alpha: 0.1) : bgColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isRecent ? color.withValues(alpha: 0.4) : borderColor,
-          width: isRecent ? 1.5 : 1.0,
-        ),
-        boxShadow: isRecent ? [
-          BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 10),
-        ] : null,
+        color: isRecent ? (rankColor ?? const Color(0xFF94A3B8)).withValues(alpha: 0.12) : const Color(0x880C1020),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,13 +404,13 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
           Text(
             label.toUpperCase(),
             style: TextStyle(
-                color: color, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+                color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.0),
           ),
           const SizedBox(height: 8),
           Text(
             entry.questTitle,
             style: TextStyle(
-                color: textColor, fontSize: 13, fontWeight: FontWeight.w800, height: 1.3),
+                color: textColor, fontSize: 13, fontWeight: FontWeight.w700, height: 1.3),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -415,12 +419,12 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
             DateFormat('MMM d, yyyy').format(entry.completedDate),
             style: TextStyle(color: subColor, fontSize: 11),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(4),
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               entry.rankAtTime,
@@ -436,29 +440,28 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
   Widget _buildHistoryItem(
       HistoryEntry entry, bool isDark, Color textColor, Color subColor, Color rankColor) {
     final categoryColor = AppColors.getCategoryColor(entry.questCategory);
-    final bgColor = isDark ? const Color(0xFF090A16) : const Color(0xFFFFFFFF);
-    final borderColor = isDark ? const Color(0xFF1A1C30) : const Color(0xFFE2E8F0);
+    final categoryIcon = AppColors.getCategoryIconData(entry.questCategory);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor, width: 1.0),
+        color: const Color(0x880C1020),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: categoryColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: categoryColor.withValues(alpha: 0.3)),
+              color: categoryColor.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
             ),
-            child: Text(
-              getCategoryIcon(entry.questCategory),
-              style: const TextStyle(fontSize: 16),
+            child: Icon(
+              categoryIcon,
+              color: categoryColor,
+              size: 16,
             ),
           ),
           const SizedBox(width: 12),
@@ -471,21 +474,21 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                   style: TextStyle(
                       color: textColor,
                       fontSize: 13,
-                      fontWeight: FontWeight.w800),
+                      fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${entry.questCategory.toUpperCase()} · ${entry.rankAtTime}',
-                  style: TextStyle(color: subColor, fontSize: 10, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: subColor, fontSize: 10, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
           ),
           Text(
             DateFormat('h:mm a').format(entry.completedDate),
-            style: TextStyle(color: subColor, fontSize: 11, fontWeight: FontWeight.w600),
+            style: TextStyle(color: subColor, fontSize: 11, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -506,9 +509,6 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
       dayCounts[key] = (dayCounts[key] ?? 0) + 1;
     }
 
-    final cardBg = isDark ? const Color(0xFF090A16) : const Color(0xFFF1F5F9);
-    final cardBorder = isDark ? const Color(0xFF1E2036) : const Color(0xFFE2E8F0);
-
     double maxY = 4;
     for (final day in last7Days) {
       final key = DateFormat('yyyy-MM-dd').format(day);
@@ -520,7 +520,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Activity Log',
+          'Weekly Activity',
           style: TextStyle(
             color: textColor,
             fontSize: 14,
@@ -534,12 +534,11 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
         ),
         const SizedBox(height: 12),
         Container(
-          height: 160,
+          height: 170,
           padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
           decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: cardBorder, width: 1),
+            color: const Color(0x880C1020),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: BarChart(
             BarChartData(
@@ -599,11 +598,21 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                   barRods: [
                     BarChartRodData(
                       toY: count,
+                      gradient: count > 0
+                          ? LinearGradient(
+                              colors: [
+                                isToday ? rankColor : rankColor.withValues(alpha: 0.9),
+                                isToday ? rankColor.withValues(alpha: 0.4) : rankColor.withValues(alpha: 0.2),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            )
+                          : null,
                       color: count > 0
-                          ? (isToday ? rankColor : rankColor.withValues(alpha: 0.65))
-                          : (isDark ? const Color(0xFF161A2E) : const Color(0xFFE2E8F0)),
-                      width: 14,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                          ? null
+                          : (isDark ? const Color(0xFF141828) : const Color(0xFFE2E8F0)),
+                      width: 16,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                     ),
                   ],
                 );

@@ -58,30 +58,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final subColor = isDark ? AppColors.darkSubText : AppColors.lightSubText;
     final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final sectionBg = isDark ? const Color(0xFF0A0C1A) : const Color(0xFFF1F5F9);
-    final sectionBorder = isDark ? const Color(0xFF1E2036) : const Color(0xFFE2E8F0);
+    final sectionBg = isDark ? const Color(0x990E1424) : const Color(0xFFF1F5F9);
+    final sectionBorder = isDark ? rankColor.withValues(alpha: 0.2) : AppColors.lightBorder;
 
     return Scaffold(
       backgroundColor: bgColor,
       body: Container(
         decoration: isDark
-            ? BoxDecoration(gradient: AppColors.darkBackgroundGradient)
+            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
             : null,
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 110),
             children: [
               // Title
-              Text('[ SYSTEM UTILITY: SETTINGS ]',
+              Text('SYSTEM PREFERENCES',
                   style: TextStyle(
                       color: rankColor,
                       fontSize: 11,
-                      letterSpacing: 2.5,
-                      fontWeight: FontWeight.w900)),
+                      letterSpacing: 1.5,
+                      fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
-              Text('SYSTEM PREFERENCES',
+              Text('SETTINGS & CONFIG',
                   style: TextStyle(
-                      color: textColor, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1.0)),
+                      color: textColor, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
               const SizedBox(height: 24),
 
               // ─── GEMINI API KEY ─────────────────────────────────────────────
@@ -193,7 +193,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Divider(height: 20),
                   _settingRow(
                     'Export Chronicle as JSON',
-                    '📤',
+                    Icons.file_download_outlined,
                     textColor,
                     subColor,
                     onTap: _exportData,
@@ -202,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Divider(height: 20),
                     _settingRow(
                       'Sign in with Google',
-                      '🔐',
+                      Icons.login_rounded,
                       textColor,
                       subColor,
                       onTap: _signInWithGoogle,
@@ -222,17 +222,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   _settingRowWithWidget(
-                    isDark ? 'Dark Mode' : 'White Mode',
-                    textColor,
-                    subColor,
-                    Switch(
-                      value: isDark,
-                      activeThumbColor: rankColor,
-                      onChanged: (v) => themeProvider.setDarkMode(v),
-                    ),
-                  ),
-                  const Divider(height: 20),
-                  _settingRowWithWidget(
                     'Reduce Effects',
                     textColor,
                     subColor,
@@ -247,12 +236,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Divider(height: 20),
                     _settingRow(
                       'Aura Color (Absolute)',
-                      '🌈',
+                      Icons.palette_outlined,
                       textColor,
                       subColor,
                       trailing: Container(
-                        width: 24,
-                        height: 24,
+                        width: 20,
+                        height: 20,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: userProvider.currentRankColor,
@@ -284,11 +273,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(color: textColor, fontSize: 14)),
                       Row(
                         children: List.generate(3, (i) {
+                          final available = i < user.shieldsRemaining;
                           return Padding(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Text(
-                              i < user.shieldsRemaining ? '🛡️' : '⬜',
-                              style: const TextStyle(fontSize: 20),
+                            padding: const EdgeInsets.only(left: 6),
+                            child: Icon(
+                              available ? Icons.shield_rounded : Icons.shield_outlined,
+                              color: available ? const Color(0xFF38BDF8) : subColor.withValues(alpha: 0.3),
+                              size: 20,
                             ),
                           );
                         }),
@@ -313,10 +304,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               sectionBorder,
               child: Column(
                 children: [
-                  _settingRow('Sign Out', '🚪', textColor, subColor,
+                  _settingRow('Sign Out', Icons.logout_rounded, textColor, subColor,
                       onTap: _confirmSignOut),
                   const Divider(height: 20),
-                  _settingRow('Delete All Data', '🗑️',
+                  _settingRow('Delete All Data', Icons.delete_forever_rounded,
                       const Color(0xFFFF6B6B), subColor,
                       onTap: _confirmDeleteAll,
                       textColor: const Color(0xFFFF6B6B)),
@@ -333,17 +324,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               sectionBorder,
               child: Column(
                 children: [
-                  _settingRow('Aumbra v1.0.0', 'ℹ️', textColor, subColor),
+                  _settingRow('Aumbra v1.0.0', Icons.info_outline_rounded, textColor, subColor),
                   const Divider(height: 20),
-                  _settingRow('100% Free. No ads. No paywalls.', '❤️', textColor, subColor),
+                  _settingRow('100% Free. No ads. No paywalls.', Icons.favorite_rounded, textColor, subColor),
                   const Divider(height: 20),
-                  _settingRow('Privacy Policy', '🔒', textColor, subColor,
+                  _settingRow('Privacy Policy', Icons.privacy_tip_outlined, textColor, subColor,
                       onTap: () {}),
                   const Divider(height: 20),
-                  _settingRow('Terms of Service', '📄', textColor, subColor,
+                  _settingRow('Terms of Service', Icons.description_outlined, textColor, subColor,
                       onTap: () {}),
                   const Divider(height: 20),
-                  _settingRow('Contact Support', '✉️', textColor, subColor,
+                  _settingRow('Contact Support', Icons.mail_outline_rounded, textColor, subColor,
                       onTap: () {}),
                 ],
               ),
@@ -358,12 +349,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _sectionHeader(String label, Color subColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text('[ $label ]',
+      child: Text(label,
           style: TextStyle(
               color: subColor,
               fontSize: 11,
-              letterSpacing: 1.5,
-              fontWeight: FontWeight.w800)),
+              letterSpacing: 1.0,
+              fontWeight: FontWeight.w700)),
     );
   }
 
@@ -373,9 +364,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       margin: const EdgeInsets.only(bottom: 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: border, width: 1.2),
+        color: const Color(0x880C1020),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: child,
     );
@@ -392,14 +382,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _settingRow(String label, String icon, Color labelColor, Color subColor,
+  Widget _settingRow(String label, IconData icon, Color labelColor, Color subColor,
       {VoidCallback? onTap, Color? textColor, Widget? trailing}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Row(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 18)),
+          Icon(icon, size: 18, color: textColor ?? subColor),
           const SizedBox(width: 12),
           Expanded(
             child: Text(label,
@@ -408,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           if (trailing != null) trailing,
           if (onTap != null && trailing == null)
-            Icon(Icons.chevron_right,
+            Icon(Icons.chevron_right_rounded,
                 color: subColor.withValues(alpha: 0.5), size: 18),
         ],
       ),

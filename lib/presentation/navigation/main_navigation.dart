@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/theme_provider.dart';
-import '../../core/constants/app_colors.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/chronicle/chronicle_screen.dart';
 import '../screens/hall_of_fame/hall_of_fame_screen.dart';
@@ -24,10 +23,10 @@ class _MainNavigationState extends State<MainNavigation>
   late Animation<double> _fadeAnim;
 
   static const _tabs = [
-    _TabItem(icon: Icons.home_outlined, label: 'HUD'),
-    _TabItem(icon: Icons.analytics_outlined, label: 'STATS'),
-    _TabItem(icon: Icons.military_tech_outlined, label: 'TITLES'),
-    _TabItem(icon: Icons.settings_outlined, label: 'SYSTEM'),
+    _TabItem(icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'HUD'),
+    _TabItem(icon: Icons.show_chart_rounded, activeIcon: Icons.show_chart_rounded, label: 'STATS'),
+    _TabItem(icon: Icons.workspace_premium_rounded, activeIcon: Icons.workspace_premium_rounded, label: 'TITLES'),
+    _TabItem(icon: Icons.tune_rounded, activeIcon: Icons.tune_rounded, label: 'SYSTEM'),
   ];
 
   @override
@@ -96,12 +95,8 @@ class _MainNavigationState extends State<MainNavigation>
     final navContent = Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xDC0B0E1A) : const Color(0xEEFFFFFF),
+        color: const Color(0xDC0B0E1A),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? rankColor.withValues(alpha: 0.25) : AppColors.lightGlassBorder,
-          width: 1.2,
-        ),
         boxShadow: [
           BoxShadow(
             color: isDark
@@ -115,74 +110,67 @@ class _MainNavigationState extends State<MainNavigation>
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 62,
-          child: Row(
-            children: List.generate(_tabs.length, (i) {
-              final isSelected = i == _currentIndex;
-              return Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => _onTabTap(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(4),
-                          decoration: isSelected
-                              ? BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: rankColor.withValues(alpha: 0.15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: rankColor.withValues(alpha: 0.4),
-                                      blurRadius: 10,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                )
-                              : null,
-                          child: Icon(
-                            _tabs[i].icon,
-                            color: isSelected ? rankColor : inactiveColor,
-                            size: isSelected ? 20 : 19,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 200),
-                          style: TextStyle(
-                            color: isSelected ? rankColor : inactiveColor,
-                            fontSize: 9,
-                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w500,
-                            letterSpacing: 0.8,
-                            fontFamily: 'monospace',
-                          ),
-                          child: Text(_tabs[i].label),
-                        ),
-                        // Sharp active indicator bar
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.only(top: 3),
-                          width: isSelected ? 18 : 0,
-                          height: 2,
-                          decoration: BoxDecoration(
-                            color: rankColor,
-                            borderRadius: BorderRadius.circular(1),
-                            boxShadow: isSelected ? [
-                              BoxShadow(color: rankColor, blurRadius: 4)
-                            ] : null,
-                          ),
+          height: 60,
+          child: Stack(
+            children: [
+              // Smooth sliding indicator pill
+              AnimatedAlign(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment(-1.0 + (_currentIndex * (2.0 / (_tabs.length - 1))), 0),
+                child: FractionallySizedBox(
+                  widthFactor: 1.0 / _tabs.length,
+                  heightFactor: 0.8,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(
+                      color: rankColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: rankColor.withValues(alpha: 0.15),
+                          blurRadius: 10,
                         ),
                       ],
                     ),
                   ),
                 ),
-              );
-            }),
+              ),
+
+              // Tab items row
+              Row(
+                children: List.generate(_tabs.length, (i) {
+                  final isSelected = i == _currentIndex;
+                  return Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _onTabTap(i),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _tabs[i].icon,
+                            color: isSelected ? rankColor : inactiveColor,
+                            size: 19,
+                          ),
+                          const SizedBox(height: 3),
+                          AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 200),
+                            style: TextStyle(
+                              color: isSelected ? rankColor : inactiveColor,
+                              fontSize: 10,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                              letterSpacing: 0.4,
+                            ),
+                            child: Text(_tabs[i].label),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
         ),
       ),
@@ -202,6 +190,7 @@ class _MainNavigationState extends State<MainNavigation>
 
 class _TabItem {
   final IconData icon;
+  final IconData activeIcon;
   final String label;
-  const _TabItem({required this.icon, required this.label});
+  const _TabItem({required this.icon, required this.activeIcon, required this.label});
 }

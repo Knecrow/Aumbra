@@ -84,17 +84,15 @@ class _AppRoot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = context.watch<ThemeProvider>();
     final userProvider = context.watch<UserProvider>();
     final rankColor = userProvider.currentRankColor;
 
     return MaterialApp(
       title: 'Aumbra',
       debugShowCheckedModeBanner: false,
-      theme: buildLightTheme(rankColor),
+      theme: buildDarkTheme(rankColor),
       darkTheme: buildDarkTheme(rankColor),
-      themeMode:
-          themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: ThemeMode.dark,
       home: const _AppEntryPoint(),
     );
   }
@@ -172,21 +170,17 @@ class _SplashScreen extends StatelessWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF9E9E9E).withValues(alpha: 0.15),
+                  color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF9E9E9E).withValues(alpha: 0.3),
+                      color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
                       blurRadius: 30,
                       spreadRadius: 8,
                     ),
                   ],
-                  border: Border.all(
-                    color: const Color(0xFF9E9E9E).withValues(alpha: 0.3),
-                    width: 1.5,
-                  ),
                 ),
                 child: const Center(
-                  child: Text('👁️', style: TextStyle(fontSize: 36)),
+                  child: Icon(Icons.auto_awesome_rounded, color: Color(0xFF00E5FF), size: 36),
                 ),
               ),
             ),

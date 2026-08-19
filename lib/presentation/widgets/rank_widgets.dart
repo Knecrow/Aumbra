@@ -109,22 +109,22 @@ class _RankGlowBadgeState extends State<RankGlowBadge>
 
   IconData _getRankIcon(int rank) {
     switch (rank) {
-      case 1: return Icons.auto_awesome;                  // Awakened: Celestial Rune
-      case 2: return Icons.explore_outlined;               // Seeker: Astral Compass
-      case 3: return Icons.bolt_outlined;                  // Strider: Gale Bolt Chevron
-      case 4: return Icons.local_fire_department_outlined;  // Forged: Molten Flame
-      case 5: return Icons.north_east;                     // Ascendant: Ascension Blade
-      case 6: return Icons.shield_outlined;               // Exalted: Valarian Crest
-      case 7: return Icons.diamond_outlined;               // Paragon: Arcane Crystal
-      case 8: return Icons.menu_book_outlined;             // Sage: Eldritch Grimoire
-      case 9: return Icons.wb_sunny_outlined;              // Saint: Solar Halo
-      case 10: return Icons.all_inclusive;                 // Limitless: Ouroboros Infinity
-      case 11: return Icons.hourglass_empty;               // Eternal: Chronos Hourglass
-      case 12: return Icons.flare;                         // Transcendent: Aetherial Starburst
-      case 13: return Icons.stars;                         // Celestial: Starlight Constellation
-      case 14: return Icons.military_tech_outlined;        // Divine: Sovereign Paladin Crest
-      case 15: return Icons.workspace_premium;             // Absolute: Sovereign Crown
-      default: return Icons.auto_awesome;
+      case 1: return Icons.auto_awesome_rounded;
+      case 2: return Icons.explore_rounded;
+      case 3: return Icons.bolt_rounded;
+      case 4: return Icons.local_fire_department_rounded;
+      case 5: return Icons.north_east_rounded;
+      case 6: return Icons.shield_rounded;
+      case 7: return Icons.diamond_rounded;
+      case 8: return Icons.menu_book_rounded;
+      case 9: return Icons.wb_sunny_rounded;
+      case 10: return Icons.all_inclusive_rounded;
+      case 11: return Icons.hourglass_empty_rounded;
+      case 12: return Icons.flare_rounded;
+      case 13: return Icons.stars_rounded;
+      case 14: return Icons.military_tech_rounded;
+      case 15: return Icons.workspace_premium_rounded;
+      default: return Icons.auto_awesome_rounded;
     }
   }
 }
@@ -147,48 +147,44 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final subColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
-    final iconColor = accentColor ?? (isDark ? const Color(0xFF64748B) : const Color(0xFFCBD5E1));
+    final labelColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final valueColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final iconColor = accentColor ?? (isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7));
 
-    final effectiveColor = accentColor ?? (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8));
-    final bgColor = isDark
-        ? effectiveColor.withValues(alpha: 0.12)
-        : effectiveColor.withValues(alpha: 0.08);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(6),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Icon(icon, color: iconColor, size: 20),
+              const SizedBox(width: 8),
               Text(
-                label.toUpperCase(),
+                value,
                 style: TextStyle(
-                  color: subColor,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.0,
+                  color: valueColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
                 ),
               ),
-              Icon(icon, color: iconColor, size: 13),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
-            value,
+            label,
             style: TextStyle(
-              color: accentColor ?? (isDark ? AppColors.darkText : Colors.black87),
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.8,
+              color: labelColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -217,11 +213,8 @@ class RankProgressBar extends StatelessWidget {
     final textColor = isDark ? AppColors.darkText : const Color(0xFF0F172A);
     final subColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
     final trackColor = isDark
-        ? const Color(0xFF22283D)
-        : Colors.black.withValues(alpha: 0.12);
-    final trackBorder = isDark
-        ? const Color(0xFF384366)
-        : Colors.black.withValues(alpha: 0.25);
+        ? color.withValues(alpha: 0.1)
+        : color.withValues(alpha: 0.08);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,11 +244,10 @@ class RankProgressBar extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Container(
-          height: 10,
+          height: 8,
           decoration: BoxDecoration(
             color: trackColor,
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: trackBorder, width: 1.0),
           ),
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: progress.clamp(0.0, 1.0)),
