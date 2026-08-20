@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../data/models/quest_model.dart';
 import '../../providers/user_provider.dart';
 import '../../core/constants/app_colors.dart';
+export 'hex_quest_card.dart';
 
 class QuestCard extends StatefulWidget {
   final QuestModel quest;
@@ -83,18 +84,34 @@ class _QuestCardState extends State<QuestCard> with SingleTickerProviderStateMix
               borderRadius: BorderRadius.circular(12),
             )
           : BoxDecoration(
-              color: isCompleted ? const Color(0xFF0D0F18) : AppColors.darkCard,
-              gradient: isCompleted ? null : AppColors.darkCardGradient,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isCompleted
+                    ? [const Color(0xFF080808), const Color(0xFF040404)]
+                    : [const Color(0xFF0E0E0E), const Color(0xFF060606)],
+              ),
               borderRadius: BorderRadius.circular(16),
-              boxShadow: widget.quest.isBossQuest && !isCompleted
-                  ? [
-                      BoxShadow(
-                        color: rankColor.withValues(alpha: 0.15),
-                        blurRadius: 12,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
+              border: Border.all(
+                color: widget.quest.isBossQuest && !isCompleted
+                    ? effectiveColor.withValues(alpha: 0.35)
+                    : Colors.white.withValues(alpha: isCompleted ? 0.04 : 0.07),
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.50),
+                  blurRadius: 14,
+                  offset: const Offset(0, 5),
+                ),
+                if (widget.quest.isBossQuest && !isCompleted)
+                  BoxShadow(
+                    color: effectiveColor.withValues(alpha: 0.15),
+                    blurRadius: 18,
+                    spreadRadius: -2,
+                    offset: const Offset(0, 4),
+                  ),
+              ],
             ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +260,7 @@ class _QuestCardState extends State<QuestCard> with SingleTickerProviderStateMix
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF090A10),
+                      color: const Color(0xFF0A0A0A),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

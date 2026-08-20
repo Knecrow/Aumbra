@@ -131,11 +131,11 @@ class _RankGlowBadgeState extends State<RankGlowBadge>
                 height: widget.size * (progressVal != null ? 0.72 : 0.70),
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xFF0D0E15),
+                  color: Color(0xFF000000),
                   gradient: RadialGradient(
                     colors: [
-                      Color(0xFF1E1F2C),
-                      Color(0xFF090A0F),
+                      Color(0xFF101010),
+                      Color(0xFF000000),
                     ],
                   ),
                 ),

@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 
 ThemeData buildDarkTheme(Color rankColor) {
   final primaryColor = rankColor == const Color(0xFF00E5FF) ? AppColors.goldPrimary : rankColor;
+
+  final baseTextTheme = TextTheme(
+    displayLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+    displayMedium: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+    headlineLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: 0.8),
+    headlineMedium: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: 0.6),
+    headlineSmall: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 0.4),
+    titleLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 0.3),
+    titleMedium: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.2),
+    bodyLarge: const TextStyle(color: AppColors.darkText, fontSize: 14, height: 1.4),
+    bodyMedium: const TextStyle(color: AppColors.darkSubText, fontSize: 12, height: 1.4),
+    bodySmall: const TextStyle(color: AppColors.darkDimText, fontSize: 10, letterSpacing: 0.5),
+    labelLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1.2),
+  );
 
   return ThemeData(
     brightness: Brightness.dark,
@@ -16,19 +31,7 @@ ThemeData buildDarkTheme(Color rankColor) {
     ),
     cardColor: AppColors.darkCard,
     dividerColor: AppColors.darkBorder,
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w900, letterSpacing: 1.2),
-      displayMedium: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, letterSpacing: 0.8),
-      headlineLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: 0.8),
-      headlineMedium: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: 0.6),
-      headlineSmall: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 0.4),
-      titleLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 0.3),
-      titleMedium: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.2),
-      bodyLarge: TextStyle(color: AppColors.darkText, fontSize: 14, height: 1.4),
-      bodyMedium: TextStyle(color: AppColors.darkSubText, fontSize: 12, height: 1.4),
-      bodySmall: TextStyle(color: AppColors.darkDimText, fontSize: 10, letterSpacing: 0.5),
-      labelLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1.2),
-    ),
+    textTheme: GoogleFonts.interTextTheme(baseTextTheme),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -54,26 +57,36 @@ ThemeData buildDarkTheme(Color rankColor) {
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
         foregroundColor: Colors.black,
-        elevation: 6,
-        shadowColor: primaryColor.withValues(alpha: 0.4),
+        elevation: 0,
+        shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: AppColors.goldLight.withValues(alpha: 0.8), width: 1.0),
+          borderRadius: BorderRadius.circular(50), // full pill
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         textStyle: const TextStyle(
           fontWeight: FontWeight.w900,
           letterSpacing: 1.2,
+          fontSize: 13,
         ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: primaryColor,
+        side: BorderSide(color: primaryColor.withValues(alpha: 0.6), width: 1.2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       ),
     ),
     cardTheme: CardThemeData(
       color: AppColors.darkCard,
-      elevation: 4,
-      shadowColor: Colors.black.withValues(alpha: 0.5),
+      elevation: 0,
+      shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.06), width: 1),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.07), width: 1),
       ),
     ),
     dialogTheme: DialogThemeData(
@@ -118,6 +131,18 @@ ThemeData buildDarkTheme(Color rankColor) {
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: primaryColor,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: const Color(0xFF1A1C28),
+      contentTextStyle: GoogleFonts.inter(
+        color: Colors.white,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      behavior: SnackBarBehavior.floating,
+      elevation: 8,
+      actionTextColor: primaryColor,
     ),
   );
 }

@@ -264,7 +264,7 @@ class HallOfFameScreen extends StatelessWidget {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: earned ? const Color(0xFF101015) : const Color(0xFF07070A),
+                                      color: earned ? const Color(0xFF0E0E0E) : const Color(0xFF050505),
                                       borderRadius: BorderRadius.circular(12),
                                       boxShadow: earned
                                           ? [
@@ -518,8 +518,8 @@ class HallOfFameScreen extends StatelessWidget {
                     height: 44,
                     decoration: BoxDecoration(
                       color: isReached
-                          ? const Color(0xFF141624)
-                          : const Color(0xFF090A10),
+                          ? const Color(0xFF0F0F0F)
+                          : const Color(0xFF050505),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(

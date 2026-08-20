@@ -323,7 +323,7 @@ class _RadialQuestDialState extends State<RadialQuestDial>
               ),
               child: Column(
                 children: [
-                  // Category Badge
+                  // Category / Status Badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                     decoration: BoxDecoration(
@@ -335,7 +335,7 @@ class _RadialQuestDialState extends State<RadialQuestDial>
                       ),
                     ),
                     child: Text(
-                      activeQuest.category.toUpperCase(),
+                      activeQuest.isBossQuest ? 'BOSS' : 'OBJECTIVE',
                       style: TextStyle(
                         color: lightRankColor,
                         fontSize: 9.5,
@@ -408,12 +408,12 @@ class _RadialQuestDialState extends State<RadialQuestDial>
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            isCurrentCompleted ? 'SEALED (UNDO)' : 'SEAL OBJECTIVE',
+                            isCurrentCompleted ? 'COMPLETED' : 'COMPLETE',
                             style: TextStyle(
                               color: isCurrentCompleted ? Colors.white : Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 1.3,
+                              letterSpacing: 1.2,
                             ),
                           ),
                         ],

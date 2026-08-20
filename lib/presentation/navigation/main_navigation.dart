@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../core/constants/app_colors.dart';
@@ -121,7 +122,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0D0E16),
+                    color: const Color(0xFF0A0A0A),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -209,44 +210,45 @@ class _MainNavigationState extends State<MainNavigation> {
     final lightRankColor = AppColors.getLightVariant(rankColor);
 
     final navContent = Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
+        color: const Color(0xFF000000),
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF0D0D12),
-            Color.lerp(const Color(0xFF050508), rankColor, 0.14)!,
+            const Color(0xFF0A0A0A),
+            Color.lerp(const Color(0xFF000000), rankColor, 0.08)!,
           ],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(26),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: rankColor.withValues(alpha: 0.22),
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.65),
-            blurRadius: 28,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.70),
+            blurRadius: 32,
+            offset: const Offset(0, 10),
           ),
           BoxShadow(
-            color: rankColor.withValues(alpha: 0.30),
-            blurRadius: 20,
-            spreadRadius: 1,
-            offset: const Offset(0, 2),
+            color: rankColor.withValues(alpha: 0.18),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 56,
+          height: 52,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // 1. HUD / Home
+              // 1. Home / HUD
               _NavTabItem(
                 icon: Icons.space_dashboard_outlined,
                 activeIcon: Icons.space_dashboard_rounded,
@@ -257,7 +259,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 2. Stats / Habits
+              // 2. Chronicle / Stats
               _NavTabItem(
                 icon: Icons.query_stats_rounded,
                 activeIcon: Icons.query_stats_rounded,
@@ -268,14 +270,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 3. Center Glowing Rank Emblem Button
-              _CenterEmblemButton(
-                rankColor: rankColor,
-                lightRankColor: lightRankColor,
-                onTap: _onCenterEmblemTap,
-              ),
-
-              // 4. Titles / Badges
+              // 3. Hall of Fame
               _NavTabItem(
                 icon: Icons.military_tech_outlined,
                 activeIcon: Icons.military_tech_rounded,
@@ -286,7 +281,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 5. System / Settings
+              // 4. Settings
               _NavTabItem(
                 icon: Icons.tune_rounded,
                 activeIcon: Icons.tune_rounded,
@@ -307,6 +302,7 @@ class _MainNavigationState extends State<MainNavigation> {
 }
 
 // ── ONE UI FLUID TACTILE NAV TAB ITEM ──────────────────────────────────────────
+// ── ONE UI FLUID TACTILE NAV TAB ITEM (NO TEXT, PURE ICON) ─────────────────
 class _NavTabItem extends StatefulWidget {
   final IconData icon;
   final IconData activeIcon;
@@ -369,7 +365,7 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 240),
               curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
               decoration: BoxDecoration(
                 color: widget.isSelected
                     ? widget.rankColor.withValues(alpha: 0.20)
@@ -378,16 +374,16 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
                 boxShadow: widget.isSelected
                     ? [
                         BoxShadow(
-                          color: widget.rankColor.withValues(alpha: 0.35),
+                          color: widget.rankColor.withValues(alpha: 0.25),
                           blurRadius: 10,
-                          spreadRadius: 1,
+                          spreadRadius: 0,
                         ),
                       ]
                     : null,
               ),
               child: AnimatedScale(
                 duration: const Duration(milliseconds: 240),
-                scale: widget.isSelected ? 1.08 : 1.0,
+                scale: widget.isSelected ? 1.10 : 1.0,
                 curve: Curves.easeOutBack,
                 child: Icon(
                   widget.isSelected ? widget.activeIcon : widget.icon,

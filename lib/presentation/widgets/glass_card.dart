@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
 import '../../core/constants/app_colors.dart';
 
 class GlassCard extends StatelessWidget {
@@ -29,69 +27,45 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = context.watch<ThemeProvider>();
-    final isDark = themeProvider.isDarkMode;
-
-    final defaultBorder = isDark
-        ? Colors.white.withValues(alpha: 0.06)
-        : AppColors.lightGlassBorder;
-    final effectiveBorder = borderColor ?? defaultBorder;
-    final defaultBg = isDark ? AppColors.darkCard : const Color(0xFFF1F5F9);
+    final effectiveBorder = borderColor ?? Colors.white.withValues(alpha: 0.07);
 
     final List<BoxShadow> shadows = glowColor != null
         ? [
             BoxShadow(
-              color: glowColor!.withValues(alpha: 0.25),
-              blurRadius: 20,
-              spreadRadius: 1,
+              color: glowColor!.withValues(alpha: 0.20),
+              blurRadius: 22,
+              spreadRadius: -2,
+              offset: const Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.50),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
-              blurRadius: 12,
-              spreadRadius: 0,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: 0.50),
+              blurRadius: 16,
+              offset: const Offset(0, 5),
             ),
           ];
 
     Widget containerWidget = Container(
       margin: margin,
       decoration: BoxDecoration(
-        color: gradient == null ? defaultBg : null,
-        gradient: gradient ?? (isDark ? AppColors.darkCardGradient : null),
+        gradient: gradient ?? const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0D0D0D), Color(0xFF050505)],
+        ),
         borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: effectiveBorder, width: 1.0),
         boxShadow: shadows,
       ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: padding ?? const EdgeInsets.all(16),
-            child: child,
-          ),
-          if (showCornerBrackets && isDark) ...[
-            Positioned(
-              top: 4,
-              left: 4,
-              child: _CornerBracket(color: effectiveBorder, angle: 0),
-            ),
-            Positioned(
-              top: 4,
-              right: 4,
-              child: _CornerBracket(color: effectiveBorder, angle: 1.5708),
-            ),
-            Positioned(
-              bottom: 4,
-              right: 4,
-              child: _CornerBracket(color: effectiveBorder, angle: 3.14159),
-            ),
-            Positioned(
-              bottom: 4,
-              left: 4,
-              child: _CornerBracket(color: effectiveBorder, angle: 4.71239),
-            ),
-          ],
-        ],
+      child: Padding(
+        padding: padding ?? const EdgeInsets.all(16),
+        child: child,
       ),
     );
 
@@ -107,6 +81,7 @@ class GlassCard extends StatelessWidget {
   }
 }
 
+// ── Corner Bracket Decorator (kept for backwards compatibility) ──────────────
 class _CornerBracket extends StatelessWidget {
   final Color color;
   final double angle;
@@ -139,15 +114,15 @@ class _BracketPainter extends CustomPainter {
       ..color = color.withValues(alpha: 0.6)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
-
     final path = Path()
       ..moveTo(0, size.height)
       ..lineTo(0, 0)
       ..lineTo(size.width, 0);
-
     canvas.drawPath(path, paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+

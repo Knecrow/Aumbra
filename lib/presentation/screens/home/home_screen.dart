@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/quest_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../widgets/rank_widgets.dart';
-import '../../widgets/radial_quest_dial.dart';
+import '../../widgets/hex_quest_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -76,160 +77,171 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             opacity: _headerAnim,
             child: Column(
               children: [
-                // ── 1. LARGE & PROMINENT TOP PODS (IDENTITY LEFT + TELEMETRY RIGHT) ──
+                // ── 1. DEDICATED TOP PROFILE & TELEMETRY CARD ─────────────
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // ── LEFT TOP: STRUCTURED IDENTITY POD ──
-                      GestureDetector(
-                        onTap: () => _showEditProfileModal(context, userProvider),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.darkCard,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.06),
-                              width: 1.0,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.40),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RankGlowBadge(
-                                rankInfo: rankInfo,
-                                size: 44,
-                                progress: ascProgress,
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: AppColors.glassCard(
+                      rankColor: rankColor,
+                      borderRadius: 22,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // ── Top Row: Profile & Stats ───────────────────────
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Left: Avatar with Progress Ring + Codename + Rank Name Highlight
+                            GestureDetector(
+                              onTap: () => _showEditProfileModal(context, userProvider),
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Row(
+                                  // Circular Avatar with Ascension Progress Ring in Rank Color
+                                  SizedBox(
+                                    width: 46,
+                                    height: 46,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        // Progress Ring in Rank Color
+                                        CircularProgressIndicator(
+                                          value: ascProgress,
+                                          strokeWidth: 2.5,
+                                          backgroundColor: Colors.white.withValues(alpha: 0.08),
+                                          valueColor: AlwaysStoppedAnimation<Color>(rankColor),
+                                        ),
+                                        // Inner Avatar Circle with Unique Rank Insignia Icon
+                                        Container(
+                                          width: 36,
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: const Color(0xFF000000),
+                                            border: Border.all(
+                                              color: rankColor.withValues(alpha: 0.40),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              _getRankAvatarIcon(rankInfo.rankNumber),
+                                              color: lightRankColor,
+                                              size: 19,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Name & Highlighted Rank Name Pill
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         user.name.toUpperCase(),
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 15,
+                                          fontSize: 14.5,
                                           fontWeight: FontWeight.w900,
-                                          letterSpacing: 1.2,
+                                          letterSpacing: 0.6,
                                         ),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Icon(Icons.edit_outlined, color: rankColor.withValues(alpha: 0.7), size: 13),
+                                      const SizedBox(height: 3),
+                                      // 🌟 RANK NAME HIGHLIGHT PILL
+                                      GestureDetector(
+                                        onTap: () => _showRankLoreModal(context, userProvider),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: rankColor.withValues(alpha: 0.16),
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: rankColor.withValues(alpha: 0.45),
+                                              width: 0.9,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            rankInfo.name.toUpperCase(),
+                                            style: TextStyle(
+                                              color: lightRankColor,
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 0.8,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: rankColor.withValues(alpha: 0.16),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(
-                                        color: rankColor.withValues(alpha: 0.35),
-                                        width: 0.8,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      rankInfo.name.toUpperCase(),
-                                      style: TextStyle(
-                                        color: lightRankColor,
-                                        fontSize: 9.5,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 0.8,
-                                      ),
-                                    ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // ── RIGHT TOP: STRUCTURED TELEMETRY POD ──
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: AppColors.darkCard,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.06),
-                            width: 1.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.40),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Streak & Days Row
+
+                            // Right: 3 Shields & Streak Pill
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Days Awakened
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.darkCardElevated,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.05),
-                                      width: 0.8,
+                                // 1. Streak Protection Shields (3 Shields)
+                                GestureDetector(
+                                  onTap: () => _showShieldInfoDialog(context, user.shieldsRemaining, rankColor),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF000000),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: rankColor.withValues(alpha: 0.35),
+                                        width: 1.0,
+                                      ),
                                     ),
-                                  ),
-                                  child: Text(
-                                    '⚡ ${daysAwakened}d',
-                                    style: const TextStyle(
-                                      color: AppColors.darkSubText,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.4,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: List.generate(3, (idx) {
+                                        final isActive = idx < user.shieldsRemaining;
+                                        return Padding(
+                                          padding: EdgeInsets.only(right: idx < 2 ? 3 : 0),
+                                          child: Icon(
+                                            isActive ? Icons.shield_rounded : Icons.shield_outlined,
+                                            color: isActive
+                                                ? rankColor
+                                                : Colors.white.withValues(alpha: 0.18),
+                                            size: 13.5,
+                                          ),
+                                        );
+                                      }),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 5),
+                                const SizedBox(width: 7),
 
-                                // Streak Flame Pill
+                                // 2. Streak Pill (Flame + Days)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: AppColors.darkCardElevated,
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: const Color(0xFF000000),
+                                    borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                      color: rankColor.withValues(alpha: 0.35),
-                                      width: 0.8,
+                                      color: const Color(0xFFFF9100).withValues(alpha: 0.30),
+                                      width: 1.0,
                                     ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.local_fire_department_rounded, color: rankColor, size: 14),
+                                      const Icon(Icons.local_fire_department_rounded,
+                                          color: Color(0xFFFF9100), size: 13),
                                       const SizedBox(width: 3),
                                       Text(
                                         '${user.currentStreak}d',
-                                        style: TextStyle(
-                                          color: lightRankColor,
-                                          fontSize: 11.5,
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFB74D),
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),
@@ -238,161 +250,378 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 ),
                               ],
                             ),
+                          ],
+                        ),
 
-                            const SizedBox(height: 5),
+                        const SizedBox(height: 12),
 
-                            // Shields & Info Row
+                        // ── Bottom Progress Bar for Completed Days / Ascension ──
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.darkCardElevated,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.05),
-                                      width: 0.8,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: List.generate(3, (i) {
-                                      final available = i < user.shieldsRemaining;
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 1),
-                                        child: Icon(
-                                          available ? Icons.shield_rounded : Icons.shield_outlined,
-                                          color: available ? rankColor : AppColors.darkDimText.withValues(alpha: 0.35),
-                                          size: 13,
-                                        ),
-                                      );
-                                    }),
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                GestureDetector(
-                                  onTap: () => _showRankLoreModal(context, userProvider),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(3.5),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.darkCardElevated,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white.withValues(alpha: 0.06),
-                                        width: 0.8,
-                                      ),
-                                    ),
-                                    child: Icon(Icons.info_outline_rounded, color: rankColor, size: 13),
+                                Icon(Icons.done_all_rounded,
+                                    color: AppColors.emeraldPrimary, size: 12),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'COMPLETED: $userCompletions / $completionsReq PROTOCOLS',
+                                  style: const TextStyle(
+                                    color: Color(0xFF8E9BA6),
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.6,
                                   ),
                                 ),
                               ],
                             ),
+                            Text(
+                              '${(ascProgress * 100).toInt()}%',
+                              style: TextStyle(
+                                color: lightRankColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 6),
+                        // Sleek Glowing Linear Progress Bar
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            children: [
+                              Container(
+                                height: 5.5,
+                                width: double.infinity,
+                                color: Colors.white.withValues(alpha: 0.08),
+                              ),
+                              FractionallySizedBox(
+                                widthFactor: ascProgress.clamp(0.02, 1.0),
+                                child: Container(
+                                  height: 5.5,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        rankColor,
+                                        lightRankColor,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: rankColor.withValues(alpha: 0.5),
+                                        blurRadius: 6,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
-                // ── 2. HERO CENTERPIECE: RADIAL ENERGY WHEEL (70% ATTENTION) ──
+                // ── 2. HERO CENTERPIECE: HEXAGONAL HONEYCOMB QUEST GRID ────
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: RadialQuestDial(
-                          quests: questProvider.todayQuests,
-                          bossQuest: questProvider.bossQuest,
-                          bossQuestUnlocked: questProvider.bossQuestUnlocked,
-                          rankColor: rankColor,
-                          rankInfo: rankInfo,
-                          ascProgress: ascProgress,
-                          onComplete: (id) => questProvider.completeQuest(id),
-                          onUncomplete: (id) => questProvider.uncompleteQuest(id),
-                          onBossChallenge: () => _showBossQuestDialog(questProvider, rankColor),
-                          onCenterTap: () => _showRankLoreModal(context, userProvider),
-                        ),
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      child: HexQuestHoneycombGrid(
+                        quests: questProvider.todayQuests,
+                        bossQuest: questProvider.bossQuest,
+                        bossQuestUnlocked: questProvider.bossQuestUnlocked,
+                        oathAnswered: answered,
+                        oathHonored: answerTrue,
+                        onOathTap: () => _showHonestyOathModal(context, questProvider, rankColor),
+                        rankColor: rankColor,
+                        rankInfo: rankInfo,
+                        onComplete: (id) => questProvider.completeQuest(id),
+                        onUncomplete: (id) => questProvider.uncompleteQuest(id),
+                        onBossChallenge: () => _showBossQuestDialog(questProvider, rankColor),
                       ),
-                    ),
-                  ),
-                ),
-
-                // ── 3. MINIMAL 1-LINE DAILY INTEGRITY OATH TRIGGER ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppColors.darkCard,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.06),
-                        width: 1.0,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.40),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.verified_user_rounded,
-                          color: answered
-                              ? (answerTrue ? AppColors.emeraldPrimary : AppColors.darkSubText)
-                              : rankColor,
-                          size: 15,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            answered
-                                ? (answerTrue ? 'INTEGRITY: HONOR KEPT' : 'INTEGRITY: REFLECTION LOGGED')
-                                : 'INTEGRITY: HONEST WORK TODAY?',
-                            style: TextStyle(
-                              color: answered
-                                  ? (answerTrue ? AppColors.emeraldPrimary : AppColors.darkSubText)
-                                  : Colors.white,
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.6,
-                            ),
-                          ),
-                        ),
-                        if (!answered) ...[
-                          _CompactOathButton(
-                            label: 'YES',
-                            color: rankColor,
-                            onTap: () => questProvider.answerOath(true),
-                          ),
-                          const SizedBox(width: 6),
-                          _CompactOathButton(
-                            label: 'NO',
-                            color: AppColors.darkSubText,
-                            onTap: () => _showOathReflectionDialog(context, rankColor),
-                          ),
-                        ] else
-                          Icon(
-                            answerTrue ? Icons.shield_rounded : Icons.info_outline_rounded,
-                            color: answerTrue ? AppColors.emeraldPrimary : AppColors.darkSubText,
-                            size: 16,
-                          ),
-                      ],
                     ),
                   ),
                 ),
 
                 // Floating Nav Dock spacing
-                const SizedBox(height: 80),
+                const SizedBox(height: 86),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Returns time-of-day greeting
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning,';
+    if (hour < 17) return 'Good Afternoon,';
+    return 'Good Evening,';
+  }
+
+  /// Unique avatar insignia icon for each hunter rank
+  IconData _getRankAvatarIcon(int rank) {
+    switch (rank) {
+      case 1: return Icons.auto_awesome_rounded;      // Awakened Spark
+      case 2: return Icons.explore_rounded;            // Seeker Compass
+      case 3: return Icons.bolt_rounded;               // Strider Lightning
+      case 4: return Icons.local_fire_department_rounded; // Forged Flame
+      case 5: return Icons.north_east_rounded;         // Vector Ascendant
+      case 6: return Icons.shield_rounded;             // Warden Shield
+      case 7: return Icons.diamond_rounded;            // Sovereign Diamond
+      case 8: return Icons.menu_book_rounded;          // Master Grimoire
+      case 9: return Icons.wb_sunny_rounded;           // Solar Zenith
+      case 10: return Icons.all_inclusive_rounded;     // Eternal Infinity
+      case 11: return Icons.hourglass_empty_rounded;   // Time Weaver
+      case 12: return Icons.flare_rounded;             // Solar Flare
+      case 13: return Icons.stars_rounded;             // Celestial Monarch
+      case 14: return Icons.military_tech_rounded;     // Grand Marshal
+      case 15: return Icons.workspace_premium_rounded; // Absolute Crown
+      default: return Icons.auto_awesome_rounded;
+    }
+  }
+
+  void _showShieldInfoDialog(BuildContext context, int shieldsRemaining, Color rankColor) {
+    HapticFeedback.selectionClick();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF080808),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: rankColor.withValues(alpha: 0.4), width: 1.2),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.shield_rounded, color: rankColor, size: 20),
+            const SizedBox(width: 8),
+            const Text(
+              'STREAK SHIELDS',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: List.generate(3, (idx) {
+                final active = idx < shieldsRemaining;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Icon(
+                    active ? Icons.shield_rounded : Icons.shield_outlined,
+                    color: active ? const Color(0xFF29B6F6) : Colors.white.withValues(alpha: 0.20),
+                    size: 26,
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '$shieldsRemaining of 3 Shields Available',
+              style: const TextStyle(
+                color: Color(0xFF81D4FA),
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Streak shields automatically preserve your active streak if you miss a protocol day. Shields refresh each month.',
+              style: TextStyle(
+                color: Color(0xFF8E9BA6),
+                fontSize: 12,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('DISMISS', style: TextStyle(color: Color(0xFF29B6F6), fontWeight: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showHonestyOathModal(BuildContext context, QuestProvider questProvider, Color rankColor) {
+    HapticFeedback.mediumImpact();
+    final answered = questProvider.oathAnswered;
+    final answerTrue = questProvider.oathAnswer == true;
+    final lightRank = AppColors.getLightVariant(rankColor);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Container(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: const Color(0xFF080808),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF0E0E0E), Color(0xFF040404)],
+            ),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(
+              color: answered
+                  ? (answerTrue ? AppColors.emeraldPrimary : const Color(0xFFFF9100)).withValues(alpha: 0.45)
+                  : rankColor.withValues(alpha: 0.45),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.8),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: rankColor.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: rankColor.withValues(alpha: 0.4), width: 1.0),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.shield_rounded, size: 14, color: rankColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          'HONESTY OATH',
+                          style: TextStyle(
+                            color: lightRank,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: AppColors.darkSubText, size: 20),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'DAILY INTEGRITY CHECK',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Did you complete today\'s protocols with genuine, honest effort?',
+                style: TextStyle(
+                  color: Color(0xFF8E9BA6),
+                  fontSize: 13,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        questProvider.answerOath(true);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [rankColor, AppColors.getDeepVariant(rankColor)],
+                          ),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'YES, HONORED ✓',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _showOathReflectionDialog(context, rankColor);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: AppColors.darkCardElevated,
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 1.0),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'REFLECT',
+                            style: TextStyle(
+                              color: AppColors.darkSubText,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -502,7 +731,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 decoration: InputDecoration(
                   hintText: 'Enter new codename...',
                   filled: true,
-                  fillColor: const Color(0xFF0D0E16),
+                  fillColor: const Color(0xFF0A0A0A),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),

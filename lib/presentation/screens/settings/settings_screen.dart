@@ -47,26 +47,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
-    final themeProvider = context.watch<ThemeProvider>();
-    final isDark = themeProvider.isDarkMode;
     final user = userProvider.user;
     final rankColor = userProvider.currentRankColor;
+    final rankInfo = userProvider.currentRankInfo;
+    final lightRankColor = AppColors.getLightVariant(rankColor);
+    final completionsReq = rankInfo.completionsRequired;
+    final userCompletions = user?.rankCompletions ?? 0;
+    final ascProgress = completionsReq > 0 ? (userCompletions / completionsReq).clamp(0.0, 1.0) : 1.0;
 
     if (user == null) return const SizedBox.shrink();
 
-    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final subColor = isDark ? AppColors.darkSubText : AppColors.lightSubText;
-    final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: AppColors.darkBackground,
       body: Container(
-        decoration: isDark
-            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
-            : null,
+        decoration: BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor)),
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 110),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             children: [
               // ─── TITLE ──────────────────────────────────────────────────────
@@ -84,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(
                     'SETTINGS',
                     style: TextStyle(
-                      color: textColor,
+                      color: AppColors.darkText,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.5,
@@ -92,10 +89,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
+
+              // ─── PROFILE CARD ────────────────────────────────────────────────
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      rankColor.withValues(alpha: 0.15),
+                      const Color(0xFF080808),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: rankColor.withValues(alpha: 0.30),
+                    width: 1.0,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Rank circle
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: AppColors.buildRankGradient(rankColor),
+                      ),
+                      child: Center(
+                        child: Text(
+                          rankInfo.rankNumber.toString(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: rankColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: rankColor.withValues(alpha: 0.35),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  'RANK ${rankInfo.rankNumber} · ${rankInfo.name.toUpperCase()}',
+                                  style: TextStyle(
+                                    color: lightRankColor,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: ascProgress,
+                              minHeight: 4,
+                              backgroundColor: Colors.white.withValues(alpha: 0.08),
+                              valueColor: AlwaysStoppedAnimation<Color>(rankColor),
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            '$userCompletions / $completionsReq PROTOCOLS',
+                            style: TextStyle(
+                              color: AppColors.darkDimText,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
 
               // ─── PANEL 1: AI CORE & CLOUD SYNC HUB ──────────────────────────
-              _sectionHeader('AI & CLOUD', subColor, rankColor),
+              _sectionHeader('AI & CLOUD', AppColors.darkSubText, rankColor),
               _settingsCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         hintText: 'AIzaSy...',
                         hintStyle: const TextStyle(color: AppColors.darkDimText),
                         filled: true,
-                        fillColor: const Color(0xFF090A10),
+                        fillColor: const Color(0xFF0A0A0A),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -193,8 +296,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Cloud Sync Row
                     _settingRowWithWidget(
                       'Cloud Sync (Firebase)',
-                      textColor,
-                      subColor,
+                      Colors.white,
+                      AppColors.darkSubText,
                       Switch(
                         value: user.cloudBackupEnabled,
                         activeThumbColor: rankColor,
@@ -206,8 +309,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _settingRow(
                       'Export Chronicle as JSON',
                       Icons.file_download_outlined,
-                      textColor,
-                      subColor,
+                      Colors.white,
+                      AppColors.darkSubText,
                       onTap: _exportData,
                     ),
                     if (!FirebaseService().isSignedIn) ...[
@@ -215,8 +318,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _settingRow(
                         'Sign in with Google',
                         Icons.login_rounded,
-                        textColor,
-                        subColor,
+                        Colors.white,
+                        AppColors.darkSubText,
                         onTap: _signInWithGoogle,
                       ),
                     ],
@@ -226,18 +329,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 18),
 
               // ─── PANEL 2: APPEARANCE & SHIELDS HUB ──────────────────────────
-              _sectionHeader('APPEARANCE & SHIELDS', subColor, rankColor),
+              _sectionHeader('APPEARANCE & SHIELDS', AppColors.darkSubText, rankColor),
               _settingsCard(
                 child: Column(
                   children: [
                     _settingRowWithWidget(
                       'Reduce Visual Effects',
-                      textColor,
-                      subColor,
+                      Colors.white,
+                      AppColors.darkSubText,
                       Switch(
-                        value: themeProvider.reduceEffects,
+                        value: context.watch<ThemeProvider>().reduceEffects,
                         activeThumbColor: rankColor,
-                        onChanged: (v) => themeProvider.setReduceEffects(v),
+                        onChanged: (v) => context.read<ThemeProvider>().setReduceEffects(v),
                       ),
                     ),
                     if (user.currentRank >= 15) ...[
@@ -245,8 +348,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _settingRow(
                         'Aura Color',
                         Icons.palette_outlined,
-                        textColor,
-                        subColor,
+                        Colors.white,
+                        AppColors.darkSubText,
                         trailing: Container(
                           width: 20,
                           height: 20,
@@ -296,21 +399,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 18),
 
               // ─── PANEL 3: DOSSIER & SECURITY HUB ────────────────────────────
-              _sectionHeader('SECURITY & DATA', subColor, rankColor),
+              _sectionHeader('SECURITY & DATA', AppColors.darkSubText, rankColor),
               _settingsCard(
                 child: Column(
                   children: [
-                    _settingRow('Aumbra Protocol v1.0.0', Icons.terminal_rounded, textColor, subColor),
+                    _settingRow('Aumbra Protocol v1.0.0', Icons.terminal_rounded, Colors.white, AppColors.darkSubText),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
-                    _settingRow('Privacy Policy', Icons.security_rounded, textColor, subColor, onTap: () {}),
+                    _settingRow('Privacy Policy', Icons.security_rounded, Colors.white, AppColors.darkSubText, onTap: () {}),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
-                    _settingRow('Terms of Service', Icons.description_rounded, textColor, subColor, onTap: () {}),
+                    _settingRow('Terms of Service', Icons.description_rounded, Colors.white, AppColors.darkSubText, onTap: () {}),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
-                    _settingRow('Sign Out', Icons.logout_rounded, textColor, subColor,
+                    _settingRow('Sign Out', Icons.logout_rounded, Colors.white, AppColors.darkSubText,
                         onTap: _confirmSignOut),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
                     _settingRow('Purge All Data', Icons.delete_sweep_rounded,
-                        const Color(0xFFFF6B6B), subColor,
+                        const Color(0xFFFF6B6B), AppColors.darkSubText,
                         onTap: _confirmDeleteAll,
                         textColor: const Color(0xFFFF6B6B)),
                   ],
@@ -352,18 +455,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
-        gradient: AppColors.darkCardGradient,
-        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0C0C0C), Color(0xFF050505)],
+        ),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: Colors.white.withValues(alpha: 0.07),
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 22,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
