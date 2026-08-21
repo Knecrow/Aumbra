@@ -302,7 +302,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         },
                       ),
 
-                      const SizedBox(height: 12),
+                      // ── Visual Power Circuit Conduit Bridge ──
+                      TacticalConduitBridge(
+                        completedCount: questProvider.todayQuests.where((q) => q.isCompleted).length,
+                        totalQuests: questProvider.todayQuests.length.clamp(1, 4),
+                        rankColor: rankColor,
+                      ),
 
                       // Ultimate Ability Card (The Final Key // Honesty Oath Reactor)
                       ValorantUltimateCard(

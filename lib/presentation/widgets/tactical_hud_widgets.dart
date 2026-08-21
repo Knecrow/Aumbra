@@ -217,3 +217,117 @@ class TacticalStreakPod extends StatelessWidget {
     );
   }
 }
+
+/// Tactical visual power circuit conduit that connects the 2x2 daily ability cards
+/// down into the central Honesty Oath / Final Key Reactor
+class TacticalConduitBridge extends StatelessWidget {
+  final int completedCount;
+  final int totalQuests;
+  final Color rankColor;
+
+  const TacticalConduitBridge({
+    super.key,
+    required this.completedCount,
+    this.totalQuests = 4,
+    required this.rankColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isFullCharge = completedCount >= totalQuests && totalQuests > 0;
+    final activeColor = isFullCharge ? const Color(0xFF00F5D4) : rankColor;
+
+    return SizedBox(
+      height: 20,
+      child: CustomPaint(
+        painter: _ConduitBridgePainter(
+          completedCount: completedCount,
+          totalQuests: totalQuests,
+          activeColor: activeColor,
+        ),
+      ),
+    );
+  }
+}
+
+class _ConduitBridgePainter extends CustomPainter {
+  final int completedCount;
+  final int totalQuests;
+  final Color activeColor;
+
+  _ConduitBridgePainter({
+    required this.completedCount,
+    required this.totalQuests,
+    required this.activeColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final leftX = size.width * 0.25;
+    final rightX = size.width * 0.75;
+    final centerX = size.width * 0.5;
+    final midY = size.height * 0.45;
+    final bottomY = size.height;
+
+    const inactiveColor = Color(0xFF232A38);
+
+    final leftActive = completedCount >= 1;
+    final rightActive = completedCount >= 2;
+    final centerActive = completedCount > 0;
+
+    final leftPaint = Paint()
+      ..color = leftActive ? activeColor : inactiveColor
+      ..strokeWidth = leftActive ? 1.5 : 1.0
+      ..style = PaintingStyle.stroke;
+
+    final rightPaint = Paint()
+      ..color = rightActive ? activeColor : inactiveColor
+      ..strokeWidth = rightActive ? 1.5 : 1.0
+      ..style = PaintingStyle.stroke;
+
+    final centerPaint = Paint()
+      ..color = centerActive ? activeColor : inactiveColor
+      ..strokeWidth = centerActive ? 1.8 : 1.0
+      ..style = PaintingStyle.stroke;
+
+    // 1. Left Vertical Feed from left abilities column
+    canvas.drawLine(Offset(leftX, 0), Offset(leftX, midY), leftPaint);
+    // Left Horizontal to Center
+    canvas.drawLine(Offset(leftX, midY), Offset(centerX, midY), leftPaint);
+
+    // 2. Right Vertical Feed from right abilities column
+    canvas.drawLine(Offset(rightX, 0), Offset(rightX, midY), rightPaint);
+    // Right Horizontal to Center
+    canvas.drawLine(Offset(rightX, midY), Offset(centerX, midY), rightPaint);
+
+    // 3. Central Injector down into the Reactor Core
+    canvas.drawLine(Offset(centerX, midY), Offset(centerX, bottomY), centerPaint);
+
+    // 4. Central Diamond Power Junction Node
+    final nodePaint = Paint()
+      ..color = centerActive ? activeColor : const Color(0xFF141822)
+      ..style = PaintingStyle.fill;
+
+    final nodeStroke = Paint()
+      ..color = centerActive ? activeColor : const Color(0xFF232A38)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..moveTo(centerX, midY - 3.5)
+      ..lineTo(centerX + 3.5, midY)
+      ..lineTo(centerX, midY + 3.5)
+      ..lineTo(centerX - 3.5, midY)
+      ..close();
+
+    canvas.drawPath(path, nodePaint);
+    canvas.drawPath(path, nodeStroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ConduitBridgePainter old) {
+    return old.completedCount != completedCount ||
+        old.totalQuests != totalQuests ||
+        old.activeColor != activeColor;
+  }
+}
