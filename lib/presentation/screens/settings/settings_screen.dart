@@ -3,11 +3,15 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../data/services/firebase_service.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../widgets/tactical_panel.dart';
+import '../../widgets/tactical_hud_widgets.dart';
+import '../../widgets/tactical_icons.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback onSignOut;
@@ -67,153 +71,137 @@ class _SettingsScreenState extends State<SettingsScreen> {
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             children: [
               // ─── TITLE ──────────────────────────────────────────────────────
-              Row(
-                children: [
-                  Container(
-                    width: 3,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: rankColor,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'SETTINGS',
-                    style: TextStyle(
-                      color: AppColors.darkText,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // ─── PROFILE CARD ────────────────────────────────────────────────
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      rankColor.withValues(alpha: 0.15),
-                      const Color(0xFF080808),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: rankColor.withValues(alpha: 0.30),
-                    width: 1.0,
-                  ),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(left: 2, bottom: 4),
                 child: Row(
                   children: [
-                    // Rank circle
                     Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: AppColors.buildRankGradient(rankColor),
-                      ),
-                      child: Center(
-                        child: Text(
-                          rankInfo.rankNumber.toString(),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
+                      width: 3,
+                      height: 16,
+                      color: rankColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'SETTINGS // SYSTEM CONFIG',
+                      style: GoogleFonts.spaceMono(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user.name.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.2,
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // ─── PROFILE CARD (TACTICAL PANEL) ───────────────────────────────
+              TacticalPanel(
+                rankColor: rankColor,
+                showHeader: true,
+                tacticalTag: 'AGENT // ACTIVE IDENTITY',
+                statusBadge: 'ONLINE',
+                chamferSize: 14.0,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // Tactical Faceted Avatar
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF07090E),
+                            border: Border.all(
+                              color: rankColor.withValues(alpha: 0.50),
+                              width: 1.2,
                             ),
                           ),
-                          const SizedBox(height: 3),
-                          Row(
+                          child: Center(
+                            child: Icon(
+                              _getRankAvatarIcon(rankInfo.rankNumber),
+                              color: lightRankColor,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Text(
+                                user.name.toUpperCase(),
+                                style: GoogleFonts.rajdhani(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.0,
+                                  height: 1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: rankColor.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(6),
+                                  color: rankColor.withValues(alpha: 0.14),
                                   border: Border.all(
-                                    color: rankColor.withValues(alpha: 0.35),
-                                    width: 0.8,
+                                    color: rankColor.withValues(alpha: 0.45),
+                                    width: 0.9,
                                   ),
                                 ),
                                 child: Text(
-                                  'RANK ${rankInfo.rankNumber} · ${rankInfo.name.toUpperCase()}',
-                                  style: TextStyle(
+                                  'RANK ${rankInfo.rankNumber} // ${rankInfo.name.toUpperCase()}',
+                                  style: GoogleFonts.spaceMono(
                                     color: lightRankColor,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w900,
+                                    fontSize: 8.5,
+                                    fontWeight: FontWeight.w700,
                                     letterSpacing: 0.8,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: ascProgress,
-                              minHeight: 4,
-                              backgroundColor: Colors.white.withValues(alpha: 0.08),
-                              valueColor: AlwaysStoppedAnimation<Color>(rankColor),
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            '$userCompletions / $completionsReq PROTOCOLS',
-                            style: TextStyle(
-                              color: AppColors.darkDimText,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    TacticalSegmentedBar(
+                      progress: ascProgress,
+                      rankColor: rankColor,
+                      label: 'PROTOCOL_EXP',
+                      readoutText: '$userCompletions / $completionsReq PROTOCOLS',
+                      totalSegments: 14,
+                      height: 6.0,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // ─── PANEL 1: AI CORE & CLOUD SYNC HUB ──────────────────────────
-              _sectionHeader('AI & CLOUD', AppColors.darkSubText, rankColor),
-              _settingsCard(
+              TacticalPanel(
+                rankColor: rankColor,
+                showHeader: true,
+                tacticalTag: 'SUBSYSTEM // AI & CLOUD HUB',
+                statusBadge: user.cloudBackupEnabled ? 'SYNCED' : 'LOCAL',
+                chamferSize: 14.0,
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.memory_rounded, color: rankColor, size: 16),
+                        TacticalGlyph(type: TacticalGlyphType.memoryCore, color: rankColor, size: 16),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'GEMINI AI API KEY',
-                          style: TextStyle(
+                          style: GoogleFonts.spaceMono(
                             color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.0,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
                           ),
                         ),
                       ],
@@ -222,25 +210,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     TextField(
                       controller: _apiKeyCtrl,
                       obscureText: !_apiKeyVisible,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 12),
                       decoration: InputDecoration(
                         hintText: 'AIzaSy...',
                         hintStyle: const TextStyle(color: AppColors.darkDimText),
                         filled: true,
-                        fillColor: const Color(0xFF0A0A0A),
+                        fillColor: const Color(0xFF07090E),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.zero,
                           borderSide: BorderSide(
                               color: Colors.white.withValues(alpha: 0.08), width: 1.0),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.zero,
                           borderSide: BorderSide(
                               color: Colors.white.withValues(alpha: 0.08), width: 1.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.zero,
                           borderSide: BorderSide(
                               color: rankColor.withValues(alpha: 0.6), width: 1.2),
                         ),
@@ -267,10 +255,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               backgroundColor: rankColor,
                               foregroundColor: Colors.black,
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero),
                             ),
-                            child: const Text('SAVE KEY', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11)),
+                            child: Text('SAVE KEY', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 10)),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -278,20 +266,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: OutlinedButton(
                             onPressed: _clearApiKey,
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFFFF6B6B),
-                              side: const BorderSide(color: Color(0xFFFF6B6B), width: 1),
+                              foregroundColor: const Color(0xFFFF4655),
+                              side: const BorderSide(color: Color(0xFFFF4655), width: 1),
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero),
                             ),
-                            child: const Text('CLEAR', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11)),
+                            child: Text('CLEAR', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 10)),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    Divider(height: 1, color: Colors.white.withValues(alpha: 0.05)),
                     const SizedBox(height: 14),
+                    Divider(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                    const SizedBox(height: 12),
 
                     // Cloud Sync Row
                     _settingRowWithWidget(
@@ -326,11 +314,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
               // ─── PANEL 2: APPEARANCE & SHIELDS HUB ──────────────────────────
-              _sectionHeader('APPEARANCE & SHIELDS', AppColors.darkSubText, rankColor),
-              _settingsCard(
+              TacticalPanel(
+                rankColor: rankColor,
+                showHeader: true,
+                tacticalTag: 'INTERFACE // VISUALS & ARMOR',
+                statusBadge: 'ACTIVE',
+                chamferSize: 14.0,
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     _settingRowWithWidget(
@@ -367,28 +360,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Integrity Shields',
+                              const Text('Integrity Shields',
                                   style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text('Prevents streak loss (3/mo)',
-                                  style: TextStyle(color: AppColors.darkSubText, fontSize: 11)),
+                                  style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 9.5)),
                             ],
                           ),
-                          Row(
-                            children: List.generate(3, (i) {
-                              final available = i < user.shieldsRemaining;
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 6),
-                                child: Icon(
-                                  available ? Icons.shield_rounded : Icons.shield_outlined,
-                                  color: available ? rankColor : AppColors.darkDimText.withValues(alpha: 0.3),
-                                  size: 18,
-                                ),
-                              );
-                            }),
+                          TacticalShieldsPod(
+                            shieldsRemaining: user.shieldsRemaining,
+                            rankColor: rankColor,
                           ),
                         ],
                       ),
@@ -396,11 +380,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
               // ─── PANEL 3: DOSSIER & SECURITY HUB ────────────────────────────
-              _sectionHeader('SECURITY & DATA', AppColors.darkSubText, rankColor),
-              _settingsCard(
+              TacticalPanel(
+                rankColor: rankColor,
+                showHeader: true,
+                tacticalTag: 'SYSTEM // PROTOCOL DOSSIER',
+                statusBadge: 'SECURE',
+                chamferSize: 14.0,
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     _settingRow('Aumbra Protocol v1.0.0', Icons.terminal_rounded, Colors.white, AppColors.darkSubText),
@@ -413,9 +402,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: _confirmSignOut),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
                     _settingRow('Purge All Data', Icons.delete_sweep_rounded,
-                        const Color(0xFFFF6B6B), AppColors.darkSubText,
+                        const Color(0xFFFF4655), AppColors.darkSubText,
                         onTap: _confirmDeleteAll,
-                        textColor: const Color(0xFFFF6B6B)),
+                        textColor: const Color(0xFFFF4655)),
                   ],
                 ),
               ),
@@ -424,6 +413,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     ),
   );
+  }
+
+  IconData _getRankAvatarIcon(int rank) {
+    switch (rank) {
+      case 1: return Icons.auto_awesome_rounded;
+      case 2: return Icons.explore_rounded;
+      case 3: return Icons.bolt_rounded;
+      case 4: return Icons.local_fire_department_rounded;
+      case 5: return Icons.north_east_rounded;
+      case 6: return Icons.shield_rounded;
+      case 7: return Icons.diamond_rounded;
+      case 8: return Icons.menu_book_rounded;
+      case 9: return Icons.wb_sunny_rounded;
+      case 10: return Icons.all_inclusive_rounded;
+      case 11: return Icons.hourglass_empty_rounded;
+      case 12: return Icons.flare_rounded;
+      case 13: return Icons.stars_rounded;
+      case 14: return Icons.military_tech_rounded;
+      case 15: return Icons.workspace_premium_rounded;
+      default: return Icons.auto_awesome_rounded;
+    }
   }
 
   Widget _sectionHeader(String label, Color subColor, Color rankColor) {

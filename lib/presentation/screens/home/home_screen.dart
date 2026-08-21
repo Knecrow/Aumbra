@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/quest_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../widgets/rank_widgets.dart';
 import '../../widgets/hex_quest_card.dart';
+import '../../widgets/tactical_panel.dart';
+import '../../widgets/tactical_hud_widgets.dart';
+import '../../widgets/valorant_ability_card.dart';
+import '../../widgets/valorant_inspect_modal.dart';
+import '../../widgets/tactical_icons.dart';
+import '../../widgets/tactical_oath_modal.dart';
+import '../../widgets/tactical_dialogs.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -77,60 +85,61 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             opacity: _headerAnim,
             child: Column(
               children: [
-                // ── 1. DEDICATED TOP PROFILE & TELEMETRY CARD ─────────────
+                // ── 1. RIOT VALORANT TACTICAL TOP HUD DECK ───────────────────
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: AppColors.glassCard(
-                      rankColor: rankColor,
-                      borderRadius: 22,
-                    ),
+                  child: TacticalPanel(
+                    rankColor: rankColor,
+                    showHeader: true,
+                    tacticalTag: 'PROTOCOL: HUD · ACT 01',
+                    statusBadge: 'ONLINE',
+                    chamferSize: 14.0,
+                    chamferCorner: ChamferCorner.all,
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // ── Top Row: Profile & Stats ───────────────────────
+                        // ── Top Row: Agent Crest, Codename, Shields, Streak ───
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Left: Avatar with Progress Ring + Codename + Rank Name Highlight
+                            // Left: Faceted Avatar with Progress Ring + Codename + Tactical Rank Badge
                             GestureDetector(
-                              onTap: () => _showEditProfileModal(context, userProvider),
+                              onTap: () => showTacticalEditProfileDialog(context, userProvider, rankColor),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // Circular Avatar with Ascension Progress Ring in Rank Color
+                                  // Faceted Avatar with Ascension Progress Ring in Rank Color
                                   SizedBox(
-                                    width: 46,
-                                    height: 46,
+                                    width: 48,
+                                    height: 48,
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
-                                        // Progress Ring in Rank Color
+                                        // Circular Progress Ring
                                         CircularProgressIndicator(
                                           value: ascProgress,
                                           strokeWidth: 2.5,
                                           backgroundColor: Colors.white.withValues(alpha: 0.08),
                                           valueColor: AlwaysStoppedAnimation<Color>(rankColor),
                                         ),
-                                        // Inner Avatar Circle with Unique Rank Insignia Icon
+                                        // Tactical Inner Hex / Diamond Disc
                                         Container(
-                                          width: 36,
-                                          height: 36,
+                                          width: 38,
+                                          height: 38,
                                           decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: const Color(0xFF000000),
+                                            color: const Color(0xFF07090E),
                                             border: Border.all(
-                                              color: rankColor.withValues(alpha: 0.40),
-                                              width: 1.0,
+                                              color: rankColor.withValues(alpha: 0.50),
+                                              width: 1.2,
                                             ),
                                           ),
                                           child: Center(
                                             child: Icon(
                                               _getRankAvatarIcon(rankInfo.rankNumber),
                                               color: lightRankColor,
-                                              size: 19,
+                                              size: 20,
                                             ),
                                           ),
                                         ),
@@ -138,39 +147,38 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  // Name & Highlighted Rank Name Pill
+                                  // Agent Codename & Highlighted Tactical Rank Badge
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         user.name.toUpperCase(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14.5,
+                                        style: GoogleFonts.rajdhani(
+                                          color: AppColors.darkText,
+                                          fontSize: 19,
                                           fontWeight: FontWeight.w900,
-                                          letterSpacing: 0.6,
+                                          letterSpacing: 1.0,
+                                          height: 1.0,
                                         ),
                                       ),
-                                      const SizedBox(height: 3),
-                                      // 🌟 RANK NAME HIGHLIGHT PILL
+                                      const SizedBox(height: 4),
                                       GestureDetector(
-                                        onTap: () => _showRankLoreModal(context, userProvider),
+                                        onTap: () => showTacticalRankLoreDialog(context, userProvider),
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: rankColor.withValues(alpha: 0.16),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color: rankColor.withValues(alpha: 0.15),
                                             border: Border.all(
-                                              color: rankColor.withValues(alpha: 0.45),
+                                              color: rankColor.withValues(alpha: 0.50),
                                               width: 0.9,
                                             ),
                                           ),
                                           child: Text(
                                             rankInfo.name.toUpperCase(),
-                                            style: TextStyle(
+                                            style: GoogleFonts.spaceMono(
                                               color: lightRankColor,
-                                              fontSize: 9.5,
+                                              fontSize: 9.0,
                                               fontWeight: FontWeight.w900,
                                               letterSpacing: 0.8,
                                             ),
@@ -183,174 +191,177 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               ),
                             ),
 
-                            // Right: 3 Shields & Streak Pill
+                            // Right: Tactical Armor Shields & Tactical Streak Pods
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // 1. Streak Protection Shields (3 Shields)
-                                GestureDetector(
-                                  onTap: () => _showShieldInfoDialog(context, user.shieldsRemaining, rankColor),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF000000),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: rankColor.withValues(alpha: 0.35),
-                                        width: 1.0,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: List.generate(3, (idx) {
-                                        final isActive = idx < user.shieldsRemaining;
-                                        return Padding(
-                                          padding: EdgeInsets.only(right: idx < 2 ? 3 : 0),
-                                          child: Icon(
-                                            isActive ? Icons.shield_rounded : Icons.shield_outlined,
-                                            color: isActive
-                                                ? rankColor
-                                                : Colors.white.withValues(alpha: 0.18),
-                                            size: 13.5,
-                                          ),
-                                        );
-                                      }),
-                                    ),
-                                  ),
+                                TacticalShieldsPod(
+                                  shieldsRemaining: user.shieldsRemaining,
+                                  rankColor: rankColor,
+                                  onTap: () => showTacticalShieldDialog(context, user.shieldsRemaining, rankColor),
                                 ),
-                                const SizedBox(width: 7),
-
-                                // 2. Streak Pill (Flame + Days)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF000000),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: const Color(0xFFFF9100).withValues(alpha: 0.30),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.local_fire_department_rounded,
-                                          color: Color(0xFFFF9100), size: 13),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        '${user.currentStreak}d',
-                                        style: const TextStyle(
-                                          color: Color(0xFFFFB74D),
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                const SizedBox(width: 6),
+                                TacticalStreakPod(
+                                  streakDays: user.currentStreak,
+                                  rankColor: rankColor,
                                 ),
                               ],
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
 
-                        // ── Bottom Progress Bar for Completed Days / Ascension ──
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.done_all_rounded,
-                                    color: AppColors.emeraldPrimary, size: 12),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'COMPLETED: $userCompletions / $completionsReq PROTOCOLS',
-                                  style: const TextStyle(
-                                    color: Color(0xFF8E9BA6),
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.6,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '${(ascProgress * 100).toInt()}%',
-                              style: TextStyle(
-                                color: lightRankColor,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        // Sleek Glowing Linear Progress Bar
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Stack(
-                            children: [
-                              Container(
-                                height: 5.5,
-                                width: double.infinity,
-                                color: Colors.white.withValues(alpha: 0.08),
-                              ),
-                              FractionallySizedBox(
-                                widthFactor: ascProgress.clamp(0.02, 1.0),
-                                child: Container(
-                                  height: 5.5,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        rankColor,
-                                        lightRankColor,
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: rankColor.withValues(alpha: 0.5),
-                                        blurRadius: 6,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        // ── Bottom Segmented Energy Meter (Valorant Tactical Style) ──
+                        TacticalSegmentedBar(
+                          progress: ascProgress,
+                          rankColor: rankColor,
+                          label: 'ASCENSION_GOAL',
+                          readoutText: '$userCompletions / $completionsReq PROTOCOLS',
+                          totalSegments: 14,
+                          height: 7.0,
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                // ── 2. HERO CENTERPIECE: HEXAGONAL HONEYCOMB QUEST GRID ────
+                // ── 2. VALORANT TACTICAL ABILITY & PROTOCOL LOADOUT ─────────
                 Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      child: HexQuestHoneycombGrid(
-                        quests: questProvider.todayQuests,
-                        bossQuest: questProvider.bossQuest,
-                        bossQuestUnlocked: questProvider.bossQuestUnlocked,
-                        oathAnswered: answered,
-                        oathHonored: answerTrue,
-                        onOathTap: () => _showHonestyOathModal(context, questProvider, rankColor),
-                        rankColor: rankColor,
-                        rankInfo: rankInfo,
-                        onComplete: (id) => questProvider.completeQuest(id),
-                        onUncomplete: (id) => questProvider.uncompleteQuest(id),
-                        onBossChallenge: () => _showBossQuestDialog(questProvider, rankColor),
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      // Section Header Tag
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'DAILY PROTOCOLS',
+                            style: GoogleFonts.spaceMono(
+                              color: AppColors.darkSubText,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          Text(
+                            'ACT 01',
+                            style: GoogleFonts.spaceMono(
+                              color: AppColors.darkSubText,
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+
+                      const SizedBox(height: 10),
+
+                      // 2x2 Ability Cards Grid
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1.18,
+                        ),
+                        itemCount: questProvider.todayQuests.length.clamp(0, 4),
+                        itemBuilder: (ctx, idx) {
+                          final quest = questProvider.todayQuests[idx];
+                          return ValorantAbilityCard(
+                            quest: quest,
+                            index: idx,
+                            rankColor: rankColor,
+                            onTap: () {
+                              showValorantInspectModal(
+                                context: context,
+                                quest: quest,
+                                index: idx,
+                                rankColor: rankColor,
+                                onComplete: () {
+                                  if (quest.isCompleted) {
+                                    questProvider.uncompleteQuest(quest.id);
+                                  } else {
+                                    questProvider.completeQuest(quest.id);
+                                  }
+                                },
+                                onSwapQuest: () {},
+                              );
+                            },
+                            onLongPress: () {
+                              if (quest.isCompleted) {
+                                questProvider.uncompleteQuest(quest.id);
+                              } else {
+                                questProvider.completeQuest(quest.id);
+                              }
+                            },
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Ultimate Ability Card [ X // ULTIMATE ] (The Honesty Oath)
+                      ValorantUltimateCard(
+                        isAnswered: answered,
+                        isHonored: answerTrue,
+                        rankColor: rankColor,
+                        onTap: () => showTacticalHonestyOathModal(
+                          context: context,
+                          questProvider: questProvider,
+                          rankColor: rankColor,
+                        ),
+                      ),
+
+                      // Boss Quest Card if unlocked
+                      if (questProvider.bossQuestUnlocked && questProvider.bossQuest != null) ...[
+                        const SizedBox(height: 12),
+                        TacticalPanel(
+                          rankColor: const Color(0xFFFF4655), // Valorant Red
+                          showHeader: true,
+                          tacticalTag: 'BOSS PROTOCOL // ASCENSION GATE',
+                          statusBadge: 'CRITICAL',
+                          chamferSize: 12.0,
+                          onTap: () => showTacticalBossDialog(context, questProvider, rankColor),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.military_tech_rounded, color: Color(0xFFFF4655), size: 28),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      questProvider.bossQuest!.title.toUpperCase(),
+                                      style: GoogleFonts.rajdhani(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    Text(
+                                      'TAP TO CONQUER BOSS CHALLENGE',
+                                      style: GoogleFonts.spaceMono(
+                                        color: const Color(0xFFFF8A94),
+                                        fontSize: 9.0,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 90),
+                    ],
                   ),
                 ),
-
-                // Floating Nav Dock spacing
-                const SizedBox(height: 86),
               ],
             ),
           ),

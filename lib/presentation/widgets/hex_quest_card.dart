@@ -243,6 +243,7 @@ class _HexQuestTileState extends State<HexQuestTile>
     final isBoss = widget.quest.isBossQuest;
     final categoryColor = AppColors.getCategoryColor(widget.quest.category);
     final accentColor = isBoss ? widget.rankColor : categoryColor;
+    final lightRankColor = widget.isSelected ? Colors.white : const Color(0xFF90D9E6);
 
     // Glowing cyan/teal theme by default, rankColor on selected/boss
     final borderColor = isCompleted
@@ -298,25 +299,41 @@ class _HexQuestTileState extends State<HexQuestTile>
 
               // Center 2D Sci-Fi Icon
               Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 240),
-                  child: isCompleted
-                      ? Icon(
-                          Icons.check_circle_rounded,
-                          key: const ValueKey('done'),
-                          size: 38,
-                          color: AppColors.emeraldPrimary,
-                        )
-                      : Icon(
-                          isBoss
-                              ? Icons.military_tech_rounded
-                              : AppColors.getCategoryIconData(widget.quest.category),
-                          key: ValueKey(widget.quest.category),
-                          size: 36,
-                          color: widget.isSelected
-                              ? Colors.white
-                              : const Color(0xFF90D9E6),
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Tactical Protocol Index (Valorant Micro-code)
+                    Text(
+                      '// 0${widget.index + 1} ${widget.quest.category.toUpperCase()}',
+                      style: GoogleFonts.spaceMono(
+                        fontSize: 7.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                        color: isCompleted
+                            ? AppColors.emeraldPrimary.withValues(alpha: 0.8)
+                            : Colors.white.withValues(alpha: 0.45),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 240),
+                      child: isCompleted
+                          ? Icon(
+                              Icons.check_circle_rounded,
+                              key: const ValueKey('done'),
+                              size: 34,
+                              color: AppColors.emeraldPrimary,
+                            )
+                          : Icon(
+                              isBoss
+                                  ? Icons.military_tech_rounded
+                                  : AppColors.getCategoryIconData(widget.quest.category),
+                              key: ValueKey(widget.quest.category),
+                              size: 32,
+                              color: lightRankColor,
+                            ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -418,20 +435,33 @@ class _HexHonestyTileState extends State<HexHonestyTile>
                 ),
               ),
 
-              // Center Shield Icon
+              // Icon & Tactical Label
               Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 240),
-                  child: Icon(
-                    Icons.shield_rounded,
-                    key: ValueKey('${widget.isAnswered}_${widget.isHonored}'),
-                    size: 38,
-                    color: widget.isAnswered
-                        ? (widget.isHonored
-                            ? AppColors.emeraldPrimary
-                            : const Color(0xFFFFB74D))
-                        : widget.rankColor,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '// OATH',
+                      style: GoogleFonts.spaceMono(
+                        fontSize: 7.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: widget.isAnswered
+                            ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
+                            : Colors.white.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Icon(
+                      widget.isAnswered
+                          ? (widget.isHonored ? Icons.shield_rounded : Icons.shield_outlined)
+                          : Icons.shield_rounded,
+                      size: 32,
+                      color: widget.isAnswered
+                          ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
+                          : widget.rankColor,
+                    ),
+                  ],
                 ),
               ),
             ],

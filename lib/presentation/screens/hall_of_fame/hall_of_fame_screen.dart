@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/theme_provider.dart';
 import '../../../core/constants/badges.dart';
 import '../../../core/constants/ranks.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../widgets/tactical_panel.dart';
+import '../../widgets/tactical_icons.dart';
 
 class HallOfFameScreen extends StatelessWidget {
   const HallOfFameScreen({super.key});
@@ -35,68 +38,76 @@ class HallOfFameScreen extends StatelessWidget {
               // Header
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: 3,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: rankColor,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 3,
+                                height: 16,
+                                color: rankColor,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'HALL OF FAME // ARSENAL',
+                                style: GoogleFonts.spaceMono(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
                           Text(
-                            'HALL OF FAME',
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
+                            'ACT 01',
+                            style: GoogleFonts.spaceMono(
+                              color: AppColors.getLightVariant(rankColor),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '${user.unlockedBadges.length}/${kBadges.length} Badges  ·  ${user.unlockedTitles.length}/${kTitles.length} Titles',
-                        style: TextStyle(color: AppColors.getLightVariant(rankColor), fontSize: 11, fontWeight: FontWeight.w700),
+                        '${user.unlockedBadges.length}/${kBadges.length} TROPHIES UNLOCKED · ${user.unlockedTitles.length}/${kTitles.length} CALLSIGNS',
+                        style: GoogleFonts.spaceMono(
+                          color: const Color(0xFF7A8394),
+                          fontSize: 9.0,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
                     ],
                   ),
                 ),
               ),
 
-              // ─── BADGES ──────────────────────────────────────────────────
+              // ─── 1. VALORANT ACT RANK PYRAMID ──────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 3,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: rankColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text('BADGES',
-                          style: TextStyle(
-                              color: AppColors.darkSubText,
-                              fontSize: 11,
-                              letterSpacing: 1.5,
-                              fontWeight: FontWeight.w900)),
-                    ],
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TacticalPanel(
+                    rankColor: rankColor,
+                    showHeader: true,
+                    tacticalTag: 'COMPETITIVE // ACT 01 RANK PYRAMID',
+                    statusBadge: userProvider.currentRankInfo.name.toUpperCase(),
+                    chamferSize: 14.0,
+                    padding: const EdgeInsets.all(16),
+                    child: _buildActRankPyramid(context, user.currentRank, rankColor),
                   ),
                 ),
               ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
+
+              // ─── 2. BADGES ARMORY ──────────────────────────────────────────
               _buildBadgeGrid(
                   context, user.unlockedBadges, isDark, textColor, subColor, rankColor),
 
@@ -166,6 +177,88 @@ class HallOfFameScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildActRankPyramid(BuildContext context, int currentRank, Color rankColor) {
+    // 4-Tier Pyramid: Row 0 has 1 shard, Row 1 has 2, Row 2 has 3, Row 3 has 4 shards (Total 10 shards)
+    final rows = [1, 2, 3, 4];
+    int shardIndex = 0;
+
+    return Column(
+      children: [
+        const SizedBox(height: 6),
+        ...rows.map((count) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(count, (col) {
+                shardIndex++;
+                final isUnlocked = shardIndex <= currentRank;
+                final isCurrent = shardIndex == currentRank;
+                final shardColor = isUnlocked ? getRankInfo(shardIndex.clamp(1, 15)).color : const Color(0xFF141722);
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Transform.rotate(
+                    angle: 0.785398, // 45 degrees diamond
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: isUnlocked ? shardColor.withValues(alpha: 0.25) : const Color(0xFF07090F),
+                        border: Border.all(
+                          color: isCurrent
+                              ? rankColor
+                              : (isUnlocked ? shardColor : Colors.white.withValues(alpha: 0.10)),
+                          width: isCurrent ? 1.8 : 1.0,
+                        ),
+                        boxShadow: isCurrent
+                            ? [
+                                BoxShadow(
+                                  color: rankColor.withValues(alpha: 0.5),
+                                  blurRadius: 10,
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Center(
+                        child: Transform.rotate(
+                          angle: -0.785398,
+                          child: Text(
+                            '$shardIndex',
+                            style: GoogleFonts.spaceMono(
+                              color: isUnlocked ? Colors.white : const Color(0xFF3E4856),
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          );
+        }),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '// TOP ACT TRIANGLE · RANK $currentRank PROVEN',
+              style: GoogleFonts.spaceMono(
+                color: AppColors.getLightVariant(rankColor),
+                fontSize: 9.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildBadgeGrid(
     BuildContext context,
     List<String> unlocked,
@@ -181,25 +274,14 @@ class HallOfFameScreen extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.darkCard,
-            gradient: AppColors.darkCardGradient,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.06),
-              width: 1.0,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: TacticalPanel(
+          rankColor: rankColor,
+          showHeader: true,
+          tacticalTag: 'COLLECTION // ARMORY OF TROPHIES',
+          statusBadge: '${unlocked.length}/${kBadges.length} UNLOCKED',
+          chamferSize: 14.0,
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: categories.toList().asMap().entries.map((entry) {
               final idx = entry.key;
@@ -382,21 +464,14 @@ class HallOfFameScreen extends StatelessWidget {
   ) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: TacticalPanel(
+          rankColor: rankColor,
+          showHeader: true,
+          tacticalTag: 'REPUTATION // AGENT CALLSIGNS',
+          statusBadge: '${unlocked.length}/${kTitles.length} EARNED',
+          chamferSize: 14.0,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.darkCard,
-            gradient: AppColors.darkCardGradient,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
           child: Column(
             children: List.generate(kTitles.length, (i) {
               final title = kTitles[i];

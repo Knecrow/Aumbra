@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../providers/user_provider.dart';
 import '../../../providers/theme_provider.dart';
-import '../../../data/models/history_entry.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../data/models/history_entry.dart';
+import '../../widgets/tactical_panel.dart';
+import '../../widgets/tactical_icons.dart';
 
 class ChronicleScreen extends StatefulWidget {
   const ChronicleScreen({super.key});
@@ -108,71 +111,60 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                       ),
                     ),
 
-                    // ─── PANEL 1: UNIFIED 4-METRIC COMMAND DECK ───────────────────────
+                    // ─── PANEL 1: COMBAT RECORD / CAREER SCOREBOARD ───────────────────
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            color: AppColors.darkCard,
-                            gradient: AppColors.darkCardGradient,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.06),
-                              width: 1.0,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TacticalPanel(
+                          rankColor: rankColor,
+                          showHeader: true,
+                          tacticalTag: 'TELEMETRY // CAREER COMBAT RECORD',
+                          statusBadge: 'ACS ${(user.totalQuestsCompleted * 25 + user.currentStreak * 10)}',
+                          chamferSize: 14.0,
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             children: [
                               Row(
                                 children: [
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'TOTAL QUESTS',
+                                      'PROTOCOLS SECURED',
                                       user.totalQuestsCompleted.toString(),
-                                      Icons.verified_rounded,
+                                      TacticalGlyphType.completed,
                                       rankColor,
                                     ),
                                   ),
-                                  Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.06)),
+                                  Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.08)),
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'LONGEST STREAK',
-                                      '${user.longestStreak}d',
-                                      Icons.local_fire_department_rounded,
-                                      const Color(0xFFFF9100),
+                                      'LONGEST COMBAT STREAK',
+                                      '${user.longestStreak}D',
+                                      TacticalGlyphType.streak,
+                                      const Color(0xFFFF4655), // Valorant Red
                                     ),
                                   ),
                                 ],
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
-                                child: Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
+                                child: Divider(height: 1, color: Colors.white.withValues(alpha: 0.08)),
                               ),
                               Row(
                                 children: [
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'DAYS AWAKENED',
+                                      'ACTIVE SESSIONS',
                                       userProvider.daysSinceStart.toString(),
-                                      Icons.bolt_rounded,
+                                      TacticalGlyphType.body,
                                       const Color(0xFF00E676),
                                     ),
                                   ),
-                                  Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.06)),
+                                  Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.08)),
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'ASCENSION',
+                                      'CONTRACT ASCENSION',
                                       '${(ascProgress * 100).round()}%',
-                                      Icons.military_tech_rounded,
+                                      TacticalGlyphType.navArsenal,
                                       rankColor,
                                     ),
                                   ),
@@ -189,76 +181,35 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                     // ─── PANEL 2: UNIFIED ACTIVITY & STREAK TRENDS ────────────────────
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            color: AppColors.darkCard,
-                            gradient: AppColors.darkCardGradient,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.06),
-                              width: 1.0,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TacticalPanel(
+                          rankColor: rankColor,
+                          showHeader: true,
+                          tacticalTag: 'ANALYTICS // 7-DAY TRAJECTORY',
+                          statusBadge: 'ACTIVE',
+                          chamferSize: 14.0,
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.query_stats_rounded, color: rankColor, size: 16),
-                                      const SizedBox(width: 8),
-                                      const Text(
-                                        'TRAJECTORY',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 1.2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    'LAST 7 DAYS',
-                                    style: TextStyle(
-                                      color: AppColors.getLightVariant(rankColor),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 1.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
                               SizedBox(
-                                height: 160,
+                                height: 150,
                                 child: _buildActivityChart(rankColor, isDark, subColor, textColor),
                               ),
-                              const SizedBox(height: 16),
-                              Divider(height: 1, color: Colors.white.withValues(alpha: 0.05)),
                               const SizedBox(height: 14),
+                              Divider(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                              const SizedBox(height: 12),
                               Row(
                                 children: [
                                   Icon(Icons.show_chart_rounded, color: rankColor, size: 15),
                                   const SizedBox(width: 6),
-                                  const Text(
+                                  Text(
                                     'STREAK GROWTH',
-                                    style: TextStyle(
+                                    style: GoogleFonts.spaceMono(
                                       color: AppColors.darkSubText,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 1.2,
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1.0,
                                     ),
                                   ),
                                 ],
@@ -279,59 +230,17 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                     // ─── PANEL 3: UNIFIED MISSION ARCHIVE & MIRROR ────────────────────
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            color: AppColors.darkCard,
-                            gradient: AppColors.darkCardGradient,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.06),
-                              width: 1.0,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TacticalPanel(
+                          rankColor: rankColor,
+                          showHeader: true,
+                          tacticalTag: 'ARCHIVE // MISSION LOGS',
+                          statusBadge: '${_history.length} LOGGED',
+                          chamferSize: 14.0,
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.auto_stories_rounded, color: rankColor, size: 16),
-                                      const SizedBox(width: 8),
-                                      const Text(
-                                        'ARCHIVE',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 1.2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    '${_history.length} LOGGED',
-                                    style: TextStyle(
-                                      color: AppColors.getLightVariant(rankColor),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 1.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 12),
 
                               // Grouped History entries
                               if (_history.isEmpty)
@@ -352,7 +261,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                       children: [
                                         _buildHistoryRow(entry, isDark, textColor, subColor, rankColor),
                                         if (i < _history.length.clamp(0, 10) - 1)
-                                          Divider(height: 1, color: Colors.white.withValues(alpha: 0.04)),
+                                          const SizedBox(height: 8),
                                       ],
                                     );
                                   }),
@@ -371,21 +280,30 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
     );
   }
 
-  Widget _buildMetricTile(String label, String value, IconData icon, Color color) {
+  Widget _buildMetricTile(
+    String label,
+    String value,
+    TacticalGlyphType glyphType,
+    Color color,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, color: color, size: 16),
+            TacticalGlyph(type: glyphType, color: color, size: 14),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.darkSubText,
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.spaceMono(
+                  color: AppColors.darkSubText,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -393,9 +311,9 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
         const SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(
+          style: GoogleFonts.rajdhani(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -412,18 +330,22 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
     Color rankColor,
   ) {
     final categoryColor = AppColors.getCategoryColor(entry.questCategory);
-    final categoryIcon = AppColors.getCategoryIconData(entry.questCategory);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF06070B),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06), width: 0.8),
+      ),
       child: Row(
         children: [
-          Icon(
-            categoryIcon,
+          TacticalGlyph.fromCategory(
+            entry.questCategory,
             color: categoryColor,
-            size: 18,
+            size: 16,
+            isCompleted: true,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -432,31 +354,31 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                   entry.questTitle,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${entry.questCategory.toUpperCase()} · ${DateFormat('MMM d, h:mm a').format(entry.completedDate)}',
-                  style: const TextStyle(color: AppColors.darkSubText, fontSize: 10),
+                  '// ${entry.questCategory.toUpperCase()} · ${DateFormat('MMM d, h:mm a').format(entry.completedDate).toUpperCase()}',
+                  style: GoogleFonts.spaceMono(color: const Color(0xFF7A8394), fontSize: 9),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: rankColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(6),
+              color: rankColor.withValues(alpha: 0.15),
+              border: Border.all(color: rankColor.withValues(alpha: 0.6), width: 0.8),
             ),
             child: Text(
-              entry.rankAtTime.toUpperCase(),
-              style: TextStyle(
+              'S-TIER',
+              style: GoogleFonts.spaceMono(
                 color: AppColors.getLightVariant(rankColor),
-                fontSize: 9,
+                fontSize: 8.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.5,
               ),

@@ -8,6 +8,7 @@ import '../screens/home/home_screen.dart';
 import '../screens/chronicle/chronicle_screen.dart';
 import '../screens/hall_of_fame/hall_of_fame_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../widgets/tactical_icons.dart';
 
 class MainNavigation extends StatefulWidget {
   final VoidCallback onSignOut;
@@ -210,34 +211,25 @@ class _MainNavigationState extends State<MainNavigation> {
     final lightRankColor = AppColors.getLightVariant(rankColor);
 
     final navContent = Container(
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFF000000),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            const Color(0xFF0A0A0A),
-            Color.lerp(const Color(0xFF000000), rankColor, 0.08)!,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(26),
+        color: const Color(0xFF090B10),
         border: Border.all(
-          color: rankColor.withValues(alpha: 0.22),
+          color: rankColor.withValues(alpha: 0.35),
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.70),
-            blurRadius: 32,
-            offset: const Offset(0, 10),
+            blurRadius: 28,
+            offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: rankColor.withValues(alpha: 0.18),
-            blurRadius: 24,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
+            color: rankColor.withValues(alpha: 0.12),
+            blurRadius: 20,
+            spreadRadius: -2,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -248,10 +240,11 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // 1. Home / HUD
+              // 1. Protocol / Loadout [ Q ]
               _NavTabItem(
-                icon: Icons.space_dashboard_outlined,
-                activeIcon: Icons.space_dashboard_rounded,
+                glyphType: TacticalGlyphType.navProtocol,
+                label: 'PROTOCOL',
+                keybind: 'Q',
                 isSelected: _currentIndex == 0,
                 onTap: () => _onTabTap(0),
                 activeColor: lightRankColor,
@@ -259,10 +252,11 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 2. Chronicle / Stats
+              // 2. Career / Stats [ W ]
               _NavTabItem(
-                icon: Icons.query_stats_rounded,
-                activeIcon: Icons.query_stats_rounded,
+                glyphType: TacticalGlyphType.navCareer,
+                label: 'CAREER',
+                keybind: 'W',
                 isSelected: _currentIndex == 1,
                 onTap: () => _onTabTap(1),
                 activeColor: lightRankColor,
@@ -270,10 +264,11 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 3. Hall of Fame
+              // 3. Arsenal / Hall of Fame [ E ]
               _NavTabItem(
-                icon: Icons.military_tech_outlined,
-                activeIcon: Icons.military_tech_rounded,
+                glyphType: TacticalGlyphType.navArsenal,
+                label: 'ARSENAL',
+                keybind: 'E',
                 isSelected: _currentIndex == 2,
                 onTap: () => _onTabTap(2),
                 activeColor: lightRankColor,
@@ -281,10 +276,11 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 4. Settings
+              // 4. Config / Settings [ R ]
               _NavTabItem(
-                icon: Icons.tune_rounded,
-                activeIcon: Icons.tune_rounded,
+                glyphType: TacticalGlyphType.navConfig,
+                label: 'CONFIG',
+                keybind: 'R',
                 isSelected: _currentIndex == 3,
                 onTap: () => _onTabTap(3),
                 activeColor: lightRankColor,
@@ -301,11 +297,11 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 }
 
-// ── ONE UI FLUID TACTILE NAV TAB ITEM ──────────────────────────────────────────
-// ── ONE UI FLUID TACTILE NAV TAB ITEM (NO TEXT, PURE ICON) ─────────────────
+// ── VALORANT TACTICAL NAV TAB ITEM ──────────────────────────────────────────
 class _NavTabItem extends StatefulWidget {
-  final IconData icon;
-  final IconData activeIcon;
+  final TacticalGlyphType glyphType;
+  final String label;
+  final String keybind;
   final bool isSelected;
   final VoidCallback onTap;
   final Color activeColor;
@@ -313,8 +309,9 @@ class _NavTabItem extends StatefulWidget {
   final Color inactiveColor;
 
   const _NavTabItem({
-    required this.icon,
-    required this.activeIcon,
+    required this.glyphType,
+    required this.label,
+    required this.keybind,
     required this.isSelected,
     required this.onTap,
     required this.activeColor,
@@ -337,7 +334,7 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
       duration: const Duration(milliseconds: 100),
       vsync: this,
     );
-    _touchScale = Tween<double>(begin: 1.0, end: 0.88).animate(
+    _touchScale = Tween<double>(begin: 1.0, end: 0.90).animate(
       CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
     );
   }
@@ -363,33 +360,51 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
           scale: _touchScale,
           child: Center(
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 240),
+              duration: const Duration(milliseconds: 180),
               curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: widget.isSelected
-                    ? widget.rankColor.withValues(alpha: 0.20)
+                    ? widget.rankColor.withValues(alpha: 0.16)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
+                border: widget.isSelected
+                    ? Border(
+                        top: BorderSide(
+                          color: widget.rankColor,
+                          width: 2.0,
+                        ),
+                      )
+                    : null,
                 boxShadow: widget.isSelected
                     ? [
                         BoxShadow(
-                          color: widget.rankColor.withValues(alpha: 0.25),
+                          color: widget.rankColor.withValues(alpha: 0.35),
                           blurRadius: 10,
                           spreadRadius: 0,
                         ),
                       ]
                     : null,
               ),
-              child: AnimatedScale(
-                duration: const Duration(milliseconds: 240),
-                scale: widget.isSelected ? 1.10 : 1.0,
-                curve: Curves.easeOutBack,
-                child: Icon(
-                  widget.isSelected ? widget.activeIcon : widget.icon,
-                  color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
-                  size: 24,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TacticalGlyph(
+                    type: widget.glyphType,
+                    color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+                    size: 19,
+                    glow: widget.isSelected,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    widget.label,
+                    style: GoogleFonts.spaceMono(
+                      color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+                      fontSize: 7.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

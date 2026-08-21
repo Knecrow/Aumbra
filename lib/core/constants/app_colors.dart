@@ -3,80 +3,76 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ─── PURE OLED BLACK THEME WITH DYNAMIC RANK ACCENTS ─────────────────────
-  static const Color darkBackground    = Color(0xFF000000);
-  static const Color darkSurface       = Color(0xFF060606);
-  static const Color darkCard          = Color(0xFF0C0C0C);
-  static const Color darkCardElevated  = Color(0xFF141414);
-  static const Color darkText          = Color(0xFFFFFFFF);
-  static const Color darkSubText       = Color(0xFF888888);
-  static const Color darkDimText       = Color(0xFF444444);
-  static const Color darkBorder        = Color(0x18FFFFFF);
+  // ─── UNIFIED RIOT VALORANT TACTICAL WHOLE-APP PALETTE ─────────────────────
+  static const Color darkBackground    = Color(0xFF08090C); // Pure Obsidian Carbon Void
+  static const Color darkSurface       = Color(0xFF0E1118); // Stealth Matte Surface
+  static const Color darkCard          = Color(0xFF11141D); // Tactical Panel Base
+  static const Color darkCardElevated  = Color(0xFF161A26); // Elevated Panel
+  static const Color darkText          = Color(0xFFECE8E1); // Valorant Ghost Off-White
+  static const Color darkSubText       = Color(0xFF76808F); // Muted Ice Steel
+  static const Color darkDimText       = Color(0xFF4A5260); // Dim Grid Lines
+  static const Color darkBorder        = Color(0xFF232A38); // Gunmetal Slate Border
   static const Color darkBorderGold    = Color(0x33F5A623);
 
-  // ─── RADIANT SOLAR GOLD / AMBER ──────────────────────────────────────────
+  // ─── SIGNATURE VALORANT ACCENTS ──────────────────────────────────────────
+  static const Color valorantRed   = Color(0xFFFF4655); // Valorant Signature Red (Boss / Alert)
+  static const Color radianiteCyan = Color(0xFF00F5D4); // Radianite Mint (Energy / Success)
+  static const Color emeraldPrimary = Color(0xFF00F5D4); // Unified with Radianite
+  static const Color emeraldLight   = Color(0xFF69F0AE);
+
+  // ─── GOLD / AMBER FALLBACK ───────────────────────────────────────────────
   static const Color goldPrimary  = Color(0xFFF5A623);
   static const Color goldBright   = Color(0xFFFFB800);
   static const Color goldLight    = Color(0xFFFFD56B);
   static const Color goldDeep     = Color(0xFFD48B16);
-  static const Color goldMuted    = Color(0xFF9E782F);
   static const Color goldDark     = Color(0xFF1A150D);
 
-  // ─── ACCENT RED (Sports Bike CTA color) ─────────────────────────────────
-  static const Color accentRed     = Color(0xFFE53935);
+  static const LinearGradient goldGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFFD56B), Color(0xFFF5A623), Color(0xFFD48B16)],
+  );
+
+  static Color darkFauxGlass       = const Color(0xFF11141D);
+  static Color darkFauxGlassBorder = const Color(0xFF232A38);
+  static Color lightFauxGlass      = const Color(0xFF11141D);
+  static Color lightFauxGlassBorder = const Color(0xFF232A38);
+
+  // ─── ACCENT RED ──────────────────────────────────────────────────────────
+  static const Color accentRed     = Color(0xFFFF4655);
   static const Color accentRedDark = Color(0xFFB71C1C);
 
-  // ─── EMERALD ─────────────────────────────────────────────────────────────
-  static const Color emeraldPrimary = Color(0xFF00E676);
-  static const Color emeraldLight   = Color(0xFF69F0AE);
-
-  // ─── GLASS CARD HELPER (Pure Onyx Glass with Rank Accent) ────────────────
+  // ─── GLASS & AMBIENT GRADIENTS (Pure Obsidian Stealth) ───────────────────
   static BoxDecoration glassCard({
     required Color rankColor,
-    double borderRadius = 20,
+    double borderRadius = 0,
     bool elevated = false,
   }) {
     return BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          (elevated ? darkCardElevated : darkCard).withValues(alpha: 0.98),
-          darkSurface.withValues(alpha: 0.95),
-        ],
-      ),
-      borderRadius: BorderRadius.circular(borderRadius),
+      color: elevated ? darkCardElevated : darkCard,
       border: Border.all(
-        color: rankColor.withValues(alpha: 0.22),
+        color: rankColor.withValues(alpha: 0.25),
         width: 1.0,
       ),
       boxShadow: [
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.70),
-          blurRadius: 24,
-          offset: const Offset(0, 8),
-        ),
-        BoxShadow(
-          color: rankColor.withValues(alpha: 0.08),
-          blurRadius: 28,
-          spreadRadius: -4,
-          offset: const Offset(0, 4),
+          blurRadius: 20,
+          offset: const Offset(0, 6),
         ),
       ],
     );
   }
 
-  static Color goldGlow(double alpha) => const Color(0xFFF5A623).withValues(alpha: alpha);
-
   static RadialGradient buildRankAmbientGradient(Color rankColor) {
-    return const RadialGradient(
-      center: Alignment(0.0, -0.5),
-      radius: 1.2,
+    return RadialGradient(
+      center: const Alignment(0.0, -0.6),
+      radius: 1.4,
       colors: [
-        Color(0xFF000000),
-        Color(0xFF000000),
+        rankColor.withValues(alpha: 0.08),
+        const Color(0xFF08090C),
       ],
-      stops: [0.0, 1.0],
+      stops: const [0.0, 0.75],
     );
   }
 
@@ -93,69 +89,47 @@ class AppColors {
   static Color getLightVariant(Color color) {
     final hsl = HSLColor.fromColor(color);
     return hsl
-        .withLightness((hsl.lightness + 0.20).clamp(0.0, 1.0))
+        .withLightness((hsl.lightness + 0.18).clamp(0.0, 1.0))
         .withSaturation((hsl.saturation + 0.05).clamp(0.0, 1.0))
         .toColor();
   }
 
   static Color getDeepVariant(Color color) {
     final hsl = HSLColor.fromColor(color);
-    return hsl.withLightness((hsl.lightness - 0.18).clamp(0.0, 1.0)).toColor();
+    return hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0)).toColor();
   }
-
-  static const LinearGradient goldGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFFFD56B), Color(0xFFF5A623), Color(0xFFD48B16)],
-  );
 
   static const LinearGradient darkCardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0C0C0C), Color(0xFF040404)],
+    colors: [Color(0xFF11141D), Color(0xFF0E1118)],
   );
 
   static const LinearGradient quoteHeroGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF101010), Color(0xFF040404)],
+    colors: [Color(0xFF141824), Color(0xFF08090C)],
   );
 
-  static Color darkFauxGlass       = Colors.white.withValues(alpha: 0.03);
-  static Color darkFauxGlassBorder = const Color(0xFFF5A623).withValues(alpha: 0.15);
-  static Color darkGlass           = const Color(0xFF0C0C0C).withValues(alpha: 0.90);
-  static Color darkGlassBorder     = const Color(0xFFF5A623).withValues(alpha: 0.22);
+  // ─── LIGHT MODE FALLBACK ─────────────────────────────────────────────────
+  static const Color lightBackground = Color(0xFF08090C);
+  static const Color lightSurface    = Color(0xFF0E1118);
+  static const Color lightCard       = Color(0xFF11141D);
+  static const Color lightText       = Color(0xFFECE8E1);
+  static const Color lightSubText    = Color(0xFF76808F);
+  static const Color lightDimText    = Color(0xFF4A5260);
+  static const Color lightBorder     = Color(0xFF232A38);
 
-  // ─── LIGHT MODE (UNUSED) ─────────────────────────────────────────────────
-  static const Color lightBackground = Color(0xFFF5F6F8);
-  static const Color lightSurface    = Color(0xFFFFFFFF);
-  static const Color lightCard       = Color(0xFFEBECEF);
-  static const Color lightText       = Color(0xFF0F172A);
-  static const Color lightSubText    = Color(0xFF64748B);
-  static const Color lightDimText    = Color(0xFF94A3B8);
-  static const Color lightBorder     = Color(0xFFE2E8F0);
-
-  static Color lightFauxGlass       = Colors.black.withValues(alpha: 0.03);
-  static Color lightFauxGlassBorder = Colors.black.withValues(alpha: 0.06);
-  static Color lightGlass           = Colors.white.withValues(alpha: 0.85);
-  static Color lightGlassBorder     = Colors.black.withValues(alpha: 0.08);
-
-  // ─── CATEGORY COLORS ─────────────────────────────────────────────────────
-  static const Color mindColor        = Color(0xFFF5A623);
-  static const Color bodyColor        = Color(0xFFFF4444);
-  static const Color soulColor        = Color(0xFFFFB800);
-  static const Color environmentColor = Color(0xFF2ED573);
+  // ─── UNIFIED TACTICAL CATEGORY PALETTE ───────────────────────────────────
+  static const Color mindColor        = Color(0xFF8B9BB4); // Muted Ice Silver-Blue
+  static const Color bodyColor        = Color(0xFFFF5263); // Tactical Kinetic Crimson
+  static const Color soulColor        = Color(0xFF00F5D4); // Radianite Cyan
+  static const Color environmentColor = Color(0xFF2ED573); // Sector Mint
   static const Color socialColor      = Color(0xFF4A90E2);
   static const Color planColor        = Color(0xFFB37FEB);
   static const Color reflectColor     = Color(0xFFFF8A65);
   static const Color customColor      = Color(0xFFFFD56B);
-  static const Color oathColor        = Color(0xFF00E5FF);
-
-  static const Color bronzeTier   = Color(0xFFCD7F32);
-  static const Color silverTier   = Color(0xFFC0C0C0);
-  static const Color goldTier     = Color(0xFFFFD700);
-  static const Color platinumTier = Color(0xFFE5E4E2);
-  static const Color diamondTier  = Color(0xFF00E5FF);
+  static const Color oathColor        = Color(0xFF00F5D4);
 
   static Color getCategoryColor(String category) {
     switch (category.toLowerCase()) {
@@ -163,32 +137,16 @@ class AppColors {
       case 'body':        return bodyColor;
       case 'soul':        return soulColor;
       case 'environment': return environmentColor;
-      case 'social':      return socialColor;
-      case 'plan':        return planColor;
-      case 'reflect':     return reflectColor;
-      case 'custom':      return customColor;
-      case 'oath':        return oathColor;
-      default:            return goldPrimary;
+      default:            return const Color(0xFF8B9BB4);
     }
   }
 
   static IconData getCategoryIconData(String category) {
-    switch (category.toLowerCase()) {
-      case 'mind':        return Icons.memory_rounded;
-      case 'body':        return Icons.electric_bolt_rounded;
-      case 'soul':        return Icons.all_inclusive_rounded;
-      case 'environment': return Icons.radar_rounded;
-      case 'social':      return Icons.diversity_3_rounded;
-      case 'plan':        return Icons.alt_route_rounded;
-      case 'reflect':     return Icons.center_focus_strong_rounded;
-      case 'custom':      return Icons.diamond_rounded;
-      case 'oath':        return Icons.verified_user_rounded;
-      default:            return Icons.token_rounded;
-    }
+    return Icons.token_rounded;
   }
 
-  static const Color success = Color(0xFF10B981);
+  static const Color success = Color(0xFF00F5D4);
   static const Color warning = Color(0xFFF5A623);
-  static const Color error   = Color(0xFFEF4444);
-  static const Color accent  = Color(0xFFFFB800);
+  static const Color error   = Color(0xFFFF4655);
+  static const Color accent  = Color(0xFF00F5D4);
 }
