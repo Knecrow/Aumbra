@@ -304,11 +304,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
                       const SizedBox(height: 12),
 
-                      // Ultimate Ability Card [ X // ULTIMATE ] (The Honesty Oath)
+                      // Ultimate Ability Card (The Final Key // Honesty Oath Reactor)
                       ValorantUltimateCard(
                         isAnswered: answered,
                         isHonored: answerTrue,
                         rankColor: rankColor,
+                        completedCount: questProvider.todayQuests.where((q) => q.isCompleted).length,
+                        totalQuests: questProvider.todayQuests.length.clamp(1, 4),
                         onTap: () => showTacticalHonestyOathModal(
                           context: context,
                           questProvider: questProvider,

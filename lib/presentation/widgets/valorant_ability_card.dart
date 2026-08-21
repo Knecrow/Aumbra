@@ -333,12 +333,14 @@ class _ValorantCardPainter extends CustomPainter {
   }
 }
 
-/// Riot Valorant Ultimate Ability Card [ X // ULTIMATE ] for The Honesty Oath
+/// Riot Valorant Ultimate Ability Card (The Final Key // Honesty Oath Reactor)
 class ValorantUltimateCard extends StatefulWidget {
   final bool isAnswered;
   final bool isHonored;
   final Color rankColor;
   final VoidCallback onTap;
+  final int completedCount;
+  final int totalQuests;
 
   const ValorantUltimateCard({
     super.key,
@@ -346,6 +348,8 @@ class ValorantUltimateCard extends StatefulWidget {
     required this.isHonored,
     required this.rankColor,
     required this.onTap,
+    this.completedCount = 0,
+    this.totalQuests = 4,
   });
 
   @override
@@ -377,9 +381,10 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
   @override
   Widget build(BuildContext context) {
+    final isCharged = widget.completedCount >= widget.totalQuests && widget.totalQuests > 0;
     final statusColor = widget.isAnswered
         ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
-        : widget.rankColor;
+        : (isCharged ? const Color(0xFF00F5D4) : widget.rankColor);
 
     return GestureDetector(
       onTapDown: (_) => _touchCtrl.forward(),
@@ -396,13 +401,15 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
           decoration: BoxDecoration(
             color: const Color(0xFF0E111A),
             border: Border.all(
-              color: statusColor.withValues(alpha: widget.isAnswered ? 0.90 : 0.60),
-              width: 1.4,
+              color: isCharged
+                  ? const Color(0xFF00F5D4).withValues(alpha: 0.85)
+                  : statusColor.withValues(alpha: widget.isAnswered ? 0.90 : 0.45),
+              width: isCharged ? 1.6 : 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: statusColor.withValues(alpha: 0.20),
-                blurRadius: 24,
+                color: (isCharged ? const Color(0xFF00F5D4) : statusColor).withValues(alpha: isCharged ? 0.25 : 0.15),
+                blurRadius: isCharged ? 28 : 20,
                 spreadRadius: -2,
                 offset: const Offset(0, 4),
               ),
@@ -411,7 +418,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Header Bar
+              // ── 1. Conduit Header Bar: Final Key Reactor + 4 Energy Diamond Cells ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -424,10 +431,10 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           border: Border.all(color: statusColor, width: 1.0),
                         ),
                         child: Text(
-                          '[ ULTIMATE ]',
+                          isCharged ? '⚡ FINAL KEY' : '[ ULTIMATE ]',
                           style: GoogleFonts.spaceMono(
                             color: Colors.white,
-                            fontSize: 9.5,
+                            fontSize: 9.0,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -456,7 +463,64 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
               const SizedBox(height: 12),
 
-              // Center Core Row
+              // ── 2. 4 Energy Conduit Cells (Mind, Body, Soul, Env) ──
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF07090E),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.06), width: 0.8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'CONDUIT CHARGE',
+                      style: GoogleFonts.spaceMono(
+                        color: const Color(0xFF76808F),
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Row(
+                      children: List.generate(widget.totalQuests.clamp(1, 4), (i) {
+                        final isFilled = i < widget.completedCount;
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: isFilled
+                                  ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
+                                  : const Color(0xFF141822),
+                              border: Border.all(
+                                color: isFilled
+                                    ? const Color(0xFF00F5D4)
+                                    : const Color(0xFF232A38),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                isFilled ? '◆' : '◇',
+                                style: TextStyle(
+                                  color: isFilled ? const Color(0xFF00F5D4) : const Color(0xFF4A5260),
+                                  fontSize: 8,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // ── 3. Center Reactor Core ──
               Row(
                 children: [
                   Container(
@@ -465,14 +529,14 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                     decoration: BoxDecoration(
                       color: const Color(0xFF07090F),
                       border: Border.all(
-                        color: statusColor,
+                        color: isCharged ? const Color(0xFF00F5D4) : statusColor,
                         width: 1.2,
                       ),
                     ),
                     child: Center(
                       child: TacticalGlyph(
                         type: TacticalGlyphType.oath,
-                        color: statusColor,
+                        color: isCharged ? const Color(0xFF00F5D4) : statusColor,
                         size: 24,
                         glow: true,
                       ),
@@ -495,10 +559,12 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'DAILY PLEDGE OF TRUTH & HONOR',
+                          isCharged
+                              ? '⚡ ALL 4 PROTOCOLS LINKED // APEX READY'
+                              : 'LINK ${widget.completedCount}/${widget.totalQuests} ENERGY CELLS TO SEAL',
                           style: GoogleFonts.spaceMono(
-                            color: AppColors.darkSubText,
-                            fontSize: 9.0,
+                            color: isCharged ? const Color(0xFF00F5D4) : AppColors.darkSubText,
+                            fontSize: 8.5,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -510,29 +576,33 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
               const SizedBox(height: 12),
 
-              // Bottom Trigger Button Bar
+              // ── 4. Tactical Status / Ignition Button Bar ──
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
                   color: widget.isAnswered
                       ? (widget.isHonored
                           ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
                           : const Color(0xFFFF4655).withValues(alpha: 0.15))
-                      : statusColor.withValues(alpha: 0.15),
+                      : (isCharged
+                          ? const Color(0xFF00F5D4).withValues(alpha: 0.20)
+                          : statusColor.withValues(alpha: 0.12)),
                   border: Border.all(
-                    color: statusColor.withValues(alpha: 0.70),
-                    width: 1.0,
+                    color: isCharged ? const Color(0xFF00F5D4) : statusColor.withValues(alpha: 0.70),
+                    width: 1.2,
                   ),
                 ),
                 child: Center(
                   child: Text(
                     widget.isAnswered
-                        ? (widget.isHonored ? 'OATH SECURED // +50 RAD' : 'COMPROMISED // SHIELD USED')
-                        : 'READY TO CAST // TAP TO LOCK IN',
+                        ? (widget.isHonored ? 'FINAL KEY SEALED // +50 RAD' : 'COMPROMISED // SHIELD CONSUMED')
+                        : (isCharged
+                            ? '⚡ TURN FINAL KEY // SEAL DAILY PROTOCOLS ⚡'
+                            : 'LOCK IN EARLY OR COMPLETE ALL 4'),
                     style: GoogleFonts.spaceMono(
-                      color: statusColor,
-                      fontSize: 10.0,
+                      color: isCharged ? const Color(0xFF00F5D4) : statusColor,
+                      fontSize: 9.5,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.8,
                     ),
