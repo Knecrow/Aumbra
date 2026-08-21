@@ -93,11 +93,11 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ── Top Row: Keybind Badge + Radianite Reward ─────────────
+                // ── Top Row: Category Badge + Radianite Reward ─────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Keybind Badge [ Q ]
+                    // Category Badge
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
@@ -114,21 +114,21 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                         ),
                       ),
                       child: Text(
-                        '[ $keybind ]',
+                        widget.quest.category.toUpperCase(),
                         style: GoogleFonts.spaceMono(
                           color: isCompleted
                               ? AppColors.emeraldPrimary
                               : (widget.isSelected ? Colors.white : const Color(0xFF8E9BA6)),
-                          fontSize: 10,
+                          fontSize: 8.5,
                           fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
+                          letterSpacing: 0.6,
                         ),
                       ),
                     ),
 
                     // Radianite Points / Protocol Code
                     Text(
-                      isCompleted ? '// SECURED' : '+25 RAD',
+                      isCompleted ? 'SECURED' : '+25 RAD',
                       style: GoogleFonts.spaceMono(
                         color: isCompleted
                             ? AppColors.emeraldPrimary
@@ -424,7 +424,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           border: Border.all(color: statusColor, width: 1.0),
                         ),
                         child: Text(
-                          '[ X // ULTIMATE ]',
+                          '[ ULTIMATE ]',
                           style: GoogleFonts.spaceMono(
                             color: Colors.white,
                             fontSize: 9.5,

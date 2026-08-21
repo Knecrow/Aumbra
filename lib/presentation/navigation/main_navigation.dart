@@ -239,11 +239,10 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // 1. Protocol / Loadout [ Q ]
+              // 1. Protocol / Loadout
               _NavTabItem(
                 glyphType: TacticalGlyphType.navProtocol,
                 label: 'PROTOCOL',
-                keybind: 'Q',
                 isSelected: _currentIndex == 0,
                 onTap: () => _onTabTap(0),
                 activeColor: lightRankColor,
@@ -251,11 +250,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 2. Career / Stats [ W ]
+              // 2. Career / Stats
               _NavTabItem(
                 glyphType: TacticalGlyphType.navCareer,
                 label: 'CAREER',
-                keybind: 'W',
                 isSelected: _currentIndex == 1,
                 onTap: () => _onTabTap(1),
                 activeColor: lightRankColor,
@@ -263,11 +261,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 3. Arsenal / Hall of Fame [ E ]
+              // 3. Arsenal / Hall of Fame
               _NavTabItem(
                 glyphType: TacticalGlyphType.navArsenal,
                 label: 'ARSENAL',
-                keybind: 'E',
                 isSelected: _currentIndex == 2,
                 onTap: () => _onTabTap(2),
                 activeColor: lightRankColor,
@@ -275,11 +272,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 4. Config / Settings [ R ]
+              // 4. Config / Settings
               _NavTabItem(
                 glyphType: TacticalGlyphType.navConfig,
                 label: 'CONFIG',
-                keybind: 'R',
                 isSelected: _currentIndex == 3,
                 onTap: () => _onTabTap(3),
                 activeColor: lightRankColor,
@@ -298,7 +294,6 @@ class _MainNavigationState extends State<MainNavigation> {
 class _NavTabItem extends StatefulWidget {
   final TacticalGlyphType glyphType;
   final String label;
-  final String keybind;
   final bool isSelected;
   final VoidCallback onTap;
   final Color activeColor;
@@ -308,7 +303,6 @@ class _NavTabItem extends StatefulWidget {
   const _NavTabItem({
     required this.glyphType,
     required this.label,
-    required this.keybind,
     required this.isSelected,
     required this.onTap,
     required this.activeColor,
@@ -374,27 +368,11 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.keybind,
-                      style: GoogleFonts.spaceMono(
-                        color: widget.isSelected
-                            ? widget.activeColor.withValues(alpha: 0.70)
-                            : const Color(0xFF4A5260),
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    TacticalGlyph(
-                      type: widget.glyphType,
-                      color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
-                      size: 19,
-                      glow: widget.isSelected,
-                    ),
-                  ],
+                TacticalGlyph(
+                  type: widget.glyphType,
+                  color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+                  size: 20,
+                  glow: widget.isSelected,
                 ),
                 const SizedBox(height: 3),
                 Text(

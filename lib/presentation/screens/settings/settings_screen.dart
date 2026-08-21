@@ -504,12 +504,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       {VoidCallback? onTap, Color? textColor, Widget? trailing}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.zero,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: textColor ?? AppColors.goldPrimary),
+            Icon(icon, size: 18, color: textColor ?? const Color(0xFF76808F)),
             const SizedBox(width: 12),
             Expanded(
               child: Text(label,
