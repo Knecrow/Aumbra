@@ -207,26 +207,25 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   Widget _buildBottomDock(bool reduce, Color rankColor) {
-    const inactiveColor = Color(0xFF72768E);
+    const inactiveColor = Color(0xFF76808F);
     final lightRankColor = AppColors.getLightVariant(rankColor);
 
-    final navContent = Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 0, 14, 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF090B10),
+        color: const Color(0xFF0C0E14),
         border: Border.all(
           color: rankColor.withValues(alpha: 0.35),
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.70),
+            color: Colors.black.withValues(alpha: 0.85),
             blurRadius: 28,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: rankColor.withValues(alpha: 0.12),
+            color: rankColor.withValues(alpha: 0.15),
             blurRadius: 20,
             spreadRadius: -2,
             offset: const Offset(0, 2),
@@ -236,7 +235,7 @@ class _MainNavigationState extends State<MainNavigation> {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 52,
+          height: 56,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -292,8 +291,6 @@ class _MainNavigationState extends State<MainNavigation> {
         ),
       ),
     );
-
-    return navContent;
   }
 }
 
@@ -334,7 +331,7 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
       duration: const Duration(milliseconds: 100),
       vsync: this,
     );
-    _touchScale = Tween<double>(begin: 1.0, end: 0.90).animate(
+    _touchScale = Tween<double>(begin: 1.0, end: 0.92).animate(
       CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
     );
   }
@@ -358,54 +355,58 @@ class _NavTabItemState extends State<_NavTabItem> with SingleTickerProviderState
         onTapCancel: () => _touchCtrl.reverse(),
         child: ScaleTransition(
           scale: _touchScale,
-          child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: widget.isSelected
-                    ? widget.rankColor.withValues(alpha: 0.16)
-                    : Colors.transparent,
-                border: widget.isSelected
-                    ? Border(
-                        top: BorderSide(
-                          color: widget.rankColor,
-                          width: 2.0,
-                        ),
-                      )
-                    : null,
-                boxShadow: widget.isSelected
-                    ? [
-                        BoxShadow(
-                          color: widget.rankColor.withValues(alpha: 0.35),
-                          blurRadius: 10,
-                          spreadRadius: 0,
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TacticalGlyph(
-                    type: widget.glyphType,
-                    color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
-                    size: 19,
-                    glow: widget.isSelected,
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    widget.label,
-                    style: GoogleFonts.spaceMono(
-                      color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
-                      fontSize: 7.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: widget.isSelected
+                  ? widget.rankColor.withValues(alpha: 0.16)
+                  : Colors.transparent,
+              border: widget.isSelected
+                  ? Border(
+                      top: BorderSide(
+                        color: widget.rankColor,
+                        width: 2.4,
+                      ),
+                    )
+                  : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.keybind,
+                      style: GoogleFonts.spaceMono(
+                        color: widget.isSelected
+                            ? widget.activeColor.withValues(alpha: 0.70)
+                            : const Color(0xFF4A5260),
+                        fontSize: 8.0,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
+                    const SizedBox(width: 4),
+                    TacticalGlyph(
+                      type: widget.glyphType,
+                      color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+                      size: 19,
+                      glow: widget.isSelected,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  widget.label,
+                  style: GoogleFonts.spaceMono(
+                    color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+                    fontSize: 9.0,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

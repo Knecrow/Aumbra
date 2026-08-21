@@ -417,11 +417,11 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
         barTouchData: BarTouchData(
           enabled: true,
           touchTooltipData: BarTouchTooltipData(
-            getTooltipColor: (_) => const Color(0xFF14141A),
+            getTooltipColor: (_) => const Color(0xFF0C0E14),
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
-                '${rod.toY.round()} quests',
-                TextStyle(color: AppColors.getLightVariant(rankColor), fontSize: 11, fontWeight: FontWeight.bold),
+                '${rod.toY.round()} PROTOCOLS',
+                GoogleFonts.spaceMono(color: AppColors.radianiteCyan, fontSize: 10, fontWeight: FontWeight.bold),
               );
             },
           ),
@@ -444,10 +444,10 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
                     label,
-                    style: TextStyle(
-                      color: isToday ? rankColor : AppColors.darkSubText,
-                      fontSize: 9,
-                      fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
+                    style: GoogleFonts.spaceMono(
+                      color: isToday ? rankColor : const Color(0xFF76808F),
+                      fontSize: 8.5,
+                      fontWeight: isToday ? FontWeight.w900 : FontWeight.w700,
                     ),
                   ),
                 );
@@ -455,7 +455,11 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
             ),
           ),
         ),
-        gridData: const FlGridData(show: false),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine: (_) => const FlLine(color: Color(0x0CFFFFFF), strokeWidth: 0.8),
+        ),
         borderData: FlBorderData(show: false),
         barGroups: List.generate(last7Days.length, (i) {
           final day = last7Days[i];
@@ -471,16 +475,16 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                 gradient: count > 0
                     ? LinearGradient(
                         colors: [
-                          isToday ? AppColors.getLightVariant(rankColor) : rankColor,
-                          isToday ? rankColor : AppColors.getDeepVariant(rankColor),
+                          isToday ? AppColors.radianiteCyan : rankColor,
+                          isToday ? const Color(0xFF00BFA5) : AppColors.getDeepVariant(rankColor),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       )
                     : null,
-                color: count > 0 ? null : const Color(0xFF0E0E14),
-                width: 16,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                color: count > 0 ? null : const Color(0xFF161A26),
+                width: 14,
+                borderRadius: BorderRadius.zero,
               ),
             ],
           );
@@ -498,6 +502,8 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
         const FlSpot(2, 1),
         const FlSpot(3, 2),
         const FlSpot(4, 3),
+        const FlSpot(5, 5),
+        const FlSpot(6, 7),
       ]);
     } else {
       for (int i = 0; i < _streakHistory.length; i++) {
@@ -512,38 +518,53 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
           drawVerticalLine: false,
           getDrawingHorizontalLine: (value) => const FlLine(
             color: Color(0x0DFFFFFF),
-            strokeWidth: 1,
+            strokeWidth: 0.8,
           ),
         ),
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 28,
-              getTitlesWidget: (val, meta) => Text(
-                val.toInt().toString(),
-                style: const TextStyle(color: AppColors.darkSubText, fontSize: 10),
-              ),
-            ),
-          ),
-          bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 20,
+              getTitlesWidget: (val, meta) {
+                final idx = val.toInt();
+                if (idx % 2 != 0 || idx >= spots.length) return const SizedBox.shrink();
+                return Text(
+                  'D${idx + 1}',
+                  style: GoogleFonts.spaceMono(color: const Color(0xFF76808F), fontSize: 8.5, fontWeight: FontWeight.w700),
+                );
+              },
+            ),
+          ),
         ),
         borderData: FlBorderData(show: false),
         lineBarsData: [
           LineChartBarData(
             spots: spots,
-            isCurved: true,
-            gradient: AppColors.buildRankGradient(rankColor),
-            barWidth: 3.0,
-            dotData: const FlDotData(show: false),
+            isCurved: false,
+            color: rankColor,
+            barWidth: 2.2,
+            isStrokeCapRound: false,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 3.5,
+                  color: Colors.white,
+                  strokeWidth: 1.5,
+                  strokeColor: rankColor,
+                );
+              },
+            ),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  rankColor.withValues(alpha: 0.25),
-                  rankColor.withValues(alpha: 0.0),
+                  rankColor.withValues(alpha: 0.22),
+                  Colors.transparent,
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,

@@ -392,96 +392,151 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
       child: ScaleTransition(
         scale: _touchScale,
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF090C12),
+            color: const Color(0xFF0E111A),
             border: Border.all(
-              color: statusColor.withValues(alpha: widget.isAnswered ? 0.85 : 0.45),
-              width: 1.2,
+              color: statusColor.withValues(alpha: widget.isAnswered ? 0.90 : 0.60),
+              width: 1.4,
             ),
             boxShadow: [
               BoxShadow(
-                color: statusColor.withValues(alpha: 0.15),
-                blurRadius: 18,
+                color: statusColor.withValues(alpha: 0.20),
+                blurRadius: 24,
                 spreadRadius: -2,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Ultimate Keybind Badge [ X ]
+              // Top Header Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.20),
+                          border: Border.all(color: statusColor, width: 1.0),
+                        ),
+                        child: Text(
+                          '[ X // ULTIMATE ]',
+                          style: GoogleFonts.spaceMono(
+                            color: Colors.white,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'HONESTY REACTOR',
+                        style: GoogleFonts.spaceMono(
+                          color: const Color(0xFF76808F),
+                          fontSize: 9.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '+50 RAD MULTIPLIER',
+                    style: GoogleFonts.spaceMono(
+                      color: const Color(0xFF00F5D4),
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // Center Core Row
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF07090F),
+                      border: Border.all(
+                        color: statusColor,
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Center(
+                      child: TacticalGlyph(
+                        type: TacticalGlyphType.oath,
+                        color: statusColor,
+                        size: 24,
+                        glow: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'THE INTEGRITY OATH',
+                          style: GoogleFonts.rajdhani(
+                            color: AppColors.darkText,
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                            height: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'DAILY PLEDGE OF TRUTH & HONOR',
+                          style: GoogleFonts.spaceMono(
+                            color: AppColors.darkSubText,
+                            fontSize: 9.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // Bottom Trigger Button Bar
               Container(
-                width: 44,
-                height: 44,
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.16),
+                  color: widget.isAnswered
+                      ? (widget.isHonored
+                          ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
+                          : const Color(0xFFFF4655).withValues(alpha: 0.15))
+                      : statusColor.withValues(alpha: 0.15),
                   border: Border.all(
-                    color: statusColor.withValues(alpha: 0.8),
-                    width: 1.2,
+                    color: statusColor.withValues(alpha: 0.70),
+                    width: 1.0,
                   ),
                 ),
                 child: Center(
-                  child: TacticalGlyph(
-                    type: TacticalGlyphType.oath,
-                    color: statusColor,
-                    size: 22,
-                    glow: true,
+                  child: Text(
+                    widget.isAnswered
+                        ? (widget.isHonored ? 'OATH SECURED // +50 RAD' : 'COMPROMISED // SHIELD USED')
+                        : 'READY TO CAST // TAP TO LOCK IN',
+                    style: GoogleFonts.spaceMono(
+                      color: statusColor,
+                      fontSize: 10.0,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Title & Telemetry
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '[ X // ULTIMATE ABILITY ]',
-                          style: GoogleFonts.spaceMono(
-                            color: statusColor,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                          Text(
-                            widget.isAnswered
-                                ? (widget.isHonored ? '+50 RAD // LOCKED' : '+0 RAD')
-                                : '+50 RAD',
-                            style: GoogleFonts.spaceMono(
-                              color: widget.isAnswered
-                                  ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
-                                  : const Color(0xFF00F5D4),
-                              fontSize: 8.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'THE INTEGRITY OATH',
-                      style: GoogleFonts.rajdhani(
-                        color: AppColors.darkText,
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '+50 RAD · DAILY HONOR',
-                      style: GoogleFonts.spaceMono(
-                        color: AppColors.darkSubText,
-                        fontSize: 9.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
