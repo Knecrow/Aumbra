@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -119,10 +120,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           child: Center(
-                            child: Icon(
-                              _getRankAvatarIcon(rankInfo.rankNumber),
+                            child: TacticalGlyph(
+                              type: TacticalGlyphType.soul,
                               color: lightRankColor,
                               size: 24,
+                              glow: true,
                             ),
                           ),
                         ),
@@ -152,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'RANK ${rankInfo.rankNumber} // ${rankInfo.name.toUpperCase()}',
+                                  '[ ${rankInfo.name.toUpperCase()} ]',
                                   style: GoogleFonts.spaceMono(
                                     color: lightRankColor,
                                     fontSize: 8.5,
@@ -577,29 +579,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _confirmSignOut() {
+    HapticFeedback.selectionClick();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.darkSurface,
+        backgroundColor: const Color(0xFF090B10),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: AppColors.goldPrimary.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppColors.accentRed.withValues(alpha: 0.6), width: 1.2),
         ),
-        title: const Text('Sign Out', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-        content: const Text('You will stay in offline mode. Your local data is safe.',
-            style: TextStyle(color: AppColors.darkSubText, fontSize: 13)),
+        title: Row(
+          children: [
+            Container(width: 3, height: 16, color: AppColors.accentRed),
+            const SizedBox(width: 8),
+            Text(
+              'TERMINATE SESSION',
+              style: GoogleFonts.spaceMono(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Agent session will disconnect. Local offline telemetry remains stored in memory core.',
+          style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 11, height: 1.4),
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('CANCEL', style: TextStyle(color: AppColors.darkSubText))),
-          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('CANCEL', style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 11, fontWeight: FontWeight.w700)),
+          ),
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<UserProvider>().signOut();
               widget.onSignOut();
             },
-            child: const Text('SIGN OUT',
-                style: TextStyle(color: Color(0xFFFF6B6B), fontWeight: FontWeight.w800)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accentRed,
+              foregroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
+            child: Text('SIGN OUT', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
           ),
         ],
       ),
@@ -607,24 +631,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _confirmDeleteAll() {
+    HapticFeedback.heavyImpact();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.darkSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Color(0xFFFF6B6B), width: 1.2),
+        backgroundColor: const Color(0xFF090B10),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: Color(0xFFFF4655), width: 1.4),
         ),
-        title: const Text('Purge All Data',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-        content: const Text(
-          'This will permanently delete all your progress, history, badges, and account. This action cannot be reversed.',
-          style: TextStyle(color: AppColors.darkSubText, fontSize: 13, height: 1.5),
+        title: Row(
+          children: [
+            Container(width: 3, height: 16, color: const Color(0xFFFF4655)),
+            const SizedBox(width: 8),
+            Text(
+              'CRITICAL PURGE // SYSTEM WIPE',
+              style: GoogleFonts.spaceMono(
+                color: const Color(0xFFFF4655),
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'WARNING: This protocol permanently wipes all combat records, telemetry, rank progress, and badges from local and cloud nodes. This action cannot be reversed.',
+          style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 11, height: 1.4),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('CANCEL', style: TextStyle(color: AppColors.darkSubText))),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('ABORT', style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 11, fontWeight: FontWeight.w700)),
+          ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -632,10 +671,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               widget.onSignOut();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF6B6B),
+              backgroundColor: const Color(0xFFFF4655),
               foregroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
-            child: const Text('PURGE EVERYTHING', style: TextStyle(fontWeight: FontWeight.w900)),
+            child: Text('PURGE EVERYTHING', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
           ),
         ],
       ),
