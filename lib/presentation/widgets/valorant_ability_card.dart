@@ -8,7 +8,7 @@ import 'tactical_icons.dart';
 /// Keybind letters mapped to the 4 protocol abilities
 const List<String> kAbilityKeybinds = ['Q', 'E', 'C', 'F'];
 
-/// A Riot Valorant inspired tactical Ability Buy-Menu Tile
+/// A Riot Valorant inspired full-width horizontal Tactical Ability Card
 class ValorantAbilityCard extends StatefulWidget {
   final QuestModel quest;
   final int index;
@@ -43,7 +43,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
       duration: const Duration(milliseconds: 100),
       vsync: this,
     );
-    _touchScale = Tween<double>(begin: 1.0, end: 0.94).animate(
+    _touchScale = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
     );
   }
@@ -63,10 +63,6 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
         ? AppColors.emeraldPrimary
         : (isBoss ? widget.rankColor : categoryColor);
 
-    final keybind = widget.index < kAbilityKeybinds.length
-        ? kAbilityKeybinds[widget.index]
-        : '${widget.index + 1}';
-
     return GestureDetector(
       onTapDown: (_) => _touchCtrl.forward(),
       onTapUp: (_) {
@@ -81,173 +77,193 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
       },
       child: ScaleTransition(
         scale: _touchScale,
-        child: CustomPaint(
-          painter: _ValorantCardPainter(
-            accentColor: accentColor,
-            isCompleted: isCompleted,
-            isSelected: widget.isSelected,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isCompleted
+                ? const Color(0xFF09120E)
+                : (widget.isSelected ? const Color(0xFF141924) : const Color(0xFF0C0E15)),
+            border: Border.all(
+              color: isCompleted
+                  ? AppColors.emeraldPrimary.withValues(alpha: 0.85)
+                  : (widget.isSelected ? accentColor : accentColor.withValues(alpha: 0.35)),
+              width: isCompleted || widget.isSelected ? 1.4 : 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: (isCompleted ? AppColors.emeraldPrimary : accentColor)
+                    .withValues(alpha: isCompleted ? 0.18 : 0.08),
+                blurRadius: 16,
+                spreadRadius: -2,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // ── Top Row: Category Badge + Radianite Reward ─────────────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Category Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isCompleted
-                            ? AppColors.emeraldPrimary.withValues(alpha: 0.20)
-                            : (widget.isSelected
-                                ? accentColor.withValues(alpha: 0.35)
-                                : const Color(0xFF141822)),
-                        border: Border.all(
-                          color: isCompleted
-                              ? AppColors.emeraldPrimary.withValues(alpha: 0.8)
-                              : (widget.isSelected ? accentColor : Colors.white.withValues(alpha: 0.15)),
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Text(
-                        widget.quest.category.toUpperCase(),
-                        style: GoogleFonts.spaceMono(
-                          color: isCompleted
-                              ? AppColors.emeraldPrimary
-                              : (widget.isSelected ? Colors.white : const Color(0xFF8E9BA6)),
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.6,
-                        ),
-                      ),
-                    ),
+          child: Row(
+            children: [
+              // ── Left: Sliced Icon Plate ──
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
+                      : const Color(0xFF07090F),
+                  border: Border.all(
+                    color: isCompleted
+                        ? AppColors.emeraldPrimary.withValues(alpha: 0.80)
+                        : accentColor.withValues(alpha: 0.50),
+                    width: 1.0,
+                  ),
+                ),
+                child: Center(
+                  child: TacticalGlyph.fromCategory(
+                    widget.quest.category,
+                    color: isCompleted ? AppColors.emeraldPrimary : accentColor,
+                    size: 20,
+                    isCompleted: isCompleted,
+                  ),
+                ),
+              ),
 
-                    // Radianite Points / Protocol Code
+              const SizedBox(width: 14),
+
+              // ── Center: Title & Category Metadata ──
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: isCompleted
+                                ? AppColors.emeraldPrimary.withValues(alpha: 0.20)
+                                : accentColor.withValues(alpha: 0.15),
+                            border: Border.all(
+                              color: isCompleted
+                                  ? AppColors.emeraldPrimary.withValues(alpha: 0.60)
+                                  : accentColor.withValues(alpha: 0.40),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            widget.quest.category.toUpperCase(),
+                            style: GoogleFonts.spaceMono(
+                              color: isCompleted ? AppColors.emeraldPrimary : accentColor,
+                              fontSize: 8.0,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isCompleted ? 'PROTOCOL SECURED' : 'ACTIVE DIRECTIVE',
+                          style: GoogleFonts.spaceMono(
+                            color: isCompleted ? AppColors.emeraldPrimary : AppColors.darkSubText,
+                            fontSize: 8.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.quest.title.toUpperCase(),
+                      style: GoogleFonts.rajdhani(
+                        color: AppColors.darkText,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.6,
+                        height: 1.0,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              // ── Right: Radianite Status Tag ──
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
+                      : const Color(0xFF00F5D4).withValues(alpha: 0.10),
+                  border: Border.all(
+                    color: isCompleted
+                        ? AppColors.emeraldPrimary.withValues(alpha: 0.70)
+                        : const Color(0xFF00F5D4).withValues(alpha: 0.40),
+                    width: 0.9,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
                       isCompleted ? 'SECURED' : '+25 RAD',
                       style: GoogleFonts.spaceMono(
-                        color: isCompleted
-                            ? AppColors.emeraldPrimary
-                            : const Color(0xFF00F5D4), // Radianite Cyan
+                        color: isCompleted ? AppColors.emeraldPrimary : const Color(0xFF00F5D4),
                         fontSize: 9.0,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
                       ),
                     ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                // ── Middle: Icon + Title ─────────────────────────────────
-                Row(
-                  children: [
-                    // Ability Icon Plate
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: isCompleted
-                            ? AppColors.emeraldPrimary.withValues(alpha: 0.12)
-                            : const Color(0xFF07090E),
-                        border: Border.all(
-                          color: isCompleted
-                              ? AppColors.emeraldPrimary.withValues(alpha: 0.6)
-                              : accentColor.withValues(alpha: 0.45),
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Center(
-                        child: TacticalGlyph.fromCategory(
-                          widget.quest.category,
-                          color: isCompleted ? AppColors.emeraldPrimary : accentColor,
-                          size: 18,
-                          isCompleted: isCompleted,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Title & Clean Category
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.quest.title.toUpperCase(),
-                            style: GoogleFonts.rajdhani(
-                              color: AppColors.darkText,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                              height: 1.1,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.quest.category.toUpperCase(),
-                            style: GoogleFonts.spaceMono(
-                              color: AppColors.darkSubText,
-                              fontSize: 8.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                // ── Bottom Status Bar: [ READY ] vs [ LOCKED IN ] ────────
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 6),
-                  decoration: BoxDecoration(
-                    color: isCompleted
-                        ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
-                        : (widget.isSelected
-                            ? accentColor.withValues(alpha: 0.15)
-                            : const Color(0xFF080A10)),
-                    border: Border.all(
-                      color: isCompleted
-                          ? AppColors.emeraldPrimary.withValues(alpha: 0.4)
-                          : Colors.white.withValues(alpha: 0.06),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isCompleted ? 'STATUS: COMPLETED' : (widget.isSelected ? 'STATUS: INSPECTING' : 'STATUS: READY'),
-                        style: GoogleFonts.spaceMono(
-                          color: isCompleted
-                              ? AppColors.emeraldPrimary
-                              : (widget.isSelected ? accentColor : const Color(0xFF6E788B)),
-                          fontSize: 8.0,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.6,
-                        ),
-                      ),
-                      Icon(
-                        isCompleted ? Icons.lock_outline_rounded : Icons.radio_button_checked_rounded,
-                        color: isCompleted
-                            ? AppColors.emeraldPrimary
-                            : (widget.isSelected ? accentColor : const Color(0xFF6E788B)),
-                        size: 9.0,
-                      ),
+                    if (isCompleted) ...[
+                      const SizedBox(width: 4),
+                      const Icon(Icons.check_rounded, color: AppColors.emeraldPrimary, size: 11),
                     ],
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tactical vertical spine conduit connector linking one ability card to the next
+class TacticalSpineConnector extends StatelessWidget {
+  final bool isCompleted;
+  final Color rankColor;
+  final double height;
+
+  const TacticalSpineConnector({
+    super.key,
+    required this.isCompleted,
+    required this.rankColor,
+    this.height = 14.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = isCompleted ? const Color(0xFF00F5D4) : const Color(0xFF232A38);
+
+    return SizedBox(
+      height: height,
+      child: Center(
+        child: Container(
+          width: 2.0,
+          height: height,
+          decoration: BoxDecoration(
+            color: activeColor,
+            boxShadow: isCompleted
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF00F5D4).withValues(alpha: 0.60),
+                      blurRadius: 6,
+                      spreadRadius: 0.5,
+                    ),
+                  ]
+                : null,
           ),
         ),
       ),

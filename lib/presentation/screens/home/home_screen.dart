@@ -258,58 +258,54 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
                       const SizedBox(height: 10),
 
-                      // 2x2 Ability Cards Grid
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1.18,
-                        ),
-                        itemCount: questProvider.todayQuests.length.clamp(0, 4),
-                        itemBuilder: (ctx, idx) {
-                          final quest = questProvider.todayQuests[idx];
-                          return ValorantAbilityCard(
-                            quest: quest,
-                            index: idx,
-                            rankColor: rankColor,
-                            onTap: () {
-                              showValorantInspectModal(
-                                context: context,
-                                quest: quest,
-                                index: idx,
-                                rankColor: rankColor,
-                                onComplete: () {
-                                  if (quest.isCompleted) {
-                                    questProvider.uncompleteQuest(quest.id);
-                                  } else {
-                                    questProvider.completeQuest(quest.id);
-                                  }
-                                },
-                                onSwapQuest: () {},
-                              );
-                            },
-                            onLongPress: () {
-                              if (quest.isCompleted) {
-                                questProvider.uncompleteQuest(quest.id);
-                              } else {
-                                questProvider.completeQuest(quest.id);
-                              }
-                            },
-                          );
-                        },
-                      ),
+                      const SizedBox(height: 10),
 
-                      // ── Visual Power Circuit Conduit Bridge ──
-                      TacticalConduitBridge(
-                        completedCount: questProvider.todayQuests.where((q) => q.isCompleted).length,
-                        totalQuests: questProvider.todayQuests.length.clamp(1, 4),
-                        rankColor: rankColor,
-                      ),
+                      // ── 1-Column Vertical Ascension Spine ──
+                      ...questProvider.todayQuests.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final quest = entry.value;
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ValorantAbilityCard(
+                              quest: quest,
+                              index: idx,
+                              rankColor: rankColor,
+                              onTap: () {
+                                showValorantInspectModal(
+                                  context: context,
+                                  quest: quest,
+                                  index: idx,
+                                  rankColor: rankColor,
+                                  onComplete: () {
+                                    if (quest.isCompleted) {
+                                      questProvider.uncompleteQuest(quest.id);
+                                    } else {
+                                      questProvider.completeQuest(quest.id);
+                                    }
+                                  },
+                                  onSwapQuest: () {},
+                                );
+                              },
+                              onLongPress: () {
+                                if (quest.isCompleted) {
+                                  questProvider.uncompleteQuest(quest.id);
+                                } else {
+                                  questProvider.completeQuest(quest.id);
+                                }
+                              },
+                            ),
+                            // Vertical laser conduit spine linking to next card
+                            TacticalSpineConnector(
+                              isCompleted: quest.isCompleted,
+                              rankColor: rankColor,
+                              height: 12.0,
+                            ),
+                          ],
+                        );
+                      }),
 
-                      // Ultimate Ability Card (The Final Key // Honesty Oath Reactor)
+                      // ── The Apex 5th Card: The Final Key / Honesty Oath Reactor ──
                       ValorantUltimateCard(
                         isAnswered: answered,
                         isHonored: answerTrue,
