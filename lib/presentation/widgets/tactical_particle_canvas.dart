@@ -66,8 +66,8 @@ class _TacticalParticleCanvasState extends State<TacticalParticleCanvas>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        RepaintBoundary(
-          child: Positioned.fill(
+        Positioned.fill(
+          child: RepaintBoundary(
             child: AnimatedBuilder(
               animation: _animCtrl,
               builder: (context, _) {
