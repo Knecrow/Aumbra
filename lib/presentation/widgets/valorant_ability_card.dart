@@ -313,7 +313,7 @@ class _LeftBackboneRowPainter extends CustomPainter {
     const inactiveColor = Color(0xFF1E2430);
     const activeColor = Color(0xFF00F5D4);
 
-    // 1. Top backbone vertical line (active if power comes from above)
+    // 1. Top backbone vertical line (active only if power reached this node from above)
     if (!isTop) {
       final topPaint = Paint()
         ..color = isPoweredFromAbove ? activeColor : inactiveColor
@@ -329,8 +329,8 @@ class _LeftBackboneRowPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(backboneX, branchY), Offset(cardLeftX, branchY), branchPaint);
 
-    // 3. Bottom backbone vertical line (only transmits downwards if THIS quest or power from above is active)
-    final isTransmittingDown = isQuestCompleted || isPoweredFromAbove;
+    // 3. Bottom backbone vertical line (ONLY transmits downwards if power arrived from above AND THIS quest is completed)
+    final isTransmittingDown = isPoweredFromAbove && isQuestCompleted;
     final bottomPaint = Paint()
       ..color = isTransmittingDown ? activeColor : inactiveColor
       ..strokeWidth = isTransmittingDown ? 2.0 : 1.2
@@ -351,21 +351,12 @@ class _LeftBackboneRowPainter extends CustomPainter {
       canvas.drawCircle(Offset(packetX, branchY), 2.5, glowPaint);
       canvas.drawCircle(Offset(packetX, branchY), 1.4, packetPaint);
 
-      // Downward pulse along backbone
-      final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
-      canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
-      canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
-    } else if (isPoweredFromAbove) {
-      final glowPaint = Paint()
-        ..color = activeColor.withValues(alpha: 0.85)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
-      final packetPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-
-      final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
-      canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
-      canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
+      // Downward pulse along backbone ONLY if power continues down
+      if (isTransmittingDown) {
+        final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
+        canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
+        canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
+      }
     }
 
     // 5. Diamond Junction Pip at (backboneX, branchY)

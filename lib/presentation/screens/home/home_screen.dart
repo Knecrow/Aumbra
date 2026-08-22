@@ -24,26 +24,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+  late AnimationController _headerCtrl;
   late Animation<double> _headerAnim;
   final List<Widget> _popups = [];
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(seconds: 4),
+    _headerCtrl = AnimationController(
+      duration: const Duration(milliseconds: 400),
       vsync: this,
-    )..repeat(reverse: true);
-
-    _pulseAnimation = Tween<double>(begin: 0.98, end: 1.02).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
-    _headerAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: const Interval(0.0, 0.4, curve: Curves.easeOut)),
-    );
+    _headerAnim = CurvedAnimation(parent: _headerCtrl, curve: Curves.easeOutCubic);
+    _headerCtrl.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<QuestProvider>().loadTodayQuests();
@@ -81,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    _pulseController.dispose();
+    _headerCtrl.dispose();
     super.dispose();
   }
 
@@ -306,10 +299,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         final idx = entry.key;
                         final quest = entry.value;
 
-                        // Check if any quest above this one is completed (transmits power down the backbone)
-                        final isPoweredFromAbove = questProvider.todayQuests
-                            .take(idx)
-                            .any((q) => q.isCompleted);
+                        // Check if all quests in the chain above this one are completed
+                        final isPoweredFromAbove = idx == 0
+                            ? true
+                            : questProvider.todayQuests.take(idx).every((q) => q.isCompleted);
 
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),
