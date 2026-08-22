@@ -60,7 +60,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
     final isBoss = widget.quest.isBossQuest;
     final categoryColor = AppColors.getCategoryColor(widget.quest.category);
     final accentColor = isCompleted
-        ? AppColors.emeraldPrimary
+        ? widget.rankColor
         : (isBoss ? widget.rankColor : categoryColor);
 
     return GestureDetector(
@@ -81,18 +81,18 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: isCompleted
-                ? const Color(0xFF09120E)
+                ? widget.rankColor.withValues(alpha: 0.08)
                 : (widget.isSelected ? const Color(0xFF141924) : const Color(0xFF0C0E15)),
             border: Border.all(
               color: isCompleted
-                  ? AppColors.emeraldPrimary.withValues(alpha: 0.85)
+                  ? widget.rankColor.withValues(alpha: 0.85)
                   : (widget.isSelected ? accentColor : accentColor.withValues(alpha: 0.35)),
               width: isCompleted || widget.isSelected ? 1.4 : 1.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: (isCompleted ? AppColors.emeraldPrimary : accentColor)
-                    .withValues(alpha: isCompleted ? 0.18 : 0.08),
+                color: (isCompleted ? widget.rankColor : accentColor)
+                    .withValues(alpha: isCompleted ? 0.22 : 0.08),
                 blurRadius: 16,
                 spreadRadius: -2,
                 offset: const Offset(0, 3),
@@ -107,11 +107,11 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                 height: 42,
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
+                      ? widget.rankColor.withValues(alpha: 0.15)
                       : const Color(0xFF07090F),
                   border: Border.all(
                     color: isCompleted
-                        ? AppColors.emeraldPrimary.withValues(alpha: 0.80)
+                        ? widget.rankColor.withValues(alpha: 0.80)
                         : accentColor.withValues(alpha: 0.50),
                     width: 1.0,
                   ),
@@ -119,7 +119,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                 child: Center(
                   child: TacticalGlyph.fromCategory(
                     widget.quest.category,
-                    color: isCompleted ? AppColors.emeraldPrimary : accentColor,
+                    color: isCompleted ? widget.rankColor : accentColor,
                     size: 20,
                     isCompleted: isCompleted,
                   ),
@@ -140,11 +140,11 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: isCompleted
-                                ? AppColors.emeraldPrimary.withValues(alpha: 0.20)
+                                ? widget.rankColor.withValues(alpha: 0.20)
                                 : accentColor.withValues(alpha: 0.15),
                             border: Border.all(
                               color: isCompleted
-                                  ? AppColors.emeraldPrimary.withValues(alpha: 0.60)
+                                  ? widget.rankColor.withValues(alpha: 0.60)
                                   : accentColor.withValues(alpha: 0.40),
                               width: 0.8,
                             ),
@@ -152,7 +152,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                           child: Text(
                             widget.quest.category.toUpperCase(),
                             style: GoogleFonts.spaceMono(
-                              color: isCompleted ? AppColors.emeraldPrimary : accentColor,
+                              color: isCompleted ? widget.rankColor : accentColor,
                               fontSize: 9.0,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 0.6,
@@ -163,7 +163,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                         Text(
                           isCompleted ? 'PILLAR COMPLETED' : 'DAILY PILLAR',
                           style: GoogleFonts.spaceMono(
-                            color: isCompleted ? AppColors.emeraldPrimary : AppColors.darkSubText,
+                            color: isCompleted ? widget.rankColor : AppColors.darkSubText,
                             fontSize: 9.0,
                             fontWeight: FontWeight.w700,
                           ),
@@ -194,11 +194,11 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
+                      ? widget.rankColor.withValues(alpha: 0.15)
                       : const Color(0xFF00F5D4).withValues(alpha: 0.10),
                   border: Border.all(
                     color: isCompleted
-                        ? AppColors.emeraldPrimary.withValues(alpha: 0.70)
+                        ? widget.rankColor.withValues(alpha: 0.70)
                         : const Color(0xFF00F5D4).withValues(alpha: 0.40),
                     width: 0.9,
                   ),
@@ -209,7 +209,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                     Text(
                       isCompleted ? 'COMPLETED' : '+25 RAD',
                       style: GoogleFonts.spaceMono(
-                        color: isCompleted ? AppColors.emeraldPrimary : const Color(0xFF00F5D4),
+                        color: isCompleted ? widget.rankColor : const Color(0xFF00F5D4),
                         fontSize: 9.0,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.6,
@@ -217,7 +217,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                     ),
                     if (isCompleted) ...[
                       const SizedBox(width: 4),
-                      const Icon(Icons.check_rounded, color: AppColors.emeraldPrimary, size: 11),
+                      Icon(Icons.check_rounded, color: widget.rankColor, size: 11),
                     ],
                   ],
                 ),
@@ -230,11 +230,12 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
   }
 }
 
-/// Tactical Left Power Circuit Backbone Segment with animated traveling energy current
-class TacticalLeftBackboneSegment extends StatefulWidget {
+/// Tactical Left Power Circuit Backbone Segment (Static clean illumination in rankColor)
+class TacticalLeftBackboneSegment extends StatelessWidget {
   final bool isTop;
   final bool isQuestCompleted;
   final bool isPoweredFromAbove;
+  final Color rankColor;
   final Widget child;
 
   const TacticalLeftBackboneSegment({
@@ -242,51 +243,23 @@ class TacticalLeftBackboneSegment extends StatefulWidget {
     required this.isTop,
     required this.isQuestCompleted,
     required this.isPoweredFromAbove,
+    this.rankColor = AppColors.goldPrimary,
     required this.child,
   });
 
   @override
-  State<TacticalLeftBackboneSegment> createState() => _TacticalLeftBackboneSegmentState();
-}
-
-class _TacticalLeftBackboneSegmentState extends State<TacticalLeftBackboneSegment>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _currentCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _currentCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _currentCtrl,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: _LeftBackboneRowPainter(
-            isTop: widget.isTop,
-            isQuestCompleted: widget.isQuestCompleted,
-            isPoweredFromAbove: widget.isPoweredFromAbove,
-            progress: _currentCtrl.value,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24.0), // 24dp gutter for the main left backbone
-            child: widget.child,
-          ),
-        );
-      },
-      child: widget.child,
+    return CustomPaint(
+      painter: _LeftBackboneRowPainter(
+        isTop: isTop,
+        isQuestCompleted: isQuestCompleted,
+        isPoweredFromAbove: isPoweredFromAbove,
+        rankColor: rankColor,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24.0), // 24dp gutter for the main left backbone
+        child: child,
+      ),
     );
   }
 }
@@ -295,13 +268,13 @@ class _LeftBackboneRowPainter extends CustomPainter {
   final bool isTop;
   final bool isQuestCompleted;
   final bool isPoweredFromAbove;
-  final double progress;
+  final Color rankColor;
 
   _LeftBackboneRowPainter({
     required this.isTop,
     required this.isQuestCompleted,
     required this.isPoweredFromAbove,
-    required this.progress,
+    required this.rankColor,
   });
 
   @override
@@ -311,10 +284,18 @@ class _LeftBackboneRowPainter extends CustomPainter {
     final cardLeftX = 24.0;
 
     const inactiveColor = Color(0xFF1E2430);
-    const activeColor = Color(0xFF00F5D4);
+    final activeColor = rankColor;
 
     // 1. Top backbone vertical line (active only if power reached this node from above)
     if (!isTop) {
+      if (isPoweredFromAbove) {
+        final glowPaint = Paint()
+          ..color = activeColor.withValues(alpha: 0.40)
+          ..strokeWidth = 3.5
+          ..style = PaintingStyle.stroke
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5);
+        canvas.drawLine(const Offset(backboneX, 0), Offset(backboneX, branchY), glowPaint);
+      }
       final topPaint = Paint()
         ..color = isPoweredFromAbove ? activeColor : inactiveColor
         ..strokeWidth = isPoweredFromAbove ? 2.0 : 1.2
@@ -323,6 +304,14 @@ class _LeftBackboneRowPainter extends CustomPainter {
     }
 
     // 2. Horizontal Feeder Branch (from Card left edge to Backbone junction)
+    if (isQuestCompleted) {
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.40)
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5);
+      canvas.drawLine(Offset(backboneX, branchY), Offset(cardLeftX, branchY), glowPaint);
+    }
     final branchPaint = Paint()
       ..color = isQuestCompleted ? activeColor : inactiveColor
       ..strokeWidth = isQuestCompleted ? 2.0 : 1.2
@@ -331,35 +320,21 @@ class _LeftBackboneRowPainter extends CustomPainter {
 
     // 3. Bottom backbone vertical line (ONLY transmits downwards if power arrived from above AND THIS quest is completed)
     final isTransmittingDown = isPoweredFromAbove && isQuestCompleted;
+    if (isTransmittingDown) {
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.40)
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5);
+      canvas.drawLine(Offset(backboneX, branchY), Offset(backboneX, size.height + 10.0), glowPaint);
+    }
     final bottomPaint = Paint()
       ..color = isTransmittingDown ? activeColor : inactiveColor
       ..strokeWidth = isTransmittingDown ? 2.0 : 1.2
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(backboneX, branchY), Offset(backboneX, size.height + 10.0), bottomPaint);
 
-    // 4. Traveling High-Voltage Electrical Packet Pulse (ONLY on active paths)
-    if (isQuestCompleted) {
-      final glowPaint = Paint()
-        ..color = activeColor.withValues(alpha: 0.85)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
-      final packetPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-
-      // Traveling horizontally from card to backbone junction
-      final packetX = cardLeftX - (cardLeftX - backboneX) * progress;
-      canvas.drawCircle(Offset(packetX, branchY), 2.5, glowPaint);
-      canvas.drawCircle(Offset(packetX, branchY), 1.4, packetPaint);
-
-      // Downward pulse along backbone ONLY if power continues down
-      if (isTransmittingDown) {
-        final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
-        canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
-        canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
-      }
-    }
-
-    // 5. Diamond Junction Pip at (backboneX, branchY)
+    // 4. Diamond Junction Pip at (backboneX, branchY)
     final isNodeActive = isQuestCompleted;
     final nodeFill = Paint()
       ..color = isNodeActive ? activeColor : const Color(0xFF0C0E14)
@@ -385,116 +360,77 @@ class _LeftBackboneRowPainter extends CustomPainter {
     return old.isTop != isTop ||
         old.isQuestCompleted != isQuestCompleted ||
         old.isPoweredFromAbove != isPoweredFromAbove ||
-        old.progress != progress;
+        old.rankColor != rankColor;
   }
 }
 
-/// Tactical Left Power Circuit Backbone Wrapper with animated incoming power feed
-class TacticalLeftBackboneOathWrapper extends StatefulWidget {
+/// Tactical Left Power Circuit Backbone Wrapper for Honesty Oath
+class TacticalLeftBackboneOathWrapper extends StatelessWidget {
   final bool isFullCharge;
+  final Color rankColor;
   final Widget child;
 
   const TacticalLeftBackboneOathWrapper({
     super.key,
     required this.isFullCharge,
+    this.rankColor = AppColors.goldPrimary,
     required this.child,
   });
 
   @override
-  State<TacticalLeftBackboneOathWrapper> createState() => _TacticalLeftBackboneOathWrapperState();
-}
-
-class _TacticalLeftBackboneOathWrapperState extends State<TacticalLeftBackboneOathWrapper>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _pulseCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _pulseCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _pulseCtrl,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: _LeftBackboneOathPainter(
-            isFullCharge: widget.isFullCharge,
-            progress: _pulseCtrl.value,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: widget.child,
-          ),
-        );
-      },
-      child: widget.child,
+    return CustomPaint(
+      painter: _LeftBackboneOathPainter(
+        isFullCharge: isFullCharge,
+        rankColor: rankColor,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24.0),
+        child: child,
+      ),
     );
   }
 }
 
 class _LeftBackboneOathPainter extends CustomPainter {
   final bool isFullCharge;
-  final double progress;
+  final Color rankColor;
 
   _LeftBackboneOathPainter({
     required this.isFullCharge,
-    required this.progress,
+    required this.rankColor,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     const backboneX = 9.0;
     const cardLeftX = 24.0;
-    const branchY = 32.0; // Plugs right into the left of the Oath Header
+    const branchY = 32.0;
 
     const inactiveColor = Color(0xFF1E2430);
-    const activeColor = Color(0xFF00F5D4);
+    final activeColor = rankColor;
 
     final isPowered = isFullCharge; // ONLY power the Oath line when 100% of quests are completed
 
     // 1. Vertical line descending from top of gutter to the input port
+    if (isPowered) {
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.40)
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5);
+      canvas.drawLine(const Offset(backboneX, -10.0), const Offset(backboneX, branchY), glowPaint);
+      canvas.drawLine(const Offset(backboneX, branchY), const Offset(cardLeftX, branchY), glowPaint);
+    }
+
     final linePaint = Paint()
       ..color = isPowered ? activeColor : inactiveColor
       ..strokeWidth = isPowered ? 2.0 : 1.2
       ..style = PaintingStyle.stroke;
     canvas.drawLine(const Offset(backboneX, -10.0), const Offset(backboneX, branchY), linePaint);
-
-    // 2. Horizontal branch into the Oath card
     canvas.drawLine(const Offset(backboneX, branchY), const Offset(cardLeftX, branchY), linePaint);
 
-    // 3. Traveling Energy Spark down into Oath Core (ONLY when 100% full charge)
-    if (isPowered) {
-      final glowPaint = Paint()
-        ..color = activeColor.withValues(alpha: 0.85)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
-      final dotPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-
-      if (progress < 0.7) {
-        final y = -10.0 + (branchY - (-10.0)) * (progress / 0.7);
-        canvas.drawCircle(Offset(backboneX, y), 3.0, glowPaint);
-        canvas.drawCircle(Offset(backboneX, y), 1.6, dotPaint);
-      } else {
-        final x = backboneX + (cardLeftX - backboneX) * ((progress - 0.7) / 0.3);
-        canvas.drawCircle(Offset(x, branchY), 3.0, glowPaint);
-        canvas.drawCircle(Offset(x, branchY), 1.6, dotPaint);
-      }
-    }
-
-    // 4. Diamond Node at the input junction
+    // 2. Diamond Node at the input junction
     final nodeFill = Paint()
       ..color = isPowered ? activeColor : const Color(0xFF0C0E14)
       ..style = PaintingStyle.fill;
@@ -516,8 +452,7 @@ class _LeftBackboneOathPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _LeftBackboneOathPainter old) {
-    return old.isFullCharge != isFullCharge ||
-        old.progress != progress;
+    return old.isFullCharge != isFullCharge || old.rankColor != rankColor;
   }
 }
 

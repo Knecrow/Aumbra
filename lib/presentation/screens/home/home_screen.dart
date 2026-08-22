@@ -310,6 +310,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             isTop: idx == 0,
                             isQuestCompleted: quest.isCompleted,
                             isPoweredFromAbove: isPoweredFromAbove,
+                            rankColor: rankColor,
                             child: ValorantAbilityCard(
                               quest: quest,
                               index: idx,
@@ -348,6 +349,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       TacticalLeftBackboneOathWrapper(
                         isFullCharge: questProvider.todayQuests.where((q) => q.isCompleted).length >=
                             questProvider.todayQuests.length.clamp(1, 4),
+                        rankColor: rankColor,
                         child: ValorantUltimateCard(
                           isAnswered: answered,
                           isHonored: answerTrue,
