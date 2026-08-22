@@ -44,7 +44,7 @@ void showValorantInspectModal({
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Top Header: Keybind + Category + Close Button ────────
+            // ── Top Header: Pillar Tag + Category + Close Button ────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -58,7 +58,7 @@ void showValorantInspectModal({
                         border: Border.all(color: categoryColor, width: 1.0),
                       ),
                       child: Text(
-                        '[ $keybind ]',
+                        '0${index + 1}',
                         style: GoogleFonts.spaceMono(
                           color: Colors.white,
                           fontSize: 11,
@@ -68,12 +68,12 @@ void showValorantInspectModal({
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '// 0${index + 1} ${quest.category.toUpperCase()} PROTOCOL',
+                      '${quest.category.toUpperCase()} PILLAR',
                       style: GoogleFonts.spaceMono(
                         color: const Color(0xFF8E9BA6),
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.8,
                       ),
                     ),
                   ],
@@ -130,7 +130,7 @@ void showValorantInspectModal({
                       Row(
                         children: [
                           Text(
-                            '+25 RADIANITE',
+                            '+25 RAD',
                             style: GoogleFonts.spaceMono(
                               color: const Color(0xFF00F5D4),
                               fontSize: 10,
@@ -139,7 +139,7 @@ void showValorantInspectModal({
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '· DAILY PROTOCOL',
+                            '· DAILY PILLAR',
                             style: GoogleFonts.spaceMono(
                               color: const Color(0xFF7A8394),
                               fontSize: 10,
@@ -170,12 +170,12 @@ void showValorantInspectModal({
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '// MISSION_DIRECTIVE',
+                    'HABIT DETAILS',
                     style: GoogleFonts.spaceMono(
                       color: categoryColor,
                       fontSize: 9.0,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+                      letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -215,7 +215,7 @@ void showValorantInspectModal({
                       const Icon(Icons.verified_rounded, color: AppColors.emeraldPrimary, size: 18),
                       const SizedBox(width: 8),
                       Text(
-                        'PROTOCOL SECURED // TAP TO UNLOCK',
+                        'PILLAR COMPLETED · TAP TO UNDO',
                         style: GoogleFonts.spaceMono(
                           color: AppColors.emeraldPrimary,
                           fontSize: 11,
@@ -247,12 +247,12 @@ void showValorantInspectModal({
                     const Icon(Icons.bolt_rounded, size: 18, color: Colors.black),
                     const SizedBox(width: 6),
                     Text(
-                      'LOCK IN // EXECUTE PROTOCOL',
+                      'COMPLETE PILLAR · +25 RAD',
                       style: GoogleFonts.spaceMono(
                         color: Colors.black,
                         fontSize: 11.5,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.8,
                       ),
                     ),
                   ],

@@ -23,7 +23,7 @@ void showTacticalShieldDialog(BuildContext context, int shieldsRemaining, Color 
           Container(width: 3, height: 16, color: rankColor),
           const SizedBox(width: 8),
           Text(
-            'AP DEFENSE MATRIX',
+            'STREAK SHIELD MATRIX',
             style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800),
           ),
         ],
@@ -61,12 +61,12 @@ void showTacticalShieldDialog(BuildContext context, int shieldsRemaining, Color 
           ),
           const SizedBox(height: 16),
           Text(
-            '// AP SHIELD PROTOCOL',
+            'HOW SHIELDS WORK',
             style: GoogleFonts.spaceMono(color: rankColor, fontSize: 9.0, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
           Text(
-            'Each AP Shield automatically preserves your streak if a daily protocol is missed. You recharge 3 Shields every month.',
+            'Streak Shields automatically protect your streak if you miss a day. 3 shields recharge each month.',
             style: GoogleFonts.spaceMono(color: const Color(0xFF8E9BA6), fontSize: 11, height: 1.4),
           ),
         ],
@@ -79,7 +79,7 @@ void showTacticalShieldDialog(BuildContext context, int shieldsRemaining, Color 
             foregroundColor: Colors.black,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           ),
-          child: Text('ACKNOWLEDGE', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
+          child: Text('GOT IT', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
         ),
       ],
     ),
@@ -104,7 +104,7 @@ void showTacticalEditProfileDialog(BuildContext context, UserProvider userProvid
           Container(width: 3, height: 16, color: rankColor),
           const SizedBox(width: 8),
           Text(
-            'AGENT CALLSIGN CONFIG',
+            'EDIT PROFILE NAME',
             style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800),
           ),
         ],
@@ -114,7 +114,7 @@ void showTacticalEditProfileDialog(BuildContext context, UserProvider userProvid
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '// ENTER_CODENAME',
+            'NAME / CALLSIGN',
             style: GoogleFonts.spaceMono(color: rankColor, fontSize: 9.0, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
@@ -156,7 +156,7 @@ void showTacticalEditProfileDialog(BuildContext context, UserProvider userProvid
             foregroundColor: Colors.black,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           ),
-          child: Text('CONFIRM // LOCK IN', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
+          child: Text('SAVE CHANGES', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
         ),
       ],
     ),
@@ -181,7 +181,7 @@ void showTacticalBossDialog(BuildContext context, QuestProvider questProvider, C
           Container(width: 3, height: 16, color: const Color(0xFFFF4655)),
           const SizedBox(width: 8),
           Text(
-            'BOSS PROTOCOL // ASCENSION GATE',
+            'ASCENSION CHALLENGE',
             style: GoogleFonts.spaceMono(color: const Color(0xFFFF4655), fontSize: 12, fontWeight: FontWeight.w900),
           ),
         ],
@@ -204,7 +204,7 @@ void showTacticalBossDialog(BuildContext context, QuestProvider questProvider, C
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: Text('RETREAT', style: GoogleFonts.spaceMono(color: const Color(0xFF7A8394), fontSize: 11)),
+          child: Text('LATER', style: GoogleFonts.spaceMono(color: const Color(0xFF7A8394), fontSize: 11)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -216,7 +216,7 @@ void showTacticalBossDialog(BuildContext context, QuestProvider questProvider, C
             foregroundColor: Colors.black,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           ),
-          child: Text('CONQUER // EXECUTE', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
+          child: Text('COMPLETE CHALLENGE', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
         ),
       ],
     ),
@@ -248,7 +248,7 @@ void showTacticalRankLoreDialog(BuildContext context, UserProvider userProvider)
                 Container(width: 3, height: 14, color: rankColor),
                 const SizedBox(width: 8),
                 Text(
-                  'AGENT CONTRACT // RANK ${rankInfo.rankNumber}',
+                  'RANK DOSSIER · RANK ${rankInfo.rankNumber}',
                   style: GoogleFonts.spaceMono(color: rankColor, fontSize: 11, fontWeight: FontWeight.w800),
                 ),
               ],
@@ -260,7 +260,7 @@ void showTacticalRankLoreDialog(BuildContext context, UserProvider userProvider)
             ),
             const SizedBox(height: 6),
             Text(
-              'DEPTH LEVEL: ${rankInfo.depthLevel.toUpperCase()} · REQ: ${rankInfo.completionsRequired} PROTOCOLS',
+              'TIER: ${rankInfo.depthLevel.toUpperCase()} · REQ: ${rankInfo.completionsRequired} DAYS',
               style: const TextStyle(color: Color(0xFF8E9BA6), fontSize: 12, height: 1.45),
             ),
             const SizedBox(height: 16),
@@ -271,7 +271,7 @@ void showTacticalRankLoreDialog(BuildContext context, UserProvider userProvider)
                 foregroundColor: Colors.black,
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
-              child: Text('CLOSE DOSSIER', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
+              child: Text('CLOSE', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
             ),
           ],
         ),

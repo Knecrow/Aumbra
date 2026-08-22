@@ -282,7 +282,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
               ),
               const Spacer(),
-              _buildNextButton('BEGIN AWAKENING'),
+              _buildNextButton('START YOUR JOURNEY'),
               const SizedBox(height: 40),
             ],
           ),
@@ -294,23 +294,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   // ── Input pages ─────────────────────────────────────────────────────────────
   Widget _buildNamePage() => _buildInputPage(
         icon: Icons.person_rounded,
-        title: 'What is your\nCodename?',
-        subtitle: 'Your identifier in the system archive.',
+        title: 'What should we\ncall you?',
+        subtitle: 'Your name or callsign.',
         child: _glassTextField(
           controller: _nameController,
-          hint: 'e.g. NOVA, SHADOW, TITAN',
+          hint: 'e.g. Alex, Sarah, Nova',
           icon: Icons.person_outline_rounded,
-          capitalization: TextCapitalization.characters,
+          capitalization: TextCapitalization.words,
         ),
       );
 
   Widget _buildCareerPage() => _buildInputPage(
         icon: Icons.work_rounded,
         title: 'What is\nyour path?',
-        subtitle: 'Your career, field, or main craft. Helps calibrate daily quests.',
+        subtitle: 'Your craft, field, or main focus. Helps calibrate daily pillars.',
         child: _glassTextField(
           controller: _careerController,
-          hint: 'e.g. Software Engineer, Medical Student, Artist',
+          hint: 'e.g. Software Engineer, Medical Student, Designer',
           icon: Icons.work_outline_rounded,
           capitalization: TextCapitalization.words,
         ),
@@ -318,11 +318,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Widget _buildInterestsPage() => _buildInputPage(
         icon: Icons.auto_awesome_rounded,
-        title: 'What fuels\nyour soul?',
-        subtitle: 'Hobbies and focus areas — the more specific, the sharper your quests.',
+        title: 'What fuels\nyour growth?',
+        subtitle: 'Hobbies and focus areas — the more specific, the sharper your daily habits.',
         child: _glassTextField(
           controller: _interestsController,
-          hint: 'e.g. Strength training, coding, reading, languages',
+          hint: 'e.g. Strength training, coding, reading, mindfulness',
           icon: Icons.favorite_outline_rounded,
           maxLines: 3,
           capitalization: TextCapitalization.sentences,
@@ -332,7 +332,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget _buildFitnessPage() => _buildInputPage(
         icon: Icons.fitness_center_rounded,
         title: 'Discipline &\nFitness Level',
-        subtitle: 'Rate your baseline physical endurance.',
+        subtitle: 'Rate your baseline physical endurance and daily discipline.',
         child: Column(
           children: [
             const SizedBox(height: 16),
@@ -341,7 +341,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               children: [
                 Text('Beginner',
                     style: TextStyle(color: AppColors.darkSubText, fontSize: 12)),
-                Text('Apex Disciplined',
+                Text('Elite Discipline',
                     style: TextStyle(color: AppColors.goldLight, fontSize: 12, fontWeight: FontWeight.w700)),
               ],
             ),
@@ -392,13 +392,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final sublabels = {
       '15': 'Quick daily wins',
       '30': 'Balanced standard growth',
-      '60': 'Serious intense grind',
-      '120': 'Full protocol ascension',
+      '60': 'Serious focused grind',
+      '120': 'Maximum daily focus',
     };
     return _buildInputPage(
       icon: Icons.schedule_rounded,
-      title: 'Daily Protocol\nTime Allocation',
-      subtitle: 'Target time dedicated to daily quests.',
+      title: 'Daily Habit\nTime Allocation',
+      subtitle: 'Target time dedicated to daily pillars.',
       child: Column(
         children: _dailyTimes.map((time) {
           final isSelected = _dailyTime == time;
@@ -467,8 +467,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Widget _buildComputerPage() => _buildInputPage(
         icon: Icons.laptop_mac_rounded,
-        title: 'Terminal / PC\nAccess',
-        subtitle: 'Ensures objectives are compatible with your setup.',
+        title: 'Computer / PC\nAccess',
+        subtitle: 'Ensures daily habits match your available tools.',
         child: Column(
           children: [
             const SizedBox(height: 16),
@@ -557,8 +557,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   Widget _buildApiKeyPage() => _buildInputPage(
         icon: Icons.key_rounded,
-        title: 'Gemini AI Core\nKey (Optional)',
-        subtitle: 'Stored strictly on-device. Generates intelligent tailored quests.',
+        title: 'Gemini AI Key\n(Optional)',
+        subtitle: 'Stored strictly on-device. Generates personalized tailored habits.',
         showNext: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -627,7 +627,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
             ),
             const SizedBox(height: 28),
-            // Final AWAKEN button
+            // Final ENTER AUMBRA button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -643,7 +643,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ),
                 ),
                 child: const Text(
-                  'AWAKEN PROTOCOL',
+                  'ENTER AUMBRA',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,

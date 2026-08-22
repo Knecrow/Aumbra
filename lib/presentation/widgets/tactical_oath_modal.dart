@@ -56,22 +56,22 @@ void showTacticalHonestyOathModal({
                         border: Border.all(color: rankColor, width: 1.0),
                       ),
                       child: Text(
-                        '[ X // ULTIMATE ]',
+                        'FINAL KEY',
                         style: GoogleFonts.spaceMono(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '// INTEGRITY REACTOR',
+                      'DAILY HONESTY CHECK',
                       style: GoogleFonts.spaceMono(
                         color: const Color(0xFF8E9BA6),
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.8,
                       ),
                     ),
                   ],
@@ -129,7 +129,7 @@ void showTacticalHonestyOathModal({
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '+50 RADIANITE · STREAK MULTIPLIER',
+                        '+50 RAD BONUS · STREAK MULTIPLIER',
                         style: GoogleFonts.spaceMono(
                           color: const Color(0xFF00F5D4),
                           fontSize: 9.5,
@@ -158,17 +158,17 @@ void showTacticalHonestyOathModal({
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '// HUNTERS_PLEDGE_DIRECTIVE',
+                    'DAILY INTEGRITY PLEDGE',
                     style: GoogleFonts.spaceMono(
                       color: rankColor,
                       fontSize: 9.0,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+                      letterSpacing: 0.8,
                     ),
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Did you uphold absolute honesty and complete every protocol today without deception or cutting corners?',
+                    'Did you uphold absolute honesty and complete today\'s habits without deception or cutting corners?',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 13.5,
@@ -198,8 +198,8 @@ void showTacticalHonestyOathModal({
                 child: Center(
                   child: Text(
                     honored
-                        ? 'OATH OF TRUTH SECURED // +50 RAD'
-                        : 'OATH COMPROMISED // AP SHIELD CONSUMED',
+                        ? 'OATH HONORED · +50 RAD'
+                        : 'OATH BROKEN · SHIELD CONSUMED',
                     style: GoogleFonts.spaceMono(
                       color: honored ? AppColors.emeraldPrimary : const Color(0xFFFF8A94),
                       fontSize: 11.5,
@@ -227,7 +227,7 @@ void showTacticalHonestyOathModal({
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                       ),
                       child: Text(
-                        'COMPROMISED',
+                        'FELL SHORT',
                         style: GoogleFonts.spaceMono(
                           fontWeight: FontWeight.w900,
                           fontSize: 11,
@@ -253,7 +253,7 @@ void showTacticalHonestyOathModal({
                         elevation: 0,
                       ),
                       child: Text(
-                        'VOUCH // HONORED',
+                        'YES, I VOUCH',
                         style: GoogleFonts.spaceMono(
                           color: Colors.black,
                           fontWeight: FontWeight.w900,
