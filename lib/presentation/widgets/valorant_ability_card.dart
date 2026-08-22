@@ -161,7 +161,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          isCompleted ? 'PROTOCOL SECURED' : 'ACTIVE DIRECTIVE',
+                          isCompleted ? 'PILLAR COMPLETED' : 'DAILY PILLAR',
                           style: GoogleFonts.spaceMono(
                             color: isCompleted ? AppColors.emeraldPrimary : AppColors.darkSubText,
                             fontSize: 9.0,
@@ -189,7 +189,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
 
               const SizedBox(width: 10),
 
-              // ── Right: Radianite Status Tag ──
+              // ── Right: Status Tag ──
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
@@ -207,7 +207,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      isCompleted ? 'SECURED' : '+25 RAD',
+                      isCompleted ? 'COMPLETED' : '+25 RAD',
                       style: GoogleFonts.spaceMono(
                         color: isCompleted ? AppColors.emeraldPrimary : const Color(0xFF00F5D4),
                         fontSize: 9.0,
@@ -627,7 +627,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── 1. Conduit Header Bar: Final Key Reactor + 4 Energy Diamond Cells ──
+                  // ── 1. Header Bar: Final Key / Daily Oath + Multiplier ──
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -647,7 +647,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                               ),
                             ),
                             child: Text(
-                              isCharged ? '⚡ FINAL KEY' : '[ 🔒 DORMANT ]',
+                              isCharged ? 'FINAL KEY' : 'DAILY OATH',
                               style: GoogleFonts.spaceMono(
                                 color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                                 fontSize: 9.0,
@@ -657,7 +657,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'HONESTY REACTOR',
+                            'INTEGRITY OATH',
                             style: GoogleFonts.spaceMono(
                               color: isCharged ? const Color(0xFFECE8E1) : const Color(0xFF5A6372),
                               fontSize: 9.0,
@@ -667,7 +667,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         ],
                       ),
                       Text(
-                        '+50 RAD MULTIPLIER',
+                        '+50 RAD BONUS',
                         style: GoogleFonts.spaceMono(
                           color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                           fontSize: 9.5,
@@ -679,7 +679,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
                   const SizedBox(height: 12),
 
-                  // ── 2. 4 Energy Conduit Cells (Mind, Body, Soul, Env) ──
+                  // ── 2. 4 Energy Diamond Cells (Mind, Body, Soul, Env) ──
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
@@ -690,7 +690,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'CONDUIT CHARGE',
+                          'PILLAR ENERGY',
                           style: GoogleFonts.spaceMono(
                             color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                             fontSize: 8.5,
@@ -736,7 +736,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
                   const SizedBox(height: 12),
 
-                  // ── 3. Center Reactor Core ──
+                  // ── 3. Center Core ──
                   Row(
                     children: [
                       Container(
@@ -780,8 +780,8 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                             const SizedBox(height: 4),
                             Text(
                               isCharged
-                                  ? '⚡ ALL 4 PROTOCOLS LINKED // APEX READY'
-                                  : 'LINK ${widget.completedCount}/${widget.totalQuests} ENERGY CELLS TO SEAL',
+                                  ? 'ALL 4 PILLARS COMPLETE · READY TO SEAL'
+                                  : 'COMPLETE ${widget.completedCount}/${widget.totalQuests} PILLARS TO UNLOCK',
                               style: GoogleFonts.spaceMono(
                                 color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                                 fontSize: 8.5,
@@ -796,7 +796,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
                   const SizedBox(height: 12),
 
-                  // ── 4. Tactical Status / Ignition Button Bar ──
+                  // ── 4. Action Button Bar ──
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 9),
@@ -818,10 +818,10 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                     child: Center(
                       child: Text(
                         widget.isAnswered
-                            ? (widget.isHonored ? 'FINAL KEY SEALED // +50 RAD' : 'COMPROMISED // SHIELD CONSUMED')
+                            ? (widget.isHonored ? 'OATH HONORED · +50 RAD' : 'SHIELD DEFENSE CONSUMED')
                             : (isCharged
-                                ? '⚡ TURN FINAL KEY // SEAL DAILY PROTOCOLS ⚡'
-                                : '🔒 REQUIRES 4/4 PROTOCOLS TO IGNITE'),
+                                ? '⚡ SEAL TODAY\'S HABITS · VOUCH INTEGRITY ⚡'
+                                : '🔒 COMPLETE ALL 4 PILLARS TO SEAL'),
                         style: GoogleFonts.spaceMono(
                           color: isCharged
                               ? const Color(0xFF00F5D4)

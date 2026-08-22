@@ -237,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'DAILY PROTOCOLS',
+                            'DAILY PILLARS',
                             style: GoogleFonts.spaceMono(
                               color: AppColors.darkSubText,
                               fontSize: 9.5,
