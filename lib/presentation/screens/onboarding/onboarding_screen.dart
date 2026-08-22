@@ -425,6 +425,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 color: isSelected
                     ? _kAccent.withValues(alpha: 0.12)
                     : const Color(0xFF0C0F17),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isSelected ? _kAccent : Colors.white.withValues(alpha: 0.08),
                   width: isSelected ? 1.4 : 0.8,
@@ -493,6 +494,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         color: _hasComputer
                             ? _kAccent.withValues(alpha: 0.12)
                             : const Color(0xFF0C0F17),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _hasComputer ? _kAccent : Colors.white.withValues(alpha: 0.08),
                           width: _hasComputer ? 1.4 : 0.8,
@@ -531,6 +533,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         color: !_hasComputer
                             ? _kAccent.withValues(alpha: 0.12)
                             : const Color(0xFF0C0F17),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: !_hasComputer ? _kAccent : Colors.white.withValues(alpha: 0.08),
                           width: !_hasComputer ? 1.4 : 0.8,
@@ -573,22 +576,29 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Key field
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF0C0F17),
-                border: Border.all(color: _kAccent.withValues(alpha: 0.5), width: 1.0),
-              ),
-              child: TextField(
-                controller: _apiKeyController,
-                obscureText: true,
-                style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 13),
-                decoration: const InputDecoration(
-                  hintText: 'AIzaSy...',
-                  hintStyle: TextStyle(color: AppColors.darkDimText),
-                  prefixIcon: Icon(Icons.key_outlined, color: _kAccent, size: 18),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            TextField(
+              controller: _apiKeyController,
+              obscureText: true,
+              style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 13),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFF0C0F17),
+                hintText: 'AIzaSy...',
+                hintStyle: const TextStyle(color: AppColors.darkDimText),
+                prefixIcon: const Icon(Icons.key_outlined, color: _kAccent, size: 18),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: _kAccent, width: 1.5),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
             ),
             const SizedBox(height: 12),
@@ -681,11 +691,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             children: [
               // Icon badge
               Container(
-                width: 42,
-                height: 42,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: const Color(0xFF0E111A),
-                  border: Border.all(color: _kAccent, width: 1.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _kAccent.withValues(alpha: 0.6), width: 1.2),
                 ),
                 child: Center(
                   child: Icon(icon, color: _kAccent, size: 20),
@@ -738,24 +749,31 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     int maxLines = 1,
     TextCapitalization capitalization = TextCapitalization.none,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF0C0F17),
-        border: Border.all(color: _kAccent.withValues(alpha: 0.5), width: 1.0),
-      ),
-      child: TextField(
-        controller: controller,
-        autofocus: true,
-        maxLines: maxLines,
-        textCapitalization: capitalization,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: GoogleFonts.spaceMono(color: AppColors.darkDimText, fontSize: 13),
-          prefixIcon: Icon(icon, color: _kAccent, size: 18),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    return TextField(
+      controller: controller,
+      autofocus: true,
+      maxLines: maxLines,
+      textCapitalization: capitalization,
+      style: const TextStyle(color: Colors.white, fontSize: 15),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color(0xFF0C0F17),
+        hintText: hint,
+        hintStyle: GoogleFonts.spaceMono(color: AppColors.darkDimText, fontSize: 13),
+        prefixIcon: Icon(icon, color: _kAccent, size: 18),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _kAccent, width: 1.5),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       ),
     );
   }
@@ -772,7 +790,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           padding: const EdgeInsets.all(16),
           elevation: 4,
           shadowColor: _kAccent.withValues(alpha: 0.3),
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(
           label,
