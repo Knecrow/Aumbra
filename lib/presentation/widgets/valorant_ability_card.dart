@@ -137,7 +137,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: isCompleted
                                 ? AppColors.emeraldPrimary.withValues(alpha: 0.20)
@@ -153,7 +153,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                             widget.quest.category.toUpperCase(),
                             style: GoogleFonts.spaceMono(
                               color: isCompleted ? AppColors.emeraldPrimary : accentColor,
-                              fontSize: 8.0,
+                              fontSize: 9.0,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 0.6,
                             ),
@@ -164,7 +164,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                           isCompleted ? 'PROTOCOL SECURED' : 'ACTIVE DIRECTIVE',
                           style: GoogleFonts.spaceMono(
                             color: isCompleted ? AppColors.emeraldPrimary : AppColors.darkSubText,
-                            fontSize: 8.0,
+                            fontSize: 9.0,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -230,7 +230,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
   }
 }
 
-/// Tactical vertical spine conduit connector linking one ability card to the next
+/// Tactical vertical spine conduit connector on the LEFT axis linking cards directly
 class TacticalSpineConnector extends StatelessWidget {
   final bool isCompleted;
   final Color rankColor;
@@ -249,103 +249,29 @@ class TacticalSpineConnector extends StatelessWidget {
 
     return SizedBox(
       height: height,
-      child: Center(
-        child: Container(
-          width: 2.0,
-          height: height,
-          decoration: BoxDecoration(
-            color: activeColor,
-            boxShadow: isCompleted
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFF00F5D4).withValues(alpha: 0.60),
-                      blurRadius: 6,
-                      spreadRadius: 0.5,
-                    ),
-                  ]
-                : null,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 34.0), // Aligned with the center of the 42dp icon plate
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            width: 2.5,
+            height: height,
+            decoration: BoxDecoration(
+              color: activeColor,
+              boxShadow: isCompleted
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF00F5D4).withValues(alpha: 0.75),
+                        blurRadius: 8,
+                        spreadRadius: 1.0,
+                      ),
+                    ]
+                  : null,
+            ),
           ),
         ),
       ),
     );
-  }
-}
-
-/// Custom painter for 45° chamfered Valorant ability card
-class _ValorantCardPainter extends CustomPainter {
-  final Color accentColor;
-  final bool isCompleted;
-  final bool isSelected;
-
-  _ValorantCardPainter({
-    required this.accentColor,
-    required this.isCompleted,
-    required this.isSelected,
-  });
-
-  Path _buildChamferPath(Rect rect) {
-    const c = 12.0;
-    final path = Path();
-    path.moveTo(rect.left + c, rect.top);
-    path.lineTo(rect.right - c, rect.top);
-    path.lineTo(rect.right, rect.top + c);
-    path.lineTo(rect.right, rect.bottom - c);
-    path.lineTo(rect.right - c, rect.bottom);
-    path.lineTo(rect.left + c, rect.bottom);
-    path.lineTo(rect.left, rect.bottom - c);
-    path.lineTo(rect.left, rect.top + c);
-    path.close();
-    return path;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    final path = _buildChamferPath(rect);
-
-    // 1. Fill Gradient
-    final fillGradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: isCompleted
-          ? [const Color(0xFF0B1410), const Color(0xFF050B08)]
-          : (isSelected
-              ? [accentColor.withValues(alpha: 0.16), const Color(0xFF0A0D14)]
-              : [const Color(0xFF0D1018), const Color(0xFF06080C)]),
-    );
-
-    final fillPaint = Paint()
-      ..shader = fillGradient.createShader(rect)
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(path, fillPaint);
-
-    // 2. Glowing Perimeter Stroke
-    final borderPaint = Paint()
-      ..color = isCompleted
-          ? AppColors.emeraldPrimary.withValues(alpha: 0.70)
-          : (isSelected ? accentColor : accentColor.withValues(alpha: 0.32))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = isSelected ? 1.6 : 1.0;
-    canvas.drawPath(path, borderPaint);
-
-    // 3. Tactical Top Accent Line
-    final topAccent = Paint()
-      ..color = isCompleted ? AppColors.emeraldPrimary : accentColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    canvas.drawLine(
-      Offset(rect.left + 16, rect.top),
-      Offset(rect.left + 36, rect.top),
-      topAccent,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ValorantCardPainter old) {
-    return old.accentColor != accentColor ||
-        old.isCompleted != isCompleted ||
-        old.isSelected != isSelected;
   }
 }
 
@@ -400,7 +326,9 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
     final isCharged = widget.completedCount >= widget.totalQuests && widget.totalQuests > 0;
     final statusColor = widget.isAnswered
         ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
-        : (isCharged ? const Color(0xFF00F5D4) : widget.rankColor);
+        : (isCharged ? const Color(0xFF00F5D4) : const Color(0xFF232A38));
+
+    final hasActiveGlow = isCharged || widget.isAnswered;
 
     return GestureDetector(
       onTapDown: (_) => _touchCtrl.forward(),
@@ -415,21 +343,24 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0E111A),
+            color: const Color(0xFF0C0E15),
             border: Border.all(
               color: isCharged
-                  ? const Color(0xFF00F5D4).withValues(alpha: 0.85)
-                  : statusColor.withValues(alpha: widget.isAnswered ? 0.90 : 0.45),
-              width: isCharged ? 1.6 : 1.2,
+                  ? const Color(0xFF00F5D4)
+                  : (widget.isAnswered ? statusColor : const Color(0xFF232A38)),
+              width: hasActiveGlow ? 1.6 : 1.0,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: (isCharged ? const Color(0xFF00F5D4) : statusColor).withValues(alpha: isCharged ? 0.25 : 0.15),
-                blurRadius: isCharged ? 28 : 20,
-                spreadRadius: -2,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: hasActiveGlow
+                ? [
+                    BoxShadow(
+                      color: (isCharged ? const Color(0xFF00F5D4) : statusColor)
+                          .withValues(alpha: isCharged ? 0.35 : 0.20),
+                      blurRadius: isCharged ? 28 : 20,
+                      spreadRadius: isCharged ? 1.0 : -2.0,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,13 +374,18 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.20),
-                          border: Border.all(color: statusColor, width: 1.0),
+                          color: isCharged
+                              ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
+                              : const Color(0xFF141822),
+                          border: Border.all(
+                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF232A38),
+                            width: 1.0,
+                          ),
                         ),
                         child: Text(
                           isCharged ? '⚡ FINAL KEY' : '[ ULTIMATE ]',
                           style: GoogleFonts.spaceMono(
-                            color: Colors.white,
+                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF76808F),
                             fontSize: 9.0,
                             fontWeight: FontWeight.w900,
                           ),
@@ -545,16 +481,18 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                     decoration: BoxDecoration(
                       color: const Color(0xFF07090F),
                       border: Border.all(
-                        color: isCharged ? const Color(0xFF00F5D4) : statusColor,
+                        color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF232A38),
                         width: 1.2,
                       ),
                     ),
                     child: Center(
                       child: TacticalGlyph(
                         type: TacticalGlyphType.oath,
-                        color: isCharged ? const Color(0xFF00F5D4) : statusColor,
+                        color: isCharged
+                            ? const Color(0xFF00F5D4)
+                            : (widget.isAnswered ? statusColor : const Color(0xFF76808F)),
                         size: 24,
-                        glow: true,
+                        glow: hasActiveGlow,
                       ),
                     ),
                   ),
@@ -603,10 +541,12 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           : const Color(0xFFFF4655).withValues(alpha: 0.15))
                       : (isCharged
                           ? const Color(0xFF00F5D4).withValues(alpha: 0.20)
-                          : statusColor.withValues(alpha: 0.12)),
+                          : const Color(0xFF141822)),
                   border: Border.all(
-                    color: isCharged ? const Color(0xFF00F5D4) : statusColor.withValues(alpha: 0.70),
-                    width: 1.2,
+                    color: isCharged
+                        ? const Color(0xFF00F5D4)
+                        : (widget.isAnswered ? statusColor : const Color(0xFF232A38)),
+                    width: isCharged ? 1.4 : 1.0,
                   ),
                 ),
                 child: Center(
@@ -617,7 +557,9 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                             ? '⚡ TURN FINAL KEY // SEAL DAILY PROTOCOLS ⚡'
                             : 'LOCK IN EARLY OR COMPLETE ALL 4'),
                     style: GoogleFonts.spaceMono(
-                      color: isCharged ? const Color(0xFF00F5D4) : statusColor,
+                      color: isCharged
+                          ? const Color(0xFF00F5D4)
+                          : (widget.isAnswered ? statusColor : const Color(0xFF76808F)),
                       fontSize: 9.5,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.8,
@@ -632,3 +574,4 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
     );
   }
 }
+
