@@ -131,7 +131,7 @@ void showTacticalHonestyOathModal({
                       Text(
                         '+50 RAD BONUS · STREAK MULTIPLIER',
                         style: GoogleFonts.spaceMono(
-                          color: const Color(0xFF00F5D4),
+                          color: rankColor,
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
                         ),

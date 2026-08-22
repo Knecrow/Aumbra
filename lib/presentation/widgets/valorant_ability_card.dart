@@ -195,11 +195,11 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                 decoration: BoxDecoration(
                   color: isCompleted
                       ? widget.rankColor.withValues(alpha: 0.15)
-                      : const Color(0xFF00F5D4).withValues(alpha: 0.10),
+                      : accentColor.withValues(alpha: 0.10),
                   border: Border.all(
                     color: isCompleted
                         ? widget.rankColor.withValues(alpha: 0.70)
-                        : const Color(0xFF00F5D4).withValues(alpha: 0.40),
+                        : accentColor.withValues(alpha: 0.40),
                     width: 0.9,
                   ),
                 ),
@@ -209,7 +209,7 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
                     Text(
                       isCompleted ? 'COMPLETED' : '+25 RAD',
                       style: GoogleFonts.spaceMono(
-                        color: isCompleted ? widget.rankColor : const Color(0xFF00F5D4),
+                        color: isCompleted ? widget.rankColor : accentColor,
                         fontSize: 9.0,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.6,
@@ -512,11 +512,13 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
   @override
   Widget build(BuildContext context) {
     final isCharged = widget.completedCount >= widget.totalQuests && widget.totalQuests > 0;
-    final statusColor = widget.isAnswered
+    
+    // Priority order: 1. Answered Oath (Sealed/Compromised), 2. Charged (Ready to vouch), 3. Dormant
+    final Color activeColor = widget.isAnswered
         ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
-        : (isCharged ? const Color(0xFF00F5D4) : const Color(0xFF191D26));
+        : (isCharged ? widget.rankColor : const Color(0xFF191D26));
 
-    final hasActiveGlow = isCharged || widget.isAnswered;
+    final bool hasActiveGlow = widget.isAnswered || isCharged;
 
     return AnimatedBuilder(
       animation: _breatheCtrl,
@@ -536,24 +538,30 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF0B0D13), // Pure deep stealth carbon
+                color: widget.isAnswered
+                    ? (widget.isHonored
+                        ? AppColors.emeraldPrimary.withValues(alpha: 0.08)
+                        : const Color(0xFFFF4655).withValues(alpha: 0.08))
+                    : const Color(0xFF0B0D13), // Pure deep stealth carbon
                 border: Border.all(
-                  color: isCharged
-                      ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
-                      : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
-                  width: hasActiveGlow ? (1.4 + 0.6 * breathe) : 0.9,
+                  color: widget.isAnswered
+                      ? activeColor
+                      : (isCharged
+                          ? activeColor.withValues(alpha: 0.70 + 0.30 * breathe)
+                          : const Color(0xFF191D26)),
+                  width: hasActiveGlow ? (1.4 + (isCharged && !widget.isAnswered ? 0.6 * breathe : 0.0)) : 0.9,
                 ),
                 boxShadow: hasActiveGlow
                     ? [
                         BoxShadow(
-                          color: (isCharged ? const Color(0xFF00F5D4) : statusColor)
-                              .withValues(alpha: isCharged ? (0.20 + 0.25 * breathe) : 0.20),
-                          blurRadius: isCharged ? (20 + 16 * breathe) : 20,
-                          spreadRadius: isCharged ? (0.5 + 1.5 * breathe) : -2.0,
+                          color: activeColor.withValues(
+                              alpha: isCharged && !widget.isAnswered ? (0.20 + 0.25 * breathe) : 0.22),
+                          blurRadius: isCharged && !widget.isAnswered ? (20 + 16 * breathe) : 20,
+                          spreadRadius: isCharged && !widget.isAnswered ? (0.5 + 1.5 * breathe) : -2.0,
                           offset: const Offset(0, 4),
                         ),
                       ]
-                    : null, // Zero glow when dormant!
+                    : null, // Zero glow when dormant
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -567,20 +575,26 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: isCharged
-                                  ? const Color(0xFF00F5D4).withValues(alpha: 0.20 + 0.15 * breathe)
-                                  : const Color(0xFF12151E),
+                              color: widget.isAnswered
+                                  ? activeColor.withValues(alpha: 0.20)
+                                  : (isCharged
+                                      ? activeColor.withValues(alpha: 0.20 + 0.15 * breathe)
+                                      : const Color(0xFF12151E)),
                               border: Border.all(
-                                color: isCharged
-                                    ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
-                                    : const Color(0xFF1F2533),
+                                color: widget.isAnswered
+                                    ? activeColor
+                                    : (isCharged
+                                        ? activeColor.withValues(alpha: 0.70 + 0.30 * breathe)
+                                        : const Color(0xFF1F2533)),
                                 width: 1.0,
                               ),
                             ),
                             child: Text(
-                              isCharged ? 'FINAL KEY' : 'DAILY OATH',
+                              widget.isAnswered
+                                  ? (widget.isHonored ? 'SEALED & HONORED' : 'DEFENSE CONSUMED')
+                                  : (isCharged ? 'FINAL KEY' : 'DAILY OATH'),
                               style: GoogleFonts.spaceMono(
-                                color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                                color: widget.isAnswered ? activeColor : (isCharged ? activeColor : const Color(0xFF5A6372)),
                                 fontSize: 9.0,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -588,9 +602,9 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'INTEGRITY OATH',
+                            widget.isAnswered ? 'PROTOCOL SEALED' : 'INTEGRITY OATH',
                             style: GoogleFonts.spaceMono(
-                              color: isCharged ? const Color(0xFFECE8E1) : const Color(0xFF5A6372),
+                              color: hasActiveGlow ? const Color(0xFFECE8E1) : const Color(0xFF5A6372),
                               fontSize: 9.0,
                               fontWeight: FontWeight.w700,
                             ),
@@ -598,9 +612,11 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         ],
                       ),
                       Text(
-                        '+50 RAD BONUS',
+                        widget.isAnswered
+                            ? (widget.isHonored ? '+50 RAD EARNED' : '0 RAD')
+                            : '+50 RAD BONUS',
                         style: GoogleFonts.spaceMono(
-                          color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                          color: hasActiveGlow ? activeColor : const Color(0xFF5A6372),
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
                         ),
@@ -623,7 +639,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         Text(
                           'PILLAR ENERGY',
                           style: GoogleFonts.spaceMono(
-                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                            color: hasActiveGlow ? activeColor : const Color(0xFF5A6372),
                             fontSize: 8.5,
                             fontWeight: FontWeight.w700,
                           ),
@@ -638,11 +654,11 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                                 height: 14,
                                 decoration: BoxDecoration(
                                   color: isFilled
-                                      ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
+                                      ? activeColor.withValues(alpha: 0.25)
                                       : const Color(0xFF12151E),
                                   border: Border.all(
                                     color: isFilled
-                                        ? const Color(0xFF00F5D4)
+                                        ? activeColor
                                         : const Color(0xFF1E2430),
                                     width: 1.0,
                                   ),
@@ -651,7 +667,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                                   child: Text(
                                     isFilled ? '◆' : '◇',
                                     style: TextStyle(
-                                      color: isFilled ? const Color(0xFF00F5D4) : const Color(0xFF3E4654),
+                                      color: isFilled ? activeColor : const Color(0xFF3E4654),
                                       fontSize: 8,
                                       height: 1.0,
                                     ),
@@ -676,20 +692,21 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         decoration: BoxDecoration(
                           color: const Color(0xFF07090F),
                           border: Border.all(
-                            color: isCharged
-                                ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
-                                : const Color(0xFF191D26),
+                            color: widget.isAnswered
+                                ? activeColor
+                                : (isCharged
+                                    ? activeColor.withValues(alpha: 0.70 + 0.30 * breathe)
+                                    : const Color(0xFF191D26)),
                             width: 1.2,
                           ),
                         ),
                         child: Center(
-                          child: TacticalGlyph(
-                            type: TacticalGlyphType.oath,
-                            color: isCharged
-                                ? const Color(0xFF00F5D4)
-                                : (widget.isAnswered ? statusColor : const Color(0xFF4A5260)),
+                          child: Icon(
+                            widget.isAnswered
+                                ? (widget.isHonored ? Icons.verified_rounded : Icons.shield_outlined)
+                                : Icons.security_rounded,
+                            color: hasActiveGlow ? activeColor : const Color(0xFF4A5260),
                             size: 24,
-                            glow: hasActiveGlow,
                           ),
                         ),
                       ),
@@ -699,9 +716,11 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'THE INTEGRITY OATH',
+                              widget.isAnswered
+                                  ? (widget.isHonored ? 'OATH COMPLETED' : 'DEFENSE SHIELD USED')
+                                  : 'THE INTEGRITY OATH',
                               style: GoogleFonts.rajdhani(
-                                color: isCharged ? Colors.white : const Color(0xFF9EAAB8),
+                                color: hasActiveGlow ? Colors.white : const Color(0xFF9EAAB8),
                                 fontSize: 17.0,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 0.8,
@@ -710,11 +729,15 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              isCharged
-                                  ? 'ALL 4 PILLARS COMPLETE · READY TO SEAL'
-                                  : 'COMPLETE ${widget.completedCount}/${widget.totalQuests} PILLARS TO UNLOCK',
+                              widget.isAnswered
+                                  ? (widget.isHonored
+                                      ? 'DAY 100% SEALED · PROTOCOL HONORED'
+                                      : 'FELL SHORT · SHIELD PRESERVED STREAK')
+                                  : (isCharged
+                                      ? 'ALL 4 PILLARS COMPLETE · READY TO SEAL'
+                                      : 'COMPLETE ${widget.completedCount}/${widget.totalQuests} PILLARS TO UNLOCK'),
                               style: GoogleFonts.spaceMono(
-                                color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                                color: hasActiveGlow ? activeColor : const Color(0xFF5A6372),
                                 fontSize: 8.5,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -733,30 +756,28 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     decoration: BoxDecoration(
                       color: widget.isAnswered
-                          ? (widget.isHonored
-                              ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
-                              : const Color(0xFFFF4655).withValues(alpha: 0.15))
+                          ? activeColor.withValues(alpha: 0.15)
                           : (isCharged
-                              ? const Color(0xFF00F5D4).withValues(alpha: 0.15 + 0.15 * breathe)
+                              ? activeColor.withValues(alpha: 0.15 + 0.15 * breathe)
                               : const Color(0xFF0E1118)),
                       border: Border.all(
-                        color: isCharged
-                            ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
-                            : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
-                        width: isCharged ? 1.4 : 0.9,
+                        color: widget.isAnswered
+                            ? activeColor
+                            : (isCharged
+                                ? activeColor.withValues(alpha: 0.70 + 0.30 * breathe)
+                                : const Color(0xFF191D26)),
+                        width: hasActiveGlow ? 1.4 : 0.9,
                       ),
                     ),
                     child: Center(
                       child: Text(
                         widget.isAnswered
-                            ? (widget.isHonored ? 'OATH HONORED · +50 RAD' : 'SHIELD DEFENSE CONSUMED')
+                            ? (widget.isHonored ? '✓ OATH HONORED · DAY LOGGED IN CHRONICLE' : '✕ SHIELD DEFENSE CONSUMED')
                             : (isCharged
                                 ? '⚡ SEAL TODAY\'S HABITS · VOUCH INTEGRITY ⚡'
                                 : '🔒 COMPLETE ALL 4 PILLARS TO SEAL'),
                         style: GoogleFonts.spaceMono(
-                          color: isCharged
-                              ? const Color(0xFF00F5D4)
-                              : (widget.isAnswered ? statusColor : const Color(0xFF5A6372)),
+                          color: hasActiveGlow ? activeColor : const Color(0xFF5A6372),
                           fontSize: 9.5,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.8,

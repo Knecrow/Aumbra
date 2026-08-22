@@ -17,7 +17,7 @@ class AppColors {
   // ─── SIGNATURE VALORANT ACCENTS ──────────────────────────────────────────
   static const Color valorantRed   = Color(0xFFFF4655); // Valorant Signature Red (Boss / Alert)
   static const Color radianiteCyan = Color(0xFF00F5D4); // Radianite Mint (Energy / Success)
-  static const Color emeraldPrimary = Color(0xFF00F5D4); // Unified with Radianite
+  static const Color emeraldPrimary = Color(0xFF00E676); // True Emerald Green (Success / Verified)
   static const Color emeraldLight   = Color(0xFF69F0AE);
 
   // ─── GOLD / AMBER FALLBACK ───────────────────────────────────────────────
@@ -123,13 +123,13 @@ class AppColors {
   // ─── UNIFIED TACTICAL CATEGORY PALETTE ───────────────────────────────────
   static const Color mindColor        = Color(0xFF8B9BB4); // Muted Ice Silver-Blue
   static const Color bodyColor        = Color(0xFFFF5263); // Tactical Kinetic Crimson
-  static const Color soulColor        = Color(0xFF00F5D4); // Radianite Cyan
-  static const Color environmentColor = Color(0xFF2ED573); // Sector Mint
+  static const Color soulColor        = Color(0xFFB37FEB); // Arcana Amethyst Purple
+  static const Color environmentColor = Color(0xFF2ED573); // Sector Emerald Mint
   static const Color socialColor      = Color(0xFF4A90E2);
   static const Color planColor        = Color(0xFFB37FEB);
   static const Color reflectColor     = Color(0xFFFF8A65);
   static const Color customColor      = Color(0xFFFFD56B);
-  static const Color oathColor        = Color(0xFF00F5D4);
+  static const Color oathColor        = Color(0xFFF5A623);
 
   static Color getCategoryColor(String category) {
     switch (category.toLowerCase()) {
@@ -145,8 +145,8 @@ class AppColors {
     return Icons.token_rounded;
   }
 
-  static const Color success = Color(0xFF00F5D4);
+  static const Color success = Color(0xFF00E676);
   static const Color warning = Color(0xFFF5A623);
   static const Color error   = Color(0xFFFF4655);
-  static const Color accent  = Color(0xFF00F5D4);
+  static const Color accent  = Color(0xFFF5A623);
 }

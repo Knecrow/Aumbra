@@ -234,8 +234,7 @@ class TacticalConduitBridge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFullCharge = completedCount >= totalQuests && totalQuests > 0;
-    final activeColor = isFullCharge ? const Color(0xFF00F5D4) : rankColor;
+    final activeColor = rankColor;
 
     return SizedBox(
       height: 20,

@@ -132,7 +132,7 @@ void showValorantInspectModal({
                           Text(
                             '+25 RAD',
                             style: GoogleFonts.spaceMono(
-                              color: const Color(0xFF00F5D4),
+                              color: rankColor,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                             ),
