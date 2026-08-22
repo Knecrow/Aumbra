@@ -614,9 +614,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showAuraPicker(BuildContext context, UserProvider userProvider) {
     final colors = [
-      Colors.red, Colors.orange, Colors.yellow, Colors.green,
-      Colors.teal, Colors.cyan, Colors.blue, Colors.indigo,
-      Colors.purple, Colors.pink, Colors.white, Colors.grey,
+      const Color(0xFFFFB703), // Gold
+      const Color(0xFFFF4655), // Valorant Red
+      const Color(0xFF8B5CF6), // Violet
+      const Color(0xFF22D3EE), // Cyan
+      const Color(0xFF34D399), // Emerald
+      const Color(0xFFF59E0B), // Amber
+      const Color(0xFFEC4899), // Pink
+      const Color(0xFF60A5FA), // Blue
+      const Color(0xFFA78BFA), // Lavender
+      const Color(0xFF4ADE80), // Green
+      const Color(0xFFFB923C), // Orange
+      const Color(0xFFE2E8F0), // Silver
     ];
 
     showDialog(

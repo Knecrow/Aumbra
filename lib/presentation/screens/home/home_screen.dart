@@ -11,6 +11,7 @@ import '../../widgets/valorant_inspect_modal.dart';
 import '../../widgets/tactical_oath_modal.dart';
 import '../../widgets/tactical_dialogs.dart';
 import '../../widgets/tactical_particle_canvas.dart';
+import '../../widgets/hex_quest_card.dart'; // for HexagonClipper
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,7 +40,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
 
-  void _triggerXpPopup(Offset pos, String text, Color color) {
+  void _triggerXpPopup(BuildContext context, String text, Color color) {
+    final size = MediaQuery.of(context).size;
+    final pos = Offset(size.width / 2 - 40, size.height * 0.42);
     final key = UniqueKey();
     setState(() {
       _popups.add(
@@ -142,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           rankColor: rankColor,
                           showHeader: true,
                           tacticalTag: _getTimeGreeting(),
-                          statusBadge: 'ONLINE',
                           chamferSize: 14.0,
                           chamferCorner: ChamferCorner.all,
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
@@ -175,24 +177,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                                 valueColor: AlwaysStoppedAnimation<Color>(rankColor),
                                               ),
                                               // Tactical Inner Hex / Diamond Disc
-                                              Container(
-                                                width: 38,
-                                                height: 38,
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFF07090E),
-                                                  border: Border.all(
-                                                    color: rankColor.withValues(alpha: 0.50),
-                                                    width: 1.2,
+                                                  Container(
+                                                    width: 38,
+                                                    height: 38,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFF07090E),
+                                                      border: Border.all(
+                                                        color: rankColor.withValues(alpha: 0.50),
+                                                        width: 1.2,
+                                                      ),
+                                                    ),
+                                                    child: ClipPath(
+                                                      clipper: const HexagonClipper(cornerRadius: 8),
+                                                      child: Container(
+                                                        color: const Color(0xFF07090E),
+                                                        child: Center(
+                                                          child: Icon(
+                                                            _getRankAvatarIcon(rankInfo.rankNumber),
+                                                            color: lightRankColor,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                                child: Center(
-                                                  child: Icon(
-                                                    _getRankAvatarIcon(rankInfo.rankNumber),
-                                                    color: lightRankColor,
-                                                    size: 20,
-                                                  ),
-                                                ),
-                                              ),
                                             ],
                                           ),
                                         ),
@@ -266,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               TacticalSegmentedBar(
                                 progress: ascProgress,
                                 rankColor: rankColor,
-                                label: 'RANK_PROGRESS',
+                                label: '',
                                 readoutText: '$userCompletions / $completionsReq DAYS',
                                 totalSegments: 14,
                                 height: 7.0,
@@ -295,18 +303,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     letterSpacing: 1.0,
                                   ),
                                 ),
-                                Text(
-                                  'ACT 01',
-                                  style: GoogleFonts.spaceMono(
-                                    color: AppColors.darkSubText,
-                                    fontSize: 9.0,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
                               ],
                             ),
 
                             const SizedBox(height: 10),
+
+                            // ── Empty state ──
+                            if (questProvider.todayQuests.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 32),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.radar_rounded,
+                                        color: rankColor.withValues(alpha: 0.4), size: 40),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'NO ACTIVE PROTOCOLS',
+                                      style: GoogleFonts.spaceMono(
+                                        color: AppColors.darkSubText,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Quests load at the start of each day',
+                                      style: GoogleFonts.spaceMono(
+                                        color: AppColors.darkDimText,
+                                        fontSize: 9,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
                             // ── Main Left Power Circuit Backbone Layout ──
                             ...questProvider.todayQuests.asMap().entries.map((entry) {
@@ -340,20 +370,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                             questProvider.uncompleteQuest(quest.id);
                                           } else {
                                             questProvider.completeQuest(quest.id);
-                                            _triggerXpPopup(const Offset(220, 360), '+25 RAD', rankColor);
+                                            _triggerXpPopup(context, '+25 RAD', rankColor);
                                           }
                                         },
                                         onSwapQuest: () {},
                                       );
                                     },
-                                    onLongPress: () {
-                                      if (quest.isCompleted) {
-                                        questProvider.uncompleteQuest(quest.id);
-                                      } else {
-                                        questProvider.completeQuest(quest.id);
-                                        _triggerXpPopup(const Offset(220, 360), '+25 RAD', rankColor);
-                                      }
-                                    },
+                                     onLongPress: () {
+                                       if (quest.isCompleted) {
+                                         questProvider.uncompleteQuest(quest.id);
+                                       } else {
+                                         questProvider.completeQuest(quest.id);
+                                         _triggerXpPopup(context, '+25 RAD', rankColor);
+                                       }
+                                     },
                                   ),
                                 ),
                               );

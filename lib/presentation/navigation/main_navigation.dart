@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -69,85 +70,91 @@ class _MainNavigationState extends State<MainNavigation> {
     const inactiveColor = Color(0xFF76808F);
     final lightRankColor = AppColors.getLightVariant(rankColor);
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(14, 0, 14, 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0C0E14),
-        border: Border.all(
-          color: rankColor.withValues(alpha: 0.35),
-          width: 1.0,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.85),
-            blurRadius: 28,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: rankColor.withValues(alpha: 0.15),
-            blurRadius: 20,
-            spreadRadius: -2,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 56,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // 1. Habits / Daily
-              _NavTabItem(
-                glyphType: TacticalGlyphType.navProtocol,
-                label: 'HABITS',
-                isSelected: _currentIndex == 0,
-                onTap: () => _onTabTap(0),
-                activeColor: lightRankColor,
-                rankColor: rankColor,
-                inactiveColor: inactiveColor,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(14, 0, 14, 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0C0E14).withValues(alpha: 0.82),
+            border: Border.all(
+              color: rankColor.withValues(alpha: 0.35),
+              width: 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.85),
+                blurRadius: 28,
+                offset: const Offset(0, 8),
               ),
-
-              // 2. Stats / Progress
-              _NavTabItem(
-                glyphType: TacticalGlyphType.navCareer,
-                label: 'STATS',
-                isSelected: _currentIndex == 1,
-                onTap: () => _onTabTap(1),
-                activeColor: lightRankColor,
-                rankColor: rankColor,
-                inactiveColor: inactiveColor,
-              ),
-
-              // 3. Badges / Ranks
-              _NavTabItem(
-                glyphType: TacticalGlyphType.navArsenal,
-                label: 'BADGES',
-                isSelected: _currentIndex == 2,
-                onTap: () => _onTabTap(2),
-                activeColor: lightRankColor,
-                rankColor: rankColor,
-                inactiveColor: inactiveColor,
-              ),
-
-              // 4. Settings
-              _NavTabItem(
-                glyphType: TacticalGlyphType.navConfig,
-                label: 'SETTINGS',
-                isSelected: _currentIndex == 3,
-                onTap: () => _onTabTap(3),
-                activeColor: lightRankColor,
-                rankColor: rankColor,
-                inactiveColor: inactiveColor,
+              BoxShadow(
+                color: rankColor.withValues(alpha: 0.15),
+                blurRadius: 20,
+                spreadRadius: -2,
+                offset: const Offset(0, 2),
               ),
             ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 56,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // 1. Habits / Daily
+                  _NavTabItem(
+                    glyphType: TacticalGlyphType.navProtocol,
+                    label: 'HABITS',
+                    isSelected: _currentIndex == 0,
+                    onTap: () => _onTabTap(0),
+                    activeColor: lightRankColor,
+                    rankColor: rankColor,
+                    inactiveColor: inactiveColor,
+                  ),
+
+                  // 2. Stats / Progress
+                  _NavTabItem(
+                    glyphType: TacticalGlyphType.navCareer,
+                    label: 'STATS',
+                    isSelected: _currentIndex == 1,
+                    onTap: () => _onTabTap(1),
+                    activeColor: lightRankColor,
+                    rankColor: rankColor,
+                    inactiveColor: inactiveColor,
+                  ),
+
+                  // 3. Badges / Ranks
+                  _NavTabItem(
+                    glyphType: TacticalGlyphType.navArsenal,
+                    label: 'BADGES',
+                    isSelected: _currentIndex == 2,
+                    onTap: () => _onTabTap(2),
+                    activeColor: lightRankColor,
+                    rankColor: rankColor,
+                    inactiveColor: inactiveColor,
+                  ),
+
+                  // 4. Settings
+                  _NavTabItem(
+                    glyphType: TacticalGlyphType.navConfig,
+                    label: 'SETTINGS',
+                    isSelected: _currentIndex == 3,
+                    onTap: () => _onTabTap(3),
+                    activeColor: lightRankColor,
+                    rankColor: rankColor,
+                    inactiveColor: inactiveColor,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 }
+
 
 // ── VALORANT TACTICAL NAV TAB ITEM ──────────────────────────────────────────
 class _NavTabItem extends StatefulWidget {

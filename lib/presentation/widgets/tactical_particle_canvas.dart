@@ -66,18 +66,20 @@ class _TacticalParticleCanvasState extends State<TacticalParticleCanvas>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: AnimatedBuilder(
-            animation: _animCtrl,
-            builder: (context, _) {
-              return CustomPaint(
-                painter: _ParticlePainter(
-                  particles: _particles,
-                  rankColor: widget.rankColor,
-                  time: _animCtrl.value,
-                ),
-              );
-            },
+        RepaintBoundary(
+          child: Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _animCtrl,
+              builder: (context, _) {
+                return CustomPaint(
+                  painter: _ParticlePainter(
+                    particles: _particles,
+                    rankColor: widget.rankColor,
+                    time: _animCtrl.value,
+                  ),
+                );
+              },
+            ),
           ),
         ),
         widget.child,

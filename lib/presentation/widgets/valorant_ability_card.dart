@@ -32,9 +32,12 @@ class ValorantAbilityCard extends StatefulWidget {
 }
 
 class _ValorantAbilityCardState extends State<ValorantAbilityCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _touchCtrl;
   late Animation<double> _touchScale;
+  late AnimationController _entranceCtrl;
+  late Animation<double> _entranceFade;
+  late Animation<Offset> _entranceSlide;
 
   @override
   void initState() {
@@ -46,11 +49,26 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
     _touchScale = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
     );
+
+    _entranceCtrl = AnimationController(
+      duration: const Duration(milliseconds: 420),
+      vsync: this,
+    );
+    _entranceFade = CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOut);
+    _entranceSlide = Tween<Offset>(
+      begin: const Offset(0.0, 0.18),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic));
+
+    Future.delayed(Duration(milliseconds: widget.index * 80), () {
+      if (mounted) _entranceCtrl.forward();
+    });
   }
 
   @override
   void dispose() {
     _touchCtrl.dispose();
+    _entranceCtrl.dispose();
     super.dispose();
   }
 
@@ -63,7 +81,11 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
         ? widget.rankColor
         : (isBoss ? widget.rankColor : categoryColor);
 
-    return GestureDetector(
+    return FadeTransition(
+      opacity: _entranceFade,
+      child: SlideTransition(
+        position: _entranceSlide,
+        child: GestureDetector(
       onTapDown: (_) => _touchCtrl.forward(),
       onTapUp: (_) {
         _touchCtrl.reverse();
@@ -128,49 +150,36 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
 
               const SizedBox(width: 14),
 
-              // ── Center: Title & Category Metadata ──
+              // ── Center: Title & Category Tag ──
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isCompleted
-                                ? widget.rankColor.withValues(alpha: 0.20)
-                                : accentColor.withValues(alpha: 0.15),
-                            border: Border.all(
-                              color: isCompleted
-                                  ? widget.rankColor.withValues(alpha: 0.60)
-                                  : accentColor.withValues(alpha: 0.40),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: Text(
-                            widget.quest.category.toUpperCase(),
-                            style: GoogleFonts.spaceMono(
-                              color: isCompleted ? widget.rankColor : accentColor,
-                              fontSize: 9.0,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.6,
-                            ),
-                          ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isCompleted
+                            ? widget.rankColor.withValues(alpha: 0.20)
+                            : accentColor.withValues(alpha: 0.15),
+                        border: Border.all(
+                          color: isCompleted
+                              ? widget.rankColor.withValues(alpha: 0.60)
+                              : accentColor.withValues(alpha: 0.40),
+                          width: 0.8,
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          isCompleted ? 'PILLAR COMPLETED' : 'DAILY PILLAR',
-                          style: GoogleFonts.spaceMono(
-                            color: isCompleted ? widget.rankColor : AppColors.darkSubText,
-                            fontSize: 9.0,
-                            fontWeight: FontWeight.w700,
-                          ),
+                      ),
+                      child: Text(
+                        widget.quest.category.toUpperCase(),
+                        style: GoogleFonts.spaceMono(
+                          color: isCompleted ? widget.rankColor : accentColor,
+                          fontSize: 9.0,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.6,
                         ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 5),
                     Text(
                       widget.quest.title.toUpperCase(),
                       style: GoogleFonts.rajdhani(
@@ -226,6 +235,8 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
           ),
         ),
       ),
+    ),
+    ),
     );
   }
 }
