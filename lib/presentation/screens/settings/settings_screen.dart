@@ -417,77 +417,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   );
   }
 
-  IconData _getRankAvatarIcon(int rank) {
-    switch (rank) {
-      case 1: return Icons.auto_awesome_rounded;
-      case 2: return Icons.explore_rounded;
-      case 3: return Icons.bolt_rounded;
-      case 4: return Icons.local_fire_department_rounded;
-      case 5: return Icons.north_east_rounded;
-      case 6: return Icons.shield_rounded;
-      case 7: return Icons.diamond_rounded;
-      case 8: return Icons.menu_book_rounded;
-      case 9: return Icons.wb_sunny_rounded;
-      case 10: return Icons.all_inclusive_rounded;
-      case 11: return Icons.hourglass_empty_rounded;
-      case 12: return Icons.flare_rounded;
-      case 13: return Icons.stars_rounded;
-      case 14: return Icons.military_tech_rounded;
-      case 15: return Icons.workspace_premium_rounded;
-      default: return Icons.auto_awesome_rounded;
-    }
-  }
 
-  Widget _sectionHeader(String label, Color subColor, Color rankColor) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, left: 2),
-      child: Row(
-        children: [
-          Container(
-            width: 3,
-            height: 12,
-            decoration: BoxDecoration(
-              color: rankColor,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(label,
-              style: const TextStyle(
-                  color: AppColors.darkSubText,
-                  fontSize: 10,
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.w900)),
-        ],
-      ),
-    );
-  }
-
-  Widget _settingsCard({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF0C0C0C), Color(0xFF050505)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.07),
-          width: 1.0,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
 
   Widget _settingRowWithWidget(
       String label, Color textColor, Color subColor, Widget trailing) {

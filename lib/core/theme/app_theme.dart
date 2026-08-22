@@ -5,18 +5,18 @@ import '../constants/app_colors.dart';
 ThemeData buildDarkTheme(Color rankColor) {
   final primaryColor = rankColor == const Color(0xFF00E5FF) ? AppColors.goldPrimary : rankColor;
 
-  final baseTextTheme = TextTheme(
-    displayLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w900, letterSpacing: 1.2),
-    displayMedium: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, letterSpacing: 0.8),
-    headlineLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: 0.8),
-    headlineMedium: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: 0.6),
-    headlineSmall: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 0.4),
-    titleLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 0.3),
-    titleMedium: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.2),
-    bodyLarge: const TextStyle(color: AppColors.darkText, fontSize: 14, height: 1.4),
-    bodyMedium: const TextStyle(color: AppColors.darkSubText, fontSize: 12, height: 1.4),
-    bodySmall: const TextStyle(color: AppColors.darkDimText, fontSize: 10, letterSpacing: 0.5),
-    labelLarge: const TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1.2),
+  const baseTextTheme = TextTheme(
+    displayLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+    displayMedium: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+    headlineLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 24, letterSpacing: 0.8),
+    headlineMedium: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 20, letterSpacing: 0.6),
+    headlineSmall: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 0.4),
+    titleLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 0.3),
+    titleMedium: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.2),
+    bodyLarge: TextStyle(color: AppColors.darkText, fontSize: 14, height: 1.4),
+    bodyMedium: TextStyle(color: AppColors.darkSubText, fontSize: 12, height: 1.4),
+    bodySmall: TextStyle(color: AppColors.darkDimText, fontSize: 10, letterSpacing: 0.5),
+    labelLarge: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1.2),
   );
 
   return ThemeData(

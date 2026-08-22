@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/ranks.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/quest_provider.dart';
 import 'tactical_icons.dart';

@@ -16,7 +16,6 @@ void showValorantInspectModal({
 }) {
   final categoryColor = AppColors.getCategoryColor(quest.category);
   final isCompleted = quest.isCompleted;
-  final keybind = index < 4 ? ['Q', 'E', 'C', 'F'][index] : '${index + 1}';
 
   showModalBottomSheet(
     context: context,

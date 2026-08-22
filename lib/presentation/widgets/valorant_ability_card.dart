@@ -281,7 +281,7 @@ class _LeftBackboneRowPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const backboneX = 9.0;
     final branchY = size.height * 0.5;
-    final cardLeftX = 24.0;
+    const cardLeftX = 24.0;
 
     const inactiveColor = Color(0xFF1E2430);
     final activeColor = rankColor;

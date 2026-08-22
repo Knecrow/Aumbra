@@ -15,7 +15,6 @@ Path buildRoundedPointyHexPath(Rect rect, {double cornerRadius = 14.0}) {
   final w = rect.width;
   final h = rect.height;
   final cx = rect.left + w / 2;
-  final cy = rect.top + h / 2;
 
   // 6 vertices of a point-topped hexagon inscribed in rect
   // V0: Top center
@@ -318,9 +317,9 @@ class _HexQuestTileState extends State<HexQuestTile>
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 240),
                       child: isCompleted
-                          ? Icon(
+                          ? const Icon(
                               Icons.check_circle_rounded,
-                              key: const ValueKey('done'),
+                              key: ValueKey('done'),
                               size: 34,
                               color: AppColors.emeraldPrimary,
                             )

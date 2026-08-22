@@ -21,8 +21,6 @@ class HonestyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lightRank = AppColors.getLightVariant(rankColor);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),

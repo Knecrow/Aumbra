@@ -205,7 +205,7 @@ class _TacticalPanelPainter extends CustomPainter {
     final path = _buildChamferPath(rect);
 
     // 1. Deep Void Obsidian Fill Gradient
-    final fillGradient = const LinearGradient(
+    const fillGradient = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [

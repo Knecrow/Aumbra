@@ -7,7 +7,6 @@ import '../../../core/constants/badges.dart';
 import '../../../core/constants/ranks.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../widgets/tactical_panel.dart';
-import '../../widgets/tactical_icons.dart';
 import '../../widgets/tactical_particle_canvas.dart';
 
 class HallOfFameScreen extends StatelessWidget {
