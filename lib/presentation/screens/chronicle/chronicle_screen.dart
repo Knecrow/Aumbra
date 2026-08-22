@@ -426,7 +426,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
                 '${rod.toY.round()} PROTOCOLS',
-                GoogleFonts.spaceMono(color: AppColors.radianiteCyan, fontSize: 10, fontWeight: FontWeight.bold),
+                GoogleFonts.spaceMono(color: rankColor, fontSize: 10, fontWeight: FontWeight.bold),
               );
             },
           ),
@@ -480,8 +480,8 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                 gradient: count > 0
                     ? LinearGradient(
                         colors: [
-                          isToday ? AppColors.radianiteCyan : rankColor,
-                          isToday ? const Color(0xFF00BFA5) : AppColors.getDeepVariant(rankColor),
+                          isToday ? AppColors.getLightVariant(rankColor) : rankColor,
+                          isToday ? rankColor : AppColors.getDeepVariant(rankColor),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
