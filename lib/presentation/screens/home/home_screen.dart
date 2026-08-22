@@ -14,6 +14,7 @@ import '../../widgets/valorant_inspect_modal.dart';
 import '../../widgets/tactical_icons.dart';
 import '../../widgets/tactical_oath_modal.dart';
 import '../../widgets/tactical_dialogs.dart';
+import '../../widgets/tactical_particle_canvas.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,27 +24,64 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _headerCtrl;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
   late Animation<double> _headerAnim;
+  final List<Widget> _popups = [];
 
   @override
   void initState() {
     super.initState();
-    _headerCtrl = AnimationController(
-      duration: const Duration(milliseconds: 500),
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 4),
       vsync: this,
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.98, end: 1.02).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-    _headerAnim = CurvedAnimation(parent: _headerCtrl, curve: Curves.easeOutCubic);
-    _headerCtrl.forward();
+
+    _headerAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: const Interval(0.0, 0.4, curve: Curves.easeOut)),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<QuestProvider>().loadTodayQuests();
     });
   }
 
+  void _triggerXpPopup(Offset pos, String text, Color color) {
+    final key = UniqueKey();
+    setState(() {
+      _popups.add(
+        FloatingRadianitePopup(
+          key: key,
+          origin: pos,
+          text: text,
+          color: color,
+          onDismiss: () {
+            if (mounted) {
+              setState(() {
+                _popups.removeWhere((p) => p.key == key);
+              });
+            }
+          },
+        ),
+      );
+    });
+  }
+
+  String _getTimeGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) return 'DAWN FOCUS · ACT 01';
+    if (hour >= 12 && hour < 17) return 'MIDDAY MOMENTUM · ACT 01';
+    if (hour >= 17 && hour < 22) return 'EVENING ASCENSION · ACT 01';
+    return 'NIGHT REVIEW · ACT 01';
+  }
+
   @override
   void dispose() {
-    _headerCtrl.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -75,32 +113,37 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.buildRankAmbientGradient(rankColor),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: FadeTransition(
-            opacity: _headerAnim,
-            child: Column(
+      body: TacticalParticleCanvas(
+        rankColor: rankColor,
+        particleCount: 24,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.buildRankAmbientGradient(rankColor),
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Stack(
               children: [
-                // ── 1. RIOT VALORANT TACTICAL TOP HUD DECK ───────────────────
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-                  child: TacticalPanel(
-                    rankColor: rankColor,
-                    showHeader: true,
-                    tacticalTag: 'DAILY DASHBOARD',
-                    statusBadge: 'ONLINE',
-                    chamferSize: 14.0,
-                    chamferCorner: ChamferCorner.all,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // ── Top Row: Avatar, Name, Shields, Streak ───
-                        Row(
+                FadeTransition(
+                  opacity: _headerAnim,
+                  child: Column(
+                    children: [
+                      // ── 1. RIOT VALORANT TACTICAL TOP HUD DECK ───────────────────
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+                        child: TacticalPanel(
+                          rankColor: rankColor,
+                          showHeader: true,
+                          tacticalTag: _getTimeGreeting(),
+                          statusBadge: 'ONLINE',
+                          chamferSize: 14.0,
+                          chamferCorner: ChamferCorner.all,
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // ── Top Row: Avatar, Name, Shields, Streak ───
+                              Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -289,6 +332,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                       questProvider.uncompleteQuest(quest.id);
                                     } else {
                                       questProvider.completeQuest(quest.id);
+                                      _triggerXpPopup(const Offset(220, 360), '+25 RAD', rankColor);
                                     }
                                   },
                                   onSwapQuest: () {},
@@ -299,6 +343,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   questProvider.uncompleteQuest(quest.id);
                                 } else {
                                   questProvider.completeQuest(quest.id);
+                                  _triggerXpPopup(const Offset(220, 360), '+25 RAD', rankColor);
                                 }
                               },
                             ),
@@ -373,10 +418,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ],
             ),
           ),
-        ),
+          ..._popups,
+        ],
       ),
-    );
-  }
+    ),
+  ),
+),
+);
+}
 
   /// Returns time-of-day greeting
   String _getGreeting() {

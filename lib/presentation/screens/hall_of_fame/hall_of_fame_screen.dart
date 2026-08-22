@@ -8,6 +8,7 @@ import '../../../core/constants/ranks.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../widgets/tactical_panel.dart';
 import '../../widgets/tactical_icons.dart';
+import '../../widgets/tactical_particle_canvas.dart';
 
 class HallOfFameScreen extends StatelessWidget {
   const HallOfFameScreen({super.key});
@@ -27,14 +28,17 @@ class HallOfFameScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: Container(
-        decoration: isDark
-            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
-            : null,
-        child: SafeArea(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            slivers: [
+      body: TacticalParticleCanvas(
+        rankColor: rankColor,
+        particleCount: 18,
+        child: Container(
+          decoration: isDark
+              ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
+              : null,
+          child: SafeArea(
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
               // Header
               SliverToBoxAdapter(
                 child: Padding(
@@ -148,8 +152,9 @@ class HallOfFameScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildActRankPyramid(BuildContext context, int currentRank, Color rankColor) {
     // 4-Tier Pyramid: Row 0 has 1 shard, Row 1 has 2, Row 2 has 3, Row 3 has 4 shards (Total 10 shards)

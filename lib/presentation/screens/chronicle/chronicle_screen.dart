@@ -9,6 +9,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/history_entry.dart';
 import '../../widgets/tactical_panel.dart';
 import '../../widgets/tactical_icons.dart';
+import '../../widgets/tactical_particle_canvas.dart';
 
 class ChronicleScreen extends StatefulWidget {
   const ChronicleScreen({super.key});
@@ -72,16 +73,19 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: Container(
-        decoration: isDark
-            ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
-            : null,
-        child: SafeArea(
-          child: _loading
-              ? Center(child: CircularProgressIndicator(color: rankColor))
-              : CustomScrollView(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  slivers: [
+      body: TacticalParticleCanvas(
+        rankColor: rankColor,
+        particleCount: 18,
+        child: Container(
+          decoration: isDark
+              ? BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor))
+              : null,
+          child: SafeArea(
+            child: _loading
+                ? Center(child: CircularProgressIndicator(color: rankColor))
+                : CustomScrollView(
+                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                    slivers: [
                     // ─── TITLE ────────────────────────────────────────────────────────
                     SliverToBoxAdapter(
                       child: Padding(
@@ -275,6 +279,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                     const SliverToBoxAdapter(child: SizedBox(height: 110)),
                   ],
                 ),
+          ),
         ),
       ),
     );
