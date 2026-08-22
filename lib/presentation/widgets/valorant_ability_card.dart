@@ -230,48 +230,191 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
   }
 }
 
-/// Tactical vertical spine conduit connector on the LEFT axis linking cards directly
-class TacticalSpineConnector extends StatelessWidget {
-  final bool isCompleted;
-  final Color rankColor;
-  final double height;
+/// Tactical Left Power Circuit Backbone Segment wrapping each ability card
+class TacticalLeftBackboneSegment extends StatelessWidget {
+  final bool isTop;
+  final bool isQuestCompleted;
+  final bool isPoweredFromAbove;
+  final Widget child;
 
-  const TacticalSpineConnector({
+  const TacticalLeftBackboneSegment({
     super.key,
-    required this.isCompleted,
-    required this.rankColor,
-    this.height = 14.0,
+    required this.isTop,
+    required this.isQuestCompleted,
+    required this.isPoweredFromAbove,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = isCompleted ? const Color(0xFF00F5D4) : const Color(0xFF232A38);
-
-    return SizedBox(
-      height: height,
+    return CustomPaint(
+      painter: _LeftBackboneRowPainter(
+        isTop: isTop,
+        isQuestCompleted: isQuestCompleted,
+        isPoweredFromAbove: isPoweredFromAbove,
+      ),
       child: Padding(
-        padding: const EdgeInsets.only(left: 34.0), // Aligned with the center of the 42dp icon plate
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            width: 2.5,
-            height: height,
-            decoration: BoxDecoration(
-              color: activeColor,
-              boxShadow: isCompleted
-                  ? [
-                      BoxShadow(
-                        color: const Color(0xFF00F5D4).withValues(alpha: 0.75),
-                        blurRadius: 8,
-                        spreadRadius: 1.0,
-                      ),
-                    ]
-                  : null,
-            ),
-          ),
-        ),
+        padding: const EdgeInsets.only(left: 24.0), // 24dp gutter for the main left backbone
+        child: child,
       ),
     );
+  }
+}
+
+class _LeftBackboneRowPainter extends CustomPainter {
+  final bool isTop;
+  final bool isQuestCompleted;
+  final bool isPoweredFromAbove;
+
+  _LeftBackboneRowPainter({
+    required this.isTop,
+    required this.isQuestCompleted,
+    required this.isPoweredFromAbove,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const backboneX = 9.0;
+    final branchY = size.height * 0.5;
+    final cardLeftX = 24.0;
+
+    const inactiveColor = Color(0xFF1E2430);
+    const activeColor = Color(0xFF00F5D4);
+
+    final isTransmitting = isQuestCompleted || isPoweredFromAbove;
+
+    // 1. Top backbone vertical line
+    if (!isTop) {
+      final topPaint = Paint()
+        ..color = isPoweredFromAbove ? activeColor : inactiveColor
+        ..strokeWidth = isPoweredFromAbove ? 2.0 : 1.2
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(const Offset(backboneX, 0), Offset(backboneX, branchY), topPaint);
+    }
+
+    // 2. Bottom backbone vertical line (transmits downwards)
+    final bottomPaint = Paint()
+      ..color = isTransmitting ? activeColor : inactiveColor
+      ..strokeWidth = isTransmitting ? 2.0 : 1.2
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(Offset(backboneX, branchY), Offset(backboneX, size.height + 10.0), bottomPaint);
+
+    // 3. Horizontal Feeder Branch (from Card left edge to Backbone)
+    final branchPaint = Paint()
+      ..color = isQuestCompleted ? activeColor : inactiveColor
+      ..strokeWidth = isQuestCompleted ? 2.0 : 1.2
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(Offset(backboneX, branchY), Offset(cardLeftX, branchY), branchPaint);
+
+    // 4. Diamond Junction Pip at (backboneX, branchY)
+    final nodeFill = Paint()
+      ..color = isTransmitting ? activeColor : const Color(0xFF0C0E14)
+      ..style = PaintingStyle.fill;
+    final nodeStroke = Paint()
+      ..color = isTransmitting ? activeColor : const Color(0xFF2B3342)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..moveTo(backboneX, branchY - 3.5)
+      ..lineTo(backboneX + 3.5, branchY)
+      ..lineTo(backboneX, branchY + 3.5)
+      ..lineTo(backboneX - 3.5, branchY)
+      ..close();
+
+    canvas.drawPath(path, nodeFill);
+    canvas.drawPath(path, nodeStroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _LeftBackboneRowPainter old) {
+    return old.isTop != isTop ||
+        old.isQuestCompleted != isQuestCompleted ||
+        old.isPoweredFromAbove != isPoweredFromAbove;
+  }
+}
+
+/// Tactical Left Power Circuit Backbone Wrapper for the Oath Reactor at the base
+class TacticalLeftBackboneOathWrapper extends StatelessWidget {
+  final bool isFullCharge;
+  final bool hasAnyCompleted;
+  final Widget child;
+
+  const TacticalLeftBackboneOathWrapper({
+    super.key,
+    required this.isFullCharge,
+    required this.hasAnyCompleted,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _LeftBackboneOathPainter(
+        isFullCharge: isFullCharge,
+        hasAnyCompleted: hasAnyCompleted,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24.0),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _LeftBackboneOathPainter extends CustomPainter {
+  final bool isFullCharge;
+  final bool hasAnyCompleted;
+
+  _LeftBackboneOathPainter({
+    required this.isFullCharge,
+    required this.hasAnyCompleted,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const backboneX = 9.0;
+    const cardLeftX = 24.0;
+    const branchY = 32.0; // Plugs right into the left of the Oath Header
+
+    const inactiveColor = Color(0xFF1E2430);
+    const activeColor = Color(0xFF00F5D4);
+
+    final isPowered = hasAnyCompleted;
+
+    // 1. Vertical line descending from top of gutter to the input port
+    final linePaint = Paint()
+      ..color = isPowered ? activeColor : inactiveColor
+      ..strokeWidth = isPowered ? 2.0 : 1.2
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(const Offset(backboneX, -10.0), const Offset(backboneX, branchY), linePaint);
+
+    // 2. Horizontal branch into the Oath card
+    canvas.drawLine(const Offset(backboneX, branchY), const Offset(cardLeftX, branchY), linePaint);
+
+    // 3. Diamond Node at the input junction
+    final nodeFill = Paint()
+      ..color = isPowered ? activeColor : const Color(0xFF0C0E14)
+      ..style = PaintingStyle.fill;
+    final nodeStroke = Paint()
+      ..color = isPowered ? activeColor : const Color(0xFF2B3342)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..moveTo(backboneX, branchY - 3.5)
+      ..lineTo(backboneX + 3.5, branchY)
+      ..lineTo(backboneX, branchY + 3.5)
+      ..lineTo(backboneX - 3.5, branchY)
+      ..close();
+
+    canvas.drawPath(path, nodeFill);
+    canvas.drawPath(path, nodeStroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant _LeftBackboneOathPainter old) {
+    return old.isFullCharge != isFullCharge || old.hasAnyCompleted != hasAnyCompleted;
   }
 }
 
@@ -326,7 +469,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
     final isCharged = widget.completedCount >= widget.totalQuests && widget.totalQuests > 0;
     final statusColor = widget.isAnswered
         ? (widget.isHonored ? AppColors.emeraldPrimary : const Color(0xFFFF4655))
-        : (isCharged ? const Color(0xFF00F5D4) : const Color(0xFF232A38));
+        : (isCharged ? const Color(0xFF00F5D4) : const Color(0xFF191D26));
 
     final hasActiveGlow = isCharged || widget.isAnswered;
 
@@ -343,12 +486,12 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0C0E15),
+            color: const Color(0xFF0B0D13), // Pure deep stealth carbon
             border: Border.all(
               color: isCharged
                   ? const Color(0xFF00F5D4)
-                  : (widget.isAnswered ? statusColor : const Color(0xFF232A38)),
-              width: hasActiveGlow ? 1.6 : 1.0,
+                  : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
+              width: hasActiveGlow ? 1.6 : 0.9,
             ),
             boxShadow: hasActiveGlow
                 ? [
@@ -360,7 +503,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                       offset: const Offset(0, 4),
                     ),
                   ]
-                : null,
+                : null, // Zero glow when dormant!
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,16 +519,16 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         decoration: BoxDecoration(
                           color: isCharged
                               ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
-                              : const Color(0xFF141822),
+                              : const Color(0xFF12151E),
                           border: Border.all(
-                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF232A38),
+                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF1F2533),
                             width: 1.0,
                           ),
                         ),
                         child: Text(
-                          isCharged ? '⚡ FINAL KEY' : '[ ULTIMATE ]',
+                          isCharged ? '⚡ FINAL KEY' : '[ 🔒 DORMANT ]',
                           style: GoogleFonts.spaceMono(
-                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF76808F),
+                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                             fontSize: 9.0,
                             fontWeight: FontWeight.w900,
                           ),
@@ -395,7 +538,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                       Text(
                         'HONESTY REACTOR',
                         style: GoogleFonts.spaceMono(
-                          color: const Color(0xFF76808F),
+                          color: isCharged ? const Color(0xFFECE8E1) : const Color(0xFF5A6372),
                           fontSize: 9.0,
                           fontWeight: FontWeight.w700,
                         ),
@@ -405,7 +548,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                   Text(
                     '+50 RAD MULTIPLIER',
                     style: GoogleFonts.spaceMono(
-                      color: const Color(0xFF00F5D4),
+                      color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                       fontSize: 9.5,
                       fontWeight: FontWeight.w700,
                     ),
@@ -420,7 +563,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFF07090E),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.06), width: 0.8),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.04), width: 0.8),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -428,7 +571,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                     Text(
                       'CONDUIT CHARGE',
                       style: GoogleFonts.spaceMono(
-                        color: const Color(0xFF76808F),
+                        color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                         fontSize: 8.5,
                         fontWeight: FontWeight.w700,
                       ),
@@ -444,11 +587,11 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                             decoration: BoxDecoration(
                               color: isFilled
                                   ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
-                                  : const Color(0xFF141822),
+                                  : const Color(0xFF12151E),
                               border: Border.all(
                                 color: isFilled
                                     ? const Color(0xFF00F5D4)
-                                    : const Color(0xFF232A38),
+                                    : const Color(0xFF1E2430),
                                 width: 1.0,
                               ),
                             ),
@@ -456,7 +599,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                               child: Text(
                                 isFilled ? '◆' : '◇',
                                 style: TextStyle(
-                                  color: isFilled ? const Color(0xFF00F5D4) : const Color(0xFF4A5260),
+                                  color: isFilled ? const Color(0xFF00F5D4) : const Color(0xFF3E4654),
                                   fontSize: 8,
                                   height: 1.0,
                                 ),
@@ -481,7 +624,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                     decoration: BoxDecoration(
                       color: const Color(0xFF07090F),
                       border: Border.all(
-                        color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF232A38),
+                        color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF191D26),
                         width: 1.2,
                       ),
                     ),
@@ -490,7 +633,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         type: TacticalGlyphType.oath,
                         color: isCharged
                             ? const Color(0xFF00F5D4)
-                            : (widget.isAnswered ? statusColor : const Color(0xFF76808F)),
+                            : (widget.isAnswered ? statusColor : const Color(0xFF4A5260)),
                         size: 24,
                         glow: hasActiveGlow,
                       ),
@@ -504,7 +647,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         Text(
                           'THE INTEGRITY OATH',
                           style: GoogleFonts.rajdhani(
-                            color: AppColors.darkText,
+                            color: isCharged ? Colors.white : const Color(0xFF9EAAB8),
                             fontSize: 17.0,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.8,
@@ -517,7 +660,7 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                               ? '⚡ ALL 4 PROTOCOLS LINKED // APEX READY'
                               : 'LINK ${widget.completedCount}/${widget.totalQuests} ENERGY CELLS TO SEAL',
                           style: GoogleFonts.spaceMono(
-                            color: isCharged ? const Color(0xFF00F5D4) : AppColors.darkSubText,
+                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                             fontSize: 8.5,
                             fontWeight: FontWeight.w700,
                           ),
@@ -541,12 +684,12 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                           : const Color(0xFFFF4655).withValues(alpha: 0.15))
                       : (isCharged
                           ? const Color(0xFF00F5D4).withValues(alpha: 0.20)
-                          : const Color(0xFF141822)),
+                          : const Color(0xFF0E1118)),
                   border: Border.all(
                     color: isCharged
                         ? const Color(0xFF00F5D4)
-                        : (widget.isAnswered ? statusColor : const Color(0xFF232A38)),
-                    width: isCharged ? 1.4 : 1.0,
+                        : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
+                    width: isCharged ? 1.4 : 0.9,
                   ),
                 ),
                 child: Center(
@@ -555,11 +698,11 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
                         ? (widget.isHonored ? 'FINAL KEY SEALED // +50 RAD' : 'COMPROMISED // SHIELD CONSUMED')
                         : (isCharged
                             ? '⚡ TURN FINAL KEY // SEAL DAILY PROTOCOLS ⚡'
-                            : 'LOCK IN EARLY OR COMPLETE ALL 4'),
+                            : '🔒 REQUIRES 4/4 PROTOCOLS TO IGNITE'),
                     style: GoogleFonts.spaceMono(
                       color: isCharged
                           ? const Color(0xFF00F5D4)
-                          : (widget.isAnswered ? statusColor : const Color(0xFF76808F)),
+                          : (widget.isAnswered ? statusColor : const Color(0xFF5A6372)),
                       fontSize: 9.5,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.8,

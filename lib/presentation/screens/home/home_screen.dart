@@ -258,16 +258,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
                       const SizedBox(height: 10),
 
-                      const SizedBox(height: 10),
-
-                      // ── 1-Column Vertical Ascension Spine ──
+                      // ── Main Left Power Circuit Backbone Layout ──
                       ...questProvider.todayQuests.asMap().entries.map((entry) {
                         final idx = entry.key;
                         final quest = entry.value;
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ValorantAbilityCard(
+
+                        // Check if any quest above this one is completed (transmits power down the backbone)
+                        final isPoweredFromAbove = questProvider.todayQuests
+                            .take(idx)
+                            .any((q) => q.isCompleted);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: TacticalLeftBackboneSegment(
+                            isTop: idx == 0,
+                            isQuestCompleted: quest.isCompleted,
+                            isPoweredFromAbove: isPoweredFromAbove,
+                            child: ValorantAbilityCard(
                               quest: quest,
                               index: idx,
                               rankColor: rankColor,
@@ -295,27 +302,26 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 }
                               },
                             ),
-                            // Vertical laser conduit spine linking to next card
-                            TacticalSpineConnector(
-                              isCompleted: quest.isCompleted,
-                              rankColor: rankColor,
-                              height: 12.0,
-                            ),
-                          ],
+                          ),
                         );
                       }),
 
-                      // ── The Apex 5th Card: The Final Key / Honesty Oath Reactor ──
-                      ValorantUltimateCard(
-                        isAnswered: answered,
-                        isHonored: answerTrue,
-                        rankColor: rankColor,
-                        completedCount: questProvider.todayQuests.where((q) => q.isCompleted).length,
-                        totalQuests: questProvider.todayQuests.length.clamp(1, 4),
-                        onTap: () => showTacticalHonestyOathModal(
-                          context: context,
-                          questProvider: questProvider,
+                      // ── The Apex 5th Card: The Final Key / Honesty Oath Reactor (Left Backbone Input) ──
+                      TacticalLeftBackboneOathWrapper(
+                        isFullCharge: questProvider.todayQuests.where((q) => q.isCompleted).length >=
+                            questProvider.todayQuests.length.clamp(1, 4),
+                        hasAnyCompleted: questProvider.todayQuests.any((q) => q.isCompleted),
+                        child: ValorantUltimateCard(
+                          isAnswered: answered,
+                          isHonored: answerTrue,
                           rankColor: rankColor,
+                          completedCount: questProvider.todayQuests.where((q) => q.isCompleted).length,
+                          totalQuests: questProvider.todayQuests.length.clamp(1, 4),
+                          onTap: () => showTacticalHonestyOathModal(
+                            context: context,
+                            questProvider: questProvider,
+                            rankColor: rankColor,
+                          ),
                         ),
                       ),
 
