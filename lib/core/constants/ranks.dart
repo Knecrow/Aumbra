@@ -68,7 +68,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 1,
     name: 'Awakened',
-    color: Color(0xFF00F5D4), // Radianite Mint
+    color: Color(0xFF78909C), // Gunmetal Slate Steel
     completionsRequired: 13,
     streakRequired: 11,
     taskCount: 5,
@@ -77,7 +77,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 2,
     name: 'Seeker',
-    color: Color(0xFF00E676), // Vibrant Emerald Green
+    color: Color(0xFFD48443), // Antique Bronze Copper
     completionsRequired: 15,
     streakRequired: 13,
     taskCount: 5,
@@ -86,7 +86,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 3,
     name: 'Strider',
-    color: Color(0xFFC6FF00), // Acid Volt Lime
+    color: Color(0xFFE0E6ED), // Polished Silver Chrome
     completionsRequired: 17,
     streakRequired: 14,
     taskCount: 5,
@@ -95,7 +95,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 4,
     name: 'Forged',
-    color: Color(0xFFFF6D00), // Blaze Orange
+    color: Color(0xFFFFD700), // Pure Solar Gold
     completionsRequired: 19,
     streakRequired: 16,
     taskCount: 6,
@@ -104,7 +104,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 5,
     name: 'Ascendant',
-    color: Color(0xFF8E24AA), // Imperial Purple
+    color: Color(0xFF00F5D4), // Radianite Mint Cyan
     completionsRequired: 21,
     streakRequired: 17,
     taskCount: 6,
@@ -113,7 +113,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 6,
     name: 'Exalted',
-    color: Color(0xFFFF1744), // Vivid Crimson Red
+    color: Color(0xFF00E676), // Vibrant Emerald Green
     completionsRequired: 23,
     streakRequired: 19,
     taskCount: 6,
@@ -122,7 +122,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 7,
     name: 'Paragon',
-    color: Color(0xFFFFD600), // Pure Solar Gold
+    color: Color(0xFFC6FF00), // Acid Volt Lime
     completionsRequired: 25,
     streakRequired: 20,
     taskCount: 6,
@@ -131,7 +131,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 8,
     name: 'Sage',
-    color: Color(0xFF2979FF), // Arcana Royal Blue
+    color: Color(0xFFFF6D00), // Blaze Fire Orange
     completionsRequired: 27,
     streakRequired: 22,
     taskCount: 7,
@@ -140,7 +140,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 9,
     name: 'Saint',
-    color: Color(0xFFFF1493), // Deep Neon Rose Pink
+    color: Color(0xFFFF1744), // Vivid Crimson Red
     completionsRequired: 29,
     streakRequired: 23,
     taskCount: 7,
@@ -149,7 +149,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 10,
     name: 'Limitless',
-    color: Color(0xFF00897B), // Deep Obsidian Teal
+    color: Color(0xFFFF007F), // Deep Hot Neon Pink
     completionsRequired: 31,
     streakRequired: 25,
     taskCount: 7,
@@ -158,7 +158,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 11,
     name: 'Eternal',
-    color: Color(0xFF3D5AFE), // Cyber Electric Indigo
+    color: Color(0xFF9C27B0), // Imperial Amethyst Violet
     completionsRequired: 33,
     streakRequired: 26,
     taskCount: 7,
@@ -167,7 +167,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 12,
     name: 'Transcendent',
-    color: Color(0xFFFF3D00), // Molten Magma Coral
+    color: Color(0xFF2979FF), // Arcana Cobalt Blue
     trimColor: Color(0xFF00F5D4),
     completionsRequired: 35,
     streakRequired: 28,
@@ -177,7 +177,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 13,
     name: 'Celestial',
-    color: Color(0xFF80D8FF), // Icy Diamond Cyan
+    color: Color(0xFF004D40), // Dark Obsidian Pine
     isShimmer: true,
     completionsRequired: 37,
     streakRequired: 29,
@@ -187,7 +187,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 14,
     name: 'Divine',
-    color: Color(0xFFEA80FC), // Aurora Orchid
+    color: Color(0xFFEA80FC), // Luminous Aurora Orchid
     isGradient: true,
     gradientColors: [Color(0xFF80D8FF), Color(0xFFEA80FC), Color(0xFFFF6D00)],
     completionsRequired: 40,
@@ -198,7 +198,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 15,
     name: 'Absolute',
-    color: Color(0xFFFFD700), // Sovereign Radiant Gold
+    color: Color(0xFFFFF59D), // Luminous Sovereign Starlight
     isCustomColor: true,
     completionsRequired: 0,
     streakRequired: 0,
