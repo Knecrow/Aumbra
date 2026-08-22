@@ -13,6 +13,9 @@ void showTacticalHonestyOathModal({
 }) {
   final answered = questProvider.oathAnswered;
   final honored = questProvider.oathAnswer == true;
+  final completedCount = questProvider.todayQuests.where((q) => q.isCompleted).length;
+  final totalCount = questProvider.todayQuests.length.clamp(1, 4);
+  final isUnlocked = completedCount >= totalCount && questProvider.todayQuests.isNotEmpty;
 
   showModalBottomSheet(
     context: context,
@@ -207,6 +210,45 @@ void showTacticalHonestyOathModal({
                       letterSpacing: 0.8,
                     ),
                   ),
+                ),
+              )
+            else if (!isUnlocked)
+              // ── Locked State: Quests not finished yet ──
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C0F17),
+                  border: Border.all(color: const Color(0xFF1E2430), width: 1.0),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.lock_outline_rounded, color: Color(0xFF76808F), size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          'REACTOR LOCKED · $completedCount/$totalCount PILLARS',
+                          style: GoogleFonts.spaceMono(
+                            color: const Color(0xFFECE8E1),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Complete all 4 daily pillar quests to unlock and seal the Integrity Oath.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.spaceMono(
+                        color: const Color(0xFF76808F),
+                        fontSize: 9.5,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
                 ),
               )
             else
