@@ -230,8 +230,8 @@ class _ValorantAbilityCardState extends State<ValorantAbilityCard>
   }
 }
 
-/// Tactical Left Power Circuit Backbone Segment wrapping each ability card
-class TacticalLeftBackboneSegment extends StatelessWidget {
+/// Tactical Left Power Circuit Backbone Segment with animated traveling energy current
+class TacticalLeftBackboneSegment extends StatefulWidget {
   final bool isTop;
   final bool isQuestCompleted;
   final bool isPoweredFromAbove;
@@ -246,17 +246,47 @@ class TacticalLeftBackboneSegment extends StatelessWidget {
   });
 
   @override
+  State<TacticalLeftBackboneSegment> createState() => _TacticalLeftBackboneSegmentState();
+}
+
+class _TacticalLeftBackboneSegmentState extends State<TacticalLeftBackboneSegment>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _currentCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _currentCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _LeftBackboneRowPainter(
-        isTop: isTop,
-        isQuestCompleted: isQuestCompleted,
-        isPoweredFromAbove: isPoweredFromAbove,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0), // 24dp gutter for the main left backbone
-        child: child,
-      ),
+    return AnimatedBuilder(
+      animation: _currentCtrl,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: _LeftBackboneRowPainter(
+            isTop: widget.isTop,
+            isQuestCompleted: widget.isQuestCompleted,
+            isPoweredFromAbove: widget.isPoweredFromAbove,
+            progress: _currentCtrl.value,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0), // 24dp gutter for the main left backbone
+            child: widget.child,
+          ),
+        );
+      },
+      child: widget.child,
     );
   }
 }
@@ -265,11 +295,13 @@ class _LeftBackboneRowPainter extends CustomPainter {
   final bool isTop;
   final bool isQuestCompleted;
   final bool isPoweredFromAbove;
+  final double progress;
 
   _LeftBackboneRowPainter({
     required this.isTop,
     required this.isQuestCompleted,
     required this.isPoweredFromAbove,
+    required this.progress,
   });
 
   @override
@@ -306,7 +338,27 @@ class _LeftBackboneRowPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(backboneX, branchY), Offset(cardLeftX, branchY), branchPaint);
 
-    // 4. Diamond Junction Pip at (backboneX, branchY)
+    // 4. Traveling High-Voltage Electrical Packet Pulse
+    if (isTransmitting) {
+      final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
+      final packetPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.8)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
+
+      canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
+      canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
+
+      if (isQuestCompleted) {
+        final packetX = cardLeftX - (cardLeftX - backboneX) * progress;
+        canvas.drawCircle(Offset(packetX, branchY), 2.5, glowPaint);
+        canvas.drawCircle(Offset(packetX, branchY), 1.4, packetPaint);
+      }
+    }
+
+    // 5. Diamond Junction Pip at (backboneX, branchY)
     final nodeFill = Paint()
       ..color = isTransmitting ? activeColor : const Color(0xFF0C0E14)
       ..style = PaintingStyle.fill;
@@ -330,12 +382,13 @@ class _LeftBackboneRowPainter extends CustomPainter {
   bool shouldRepaint(covariant _LeftBackboneRowPainter old) {
     return old.isTop != isTop ||
         old.isQuestCompleted != isQuestCompleted ||
-        old.isPoweredFromAbove != isPoweredFromAbove;
+        old.isPoweredFromAbove != isPoweredFromAbove ||
+        old.progress != progress;
   }
 }
 
-/// Tactical Left Power Circuit Backbone Wrapper for the Oath Reactor at the base
-class TacticalLeftBackboneOathWrapper extends StatelessWidget {
+/// Tactical Left Power Circuit Backbone Wrapper with animated incoming power feed
+class TacticalLeftBackboneOathWrapper extends StatefulWidget {
   final bool isFullCharge;
   final bool hasAnyCompleted;
   final Widget child;
@@ -348,16 +401,46 @@ class TacticalLeftBackboneOathWrapper extends StatelessWidget {
   });
 
   @override
+  State<TacticalLeftBackboneOathWrapper> createState() => _TacticalLeftBackboneOathWrapperState();
+}
+
+class _TacticalLeftBackboneOathWrapperState extends State<TacticalLeftBackboneOathWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _LeftBackboneOathPainter(
-        isFullCharge: isFullCharge,
-        hasAnyCompleted: hasAnyCompleted,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0),
-        child: child,
-      ),
+    return AnimatedBuilder(
+      animation: _pulseCtrl,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: _LeftBackboneOathPainter(
+            isFullCharge: widget.isFullCharge,
+            hasAnyCompleted: widget.hasAnyCompleted,
+            progress: _pulseCtrl.value,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0),
+            child: widget.child,
+          ),
+        );
+      },
+      child: widget.child,
     );
   }
 }
@@ -365,10 +448,12 @@ class TacticalLeftBackboneOathWrapper extends StatelessWidget {
 class _LeftBackboneOathPainter extends CustomPainter {
   final bool isFullCharge;
   final bool hasAnyCompleted;
+  final double progress;
 
   _LeftBackboneOathPainter({
     required this.isFullCharge,
     required this.hasAnyCompleted,
+    required this.progress,
   });
 
   @override
@@ -392,7 +477,27 @@ class _LeftBackboneOathPainter extends CustomPainter {
     // 2. Horizontal branch into the Oath card
     canvas.drawLine(const Offset(backboneX, branchY), const Offset(cardLeftX, branchY), linePaint);
 
-    // 3. Diamond Node at the input junction
+    // 3. Traveling Energy Spark down into Oath Core
+    if (isPowered) {
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.85)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
+      final dotPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+
+      if (progress < 0.7) {
+        final y = -10.0 + (branchY - (-10.0)) * (progress / 0.7);
+        canvas.drawCircle(Offset(backboneX, y), 3.0, glowPaint);
+        canvas.drawCircle(Offset(backboneX, y), 1.6, dotPaint);
+      } else {
+        final x = backboneX + (cardLeftX - backboneX) * ((progress - 0.7) / 0.3);
+        canvas.drawCircle(Offset(x, branchY), 3.0, glowPaint);
+        canvas.drawCircle(Offset(x, branchY), 1.6, dotPaint);
+      }
+    }
+
+    // 4. Diamond Node at the input junction
     final nodeFill = Paint()
       ..color = isPowered ? activeColor : const Color(0xFF0C0E14)
       ..style = PaintingStyle.fill;
@@ -414,7 +519,9 @@ class _LeftBackboneOathPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _LeftBackboneOathPainter old) {
-    return old.isFullCharge != isFullCharge || old.hasAnyCompleted != hasAnyCompleted;
+    return old.isFullCharge != isFullCharge ||
+        old.hasAnyCompleted != hasAnyCompleted ||
+        old.progress != progress;
   }
 }
 
@@ -442,9 +549,10 @@ class ValorantUltimateCard extends StatefulWidget {
 }
 
 class _ValorantUltimateCardState extends State<ValorantUltimateCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _touchCtrl;
   late Animation<double> _touchScale;
+  late AnimationController _breatheCtrl;
 
   @override
   void initState() {
@@ -456,11 +564,17 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
     _touchScale = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: _touchCtrl, curve: Curves.easeOutCubic),
     );
+
+    _breatheCtrl = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _touchCtrl.dispose();
+    _breatheCtrl.dispose();
     super.dispose();
   }
 
@@ -473,247 +587,258 @@ class _ValorantUltimateCardState extends State<ValorantUltimateCard>
 
     final hasActiveGlow = isCharged || widget.isAnswered;
 
-    return GestureDetector(
-      onTapDown: (_) => _touchCtrl.forward(),
-      onTapUp: (_) {
-        _touchCtrl.reverse();
-        HapticFeedback.heavyImpact();
-        widget.onTap();
-      },
-      onTapCancel: () => _touchCtrl.reverse(),
-      child: ScaleTransition(
-        scale: _touchScale,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0B0D13), // Pure deep stealth carbon
-            border: Border.all(
-              color: isCharged
-                  ? const Color(0xFF00F5D4)
-                  : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
-              width: hasActiveGlow ? 1.6 : 0.9,
-            ),
-            boxShadow: hasActiveGlow
-                ? [
-                    BoxShadow(
-                      color: (isCharged ? const Color(0xFF00F5D4) : statusColor)
-                          .withValues(alpha: isCharged ? 0.35 : 0.20),
-                      blurRadius: isCharged ? 28 : 20,
-                      spreadRadius: isCharged ? 1.0 : -2.0,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null, // Zero glow when dormant!
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── 1. Conduit Header Bar: Final Key Reactor + 4 Energy Diamond Cells ──
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return AnimatedBuilder(
+      animation: _breatheCtrl,
+      builder: (context, child) {
+        final breathe = _breatheCtrl.value;
+
+        return GestureDetector(
+          onTapDown: (_) => _touchCtrl.forward(),
+          onTapUp: (_) {
+            _touchCtrl.reverse();
+            HapticFeedback.heavyImpact();
+            widget.onTap();
+          },
+          onTapCancel: () => _touchCtrl.reverse(),
+          child: ScaleTransition(
+            scale: _touchScale,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0B0D13), // Pure deep stealth carbon
+                border: Border.all(
+                  color: isCharged
+                      ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
+                      : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
+                  width: hasActiveGlow ? (1.4 + 0.6 * breathe) : 0.9,
+                ),
+                boxShadow: hasActiveGlow
+                    ? [
+                        BoxShadow(
+                          color: (isCharged ? const Color(0xFF00F5D4) : statusColor)
+                              .withValues(alpha: isCharged ? (0.20 + 0.25 * breathe) : 0.20),
+                          blurRadius: isCharged ? (20 + 16 * breathe) : 20,
+                          spreadRadius: isCharged ? (0.5 + 1.5 * breathe) : -2.0,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null, // Zero glow when dormant!
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ── 1. Conduit Header Bar: Final Key Reactor + 4 Energy Diamond Cells ──
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isCharged
-                              ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
-                              : const Color(0xFF12151E),
-                          border: Border.all(
-                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF1F2533),
-                            width: 1.0,
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: isCharged
+                                  ? const Color(0xFF00F5D4).withValues(alpha: 0.20 + 0.15 * breathe)
+                                  : const Color(0xFF12151E),
+                              border: Border.all(
+                                color: isCharged
+                                    ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
+                                    : const Color(0xFF1F2533),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Text(
+                              isCharged ? '⚡ FINAL KEY' : '[ 🔒 DORMANT ]',
+                              style: GoogleFonts.spaceMono(
+                                color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                                fontSize: 9.0,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          isCharged ? '⚡ FINAL KEY' : '[ 🔒 DORMANT ]',
-                          style: GoogleFonts.spaceMono(
-                            color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
-                            fontSize: 9.0,
-                            fontWeight: FontWeight.w900,
+                          const SizedBox(width: 8),
+                          Text(
+                            'HONESTY REACTOR',
+                            style: GoogleFonts.spaceMono(
+                              color: isCharged ? const Color(0xFFECE8E1) : const Color(0xFF5A6372),
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
                       Text(
-                        'HONESTY REACTOR',
+                        '+50 RAD MULTIPLIER',
                         style: GoogleFonts.spaceMono(
-                          color: isCharged ? const Color(0xFFECE8E1) : const Color(0xFF5A6372),
-                          fontSize: 9.0,
+                          color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
                   ),
-                  Text(
-                    '+50 RAD MULTIPLIER',
-                    style: GoogleFonts.spaceMono(
-                      color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
 
-              const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-              // ── 2. 4 Energy Conduit Cells (Mind, Body, Soul, Env) ──
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF07090E),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.04), width: 0.8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'CONDUIT CHARGE',
-                      style: GoogleFonts.spaceMono(
-                        color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Row(
-                      children: List.generate(widget.totalQuests.clamp(1, 4), (i) {
-                        final isFilled = i < widget.completedCount;
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 6),
-                          child: Container(
-                            width: 14,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: isFilled
-                                  ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
-                                  : const Color(0xFF12151E),
-                              border: Border.all(
-                                color: isFilled
-                                    ? const Color(0xFF00F5D4)
-                                    : const Color(0xFF1E2430),
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                isFilled ? '◆' : '◇',
-                                style: TextStyle(
-                                  color: isFilled ? const Color(0xFF00F5D4) : const Color(0xFF3E4654),
-                                  fontSize: 8,
-                                  height: 1.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // ── 3. Center Reactor Core ──
-              Row(
-                children: [
+                  // ── 2. 4 Energy Conduit Cells (Mind, Body, Soul, Env) ──
                   Container(
-                    width: 48,
-                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF07090F),
-                      border: Border.all(
-                        color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF191D26),
-                        width: 1.2,
-                      ),
+                      color: const Color(0xFF07090E),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.04), width: 0.8),
                     ),
-                    child: Center(
-                      child: TacticalGlyph(
-                        type: TacticalGlyphType.oath,
-                        color: isCharged
-                            ? const Color(0xFF00F5D4)
-                            : (widget.isAnswered ? statusColor : const Color(0xFF4A5260)),
-                        size: 24,
-                        glow: hasActiveGlow,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'THE INTEGRITY OATH',
-                          style: GoogleFonts.rajdhani(
-                            color: isCharged ? Colors.white : const Color(0xFF9EAAB8),
-                            fontSize: 17.0,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                            height: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          isCharged
-                              ? '⚡ ALL 4 PROTOCOLS LINKED // APEX READY'
-                              : 'LINK ${widget.completedCount}/${widget.totalQuests} ENERGY CELLS TO SEAL',
+                          'CONDUIT CHARGE',
                           style: GoogleFonts.spaceMono(
                             color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
                             fontSize: 8.5,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
+                        Row(
+                          children: List.generate(widget.totalQuests.clamp(1, 4), (i) {
+                            final isFilled = i < widget.completedCount;
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 6),
+                              child: Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: isFilled
+                                      ? const Color(0xFF00F5D4).withValues(alpha: 0.25)
+                                      : const Color(0xFF12151E),
+                                  border: Border.all(
+                                    color: isFilled
+                                        ? const Color(0xFF00F5D4)
+                                        : const Color(0xFF1E2430),
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    isFilled ? '◆' : '◇',
+                                    style: TextStyle(
+                                      color: isFilled ? const Color(0xFF00F5D4) : const Color(0xFF3E4654),
+                                      fontSize: 8,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
                       ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ── 3. Center Reactor Core ──
+                  Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF07090F),
+                          border: Border.all(
+                            color: isCharged
+                                ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
+                                : const Color(0xFF191D26),
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Center(
+                          child: TacticalGlyph(
+                            type: TacticalGlyphType.oath,
+                            color: isCharged
+                                ? const Color(0xFF00F5D4)
+                                : (widget.isAnswered ? statusColor : const Color(0xFF4A5260)),
+                            size: 24,
+                            glow: hasActiveGlow,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'THE INTEGRITY OATH',
+                              style: GoogleFonts.rajdhani(
+                                color: isCharged ? Colors.white : const Color(0xFF9EAAB8),
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.8,
+                                height: 1.0,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isCharged
+                                  ? '⚡ ALL 4 PROTOCOLS LINKED // APEX READY'
+                                  : 'LINK ${widget.completedCount}/${widget.totalQuests} ENERGY CELLS TO SEAL',
+                              style: GoogleFonts.spaceMono(
+                                color: isCharged ? const Color(0xFF00F5D4) : const Color(0xFF5A6372),
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ── 4. Tactical Status / Ignition Button Bar ──
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: widget.isAnswered
+                          ? (widget.isHonored
+                              ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
+                              : const Color(0xFFFF4655).withValues(alpha: 0.15))
+                          : (isCharged
+                              ? const Color(0xFF00F5D4).withValues(alpha: 0.15 + 0.15 * breathe)
+                              : const Color(0xFF0E1118)),
+                      border: Border.all(
+                        color: isCharged
+                            ? const Color(0xFF00F5D4).withValues(alpha: 0.70 + 0.30 * breathe)
+                            : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
+                        width: isCharged ? 1.4 : 0.9,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.isAnswered
+                            ? (widget.isHonored ? 'FINAL KEY SEALED // +50 RAD' : 'COMPROMISED // SHIELD CONSUMED')
+                            : (isCharged
+                                ? '⚡ TURN FINAL KEY // SEAL DAILY PROTOCOLS ⚡'
+                                : '🔒 REQUIRES 4/4 PROTOCOLS TO IGNITE'),
+                        style: GoogleFonts.spaceMono(
+                          color: isCharged
+                              ? const Color(0xFF00F5D4)
+                              : (widget.isAnswered ? statusColor : const Color(0xFF5A6372)),
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 12),
-
-              // ── 4. Tactical Status / Ignition Button Bar ──
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                decoration: BoxDecoration(
-                  color: widget.isAnswered
-                      ? (widget.isHonored
-                          ? AppColors.emeraldPrimary.withValues(alpha: 0.15)
-                          : const Color(0xFFFF4655).withValues(alpha: 0.15))
-                      : (isCharged
-                          ? const Color(0xFF00F5D4).withValues(alpha: 0.20)
-                          : const Color(0xFF0E1118)),
-                  border: Border.all(
-                    color: isCharged
-                        ? const Color(0xFF00F5D4)
-                        : (widget.isAnswered ? statusColor : const Color(0xFF191D26)),
-                    width: isCharged ? 1.4 : 0.9,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    widget.isAnswered
-                        ? (widget.isHonored ? 'FINAL KEY SEALED // +50 RAD' : 'COMPROMISED // SHIELD CONSUMED')
-                        : (isCharged
-                            ? '⚡ TURN FINAL KEY // SEAL DAILY PROTOCOLS ⚡'
-                            : '🔒 REQUIRES 4/4 PROTOCOLS TO IGNITE'),
-                    style: GoogleFonts.spaceMono(
-                      color: isCharged
-                          ? const Color(0xFF00F5D4)
-                          : (widget.isAnswered ? statusColor : const Color(0xFF5A6372)),
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
