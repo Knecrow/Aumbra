@@ -425,7 +425,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 color: isSelected
                     ? _kAccent.withValues(alpha: 0.12)
                     : const Color(0xFF0C0F17),
-                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isSelected ? _kAccent : Colors.white.withValues(alpha: 0.08),
                   width: isSelected ? 1.4 : 0.8,
@@ -494,7 +493,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         color: _hasComputer
                             ? _kAccent.withValues(alpha: 0.12)
                             : const Color(0xFF0C0F17),
-                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _hasComputer ? _kAccent : Colors.white.withValues(alpha: 0.08),
                           width: _hasComputer ? 1.4 : 0.8,
@@ -533,7 +531,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         color: !_hasComputer
                             ? _kAccent.withValues(alpha: 0.12)
                             : const Color(0xFF0C0F17),
-                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: !_hasComputer ? _kAccent : Colors.white.withValues(alpha: 0.08),
                           width: !_hasComputer ? 1.4 : 0.8,
@@ -587,15 +584,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 hintStyle: const TextStyle(color: AppColors.darkDimText),
                 prefixIcon: const Icon(Icons.key_outlined, color: _kAccent, size: 18),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: _kAccent, width: 1.5),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: _kAccent, width: 1.5),
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.zero,
                   borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -689,14 +686,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Icon badge
+              // Tactical square icon badge
               Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
                   color: const Color(0xFF0E111A),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _kAccent.withValues(alpha: 0.6), width: 1.2),
+                  border: Border.all(color: _kAccent.withValues(alpha: 0.8), width: 1.2),
                 ),
                 child: Center(
                   child: Icon(icon, color: _kAccent, size: 20),
@@ -741,7 +737,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  // ── Glass text field ──────────────────────────────────────────────────────────
+  // ── Tactical Square Text Field ──────────────────────────────────────────────
   Widget _glassTextField({
     required TextEditingController controller,
     required String hint,
@@ -762,15 +758,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         hintStyle: GoogleFonts.spaceMono(color: AppColors.darkDimText, fontSize: 13),
         prefixIcon: Icon(icon, color: _kAccent, size: 18),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _kAccent, width: 1.5),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: _kAccent, width: 1.5),
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.zero,
           borderSide: BorderSide(color: _kAccent.withValues(alpha: 0.45), width: 1.0),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
@@ -790,7 +786,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           padding: const EdgeInsets.all(16),
           elevation: 4,
           shadowColor: _kAccent.withValues(alpha: 0.3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         ),
         child: Text(
           label,
