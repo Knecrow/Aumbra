@@ -313,9 +313,7 @@ class _LeftBackboneRowPainter extends CustomPainter {
     const inactiveColor = Color(0xFF1E2430);
     const activeColor = Color(0xFF00F5D4);
 
-    final isTransmitting = isQuestCompleted || isPoweredFromAbove;
-
-    // 1. Top backbone vertical line
+    // 1. Top backbone vertical line (active if power comes from above)
     if (!isTop) {
       final topPaint = Paint()
         ..color = isPoweredFromAbove ? activeColor : inactiveColor
@@ -324,46 +322,59 @@ class _LeftBackboneRowPainter extends CustomPainter {
       canvas.drawLine(const Offset(backboneX, 0), Offset(backboneX, branchY), topPaint);
     }
 
-    // 2. Bottom backbone vertical line (transmits downwards)
-    final bottomPaint = Paint()
-      ..color = isTransmitting ? activeColor : inactiveColor
-      ..strokeWidth = isTransmitting ? 2.0 : 1.2
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(Offset(backboneX, branchY), Offset(backboneX, size.height + 10.0), bottomPaint);
-
-    // 3. Horizontal Feeder Branch (from Card left edge to Backbone)
+    // 2. Horizontal Feeder Branch (from Card left edge to Backbone junction)
     final branchPaint = Paint()
       ..color = isQuestCompleted ? activeColor : inactiveColor
       ..strokeWidth = isQuestCompleted ? 2.0 : 1.2
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(backboneX, branchY), Offset(cardLeftX, branchY), branchPaint);
 
-    // 4. Traveling High-Voltage Electrical Packet Pulse
-    if (isTransmitting) {
-      final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
+    // 3. Bottom backbone vertical line (only transmits downwards if THIS quest or power from above is active)
+    final isTransmittingDown = isQuestCompleted || isPoweredFromAbove;
+    final bottomPaint = Paint()
+      ..color = isTransmittingDown ? activeColor : inactiveColor
+      ..strokeWidth = isTransmittingDown ? 2.0 : 1.2
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(Offset(backboneX, branchY), Offset(backboneX, size.height + 10.0), bottomPaint);
+
+    // 4. Traveling High-Voltage Electrical Packet Pulse (ONLY on active paths)
+    if (isQuestCompleted) {
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.85)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
       final packetPaint = Paint()
         ..color = Colors.white
         ..style = PaintingStyle.fill;
-      final glowPaint = Paint()
-        ..color = activeColor.withValues(alpha: 0.8)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
 
+      // Traveling horizontally from card to backbone junction
+      final packetX = cardLeftX - (cardLeftX - backboneX) * progress;
+      canvas.drawCircle(Offset(packetX, branchY), 2.5, glowPaint);
+      canvas.drawCircle(Offset(packetX, branchY), 1.4, packetPaint);
+
+      // Downward pulse along backbone
+      final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
       canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
       canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
+    } else if (isPoweredFromAbove) {
+      final glowPaint = Paint()
+        ..color = activeColor.withValues(alpha: 0.85)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
+      final packetPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
 
-      if (isQuestCompleted) {
-        final packetX = cardLeftX - (cardLeftX - backboneX) * progress;
-        canvas.drawCircle(Offset(packetX, branchY), 2.5, glowPaint);
-        canvas.drawCircle(Offset(packetX, branchY), 1.4, packetPaint);
-      }
+      final packetY = branchY + ((size.height + 10.0) - branchY) * progress;
+      canvas.drawCircle(Offset(backboneX, packetY), 3.0, glowPaint);
+      canvas.drawCircle(Offset(backboneX, packetY), 1.6, packetPaint);
     }
 
     // 5. Diamond Junction Pip at (backboneX, branchY)
+    final isNodeActive = isQuestCompleted;
     final nodeFill = Paint()
-      ..color = isTransmitting ? activeColor : const Color(0xFF0C0E14)
+      ..color = isNodeActive ? activeColor : const Color(0xFF0C0E14)
       ..style = PaintingStyle.fill;
     final nodeStroke = Paint()
-      ..color = isTransmitting ? activeColor : const Color(0xFF2B3342)
+      ..color = isNodeActive ? activeColor : const Color(0xFF2B3342)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -390,13 +401,11 @@ class _LeftBackboneRowPainter extends CustomPainter {
 /// Tactical Left Power Circuit Backbone Wrapper with animated incoming power feed
 class TacticalLeftBackboneOathWrapper extends StatefulWidget {
   final bool isFullCharge;
-  final bool hasAnyCompleted;
   final Widget child;
 
   const TacticalLeftBackboneOathWrapper({
     super.key,
     required this.isFullCharge,
-    required this.hasAnyCompleted,
     required this.child,
   });
 
@@ -431,7 +440,6 @@ class _TacticalLeftBackboneOathWrapperState extends State<TacticalLeftBackboneOa
         return CustomPaint(
           painter: _LeftBackboneOathPainter(
             isFullCharge: widget.isFullCharge,
-            hasAnyCompleted: widget.hasAnyCompleted,
             progress: _pulseCtrl.value,
           ),
           child: Padding(
@@ -447,12 +455,10 @@ class _TacticalLeftBackboneOathWrapperState extends State<TacticalLeftBackboneOa
 
 class _LeftBackboneOathPainter extends CustomPainter {
   final bool isFullCharge;
-  final bool hasAnyCompleted;
   final double progress;
 
   _LeftBackboneOathPainter({
     required this.isFullCharge,
-    required this.hasAnyCompleted,
     required this.progress,
   });
 
@@ -465,7 +471,7 @@ class _LeftBackboneOathPainter extends CustomPainter {
     const inactiveColor = Color(0xFF1E2430);
     const activeColor = Color(0xFF00F5D4);
 
-    final isPowered = hasAnyCompleted;
+    final isPowered = isFullCharge; // ONLY power the Oath line when 100% of quests are completed
 
     // 1. Vertical line descending from top of gutter to the input port
     final linePaint = Paint()
@@ -477,7 +483,7 @@ class _LeftBackboneOathPainter extends CustomPainter {
     // 2. Horizontal branch into the Oath card
     canvas.drawLine(const Offset(backboneX, branchY), const Offset(cardLeftX, branchY), linePaint);
 
-    // 3. Traveling Energy Spark down into Oath Core
+    // 3. Traveling Energy Spark down into Oath Core (ONLY when 100% full charge)
     if (isPowered) {
       final glowPaint = Paint()
         ..color = activeColor.withValues(alpha: 0.85)
@@ -520,7 +526,6 @@ class _LeftBackboneOathPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _LeftBackboneOathPainter old) {
     return old.isFullCharge != isFullCharge ||
-        old.hasAnyCompleted != hasAnyCompleted ||
         old.progress != progress;
   }
 }

@@ -310,7 +310,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       TacticalLeftBackboneOathWrapper(
                         isFullCharge: questProvider.todayQuests.where((q) => q.isCompleted).length >=
                             questProvider.todayQuests.length.clamp(1, 4),
-                        hasAnyCompleted: questProvider.todayQuests.any((q) => q.isCompleted),
                         child: ValorantUltimateCard(
                           isAnswered: answered,
                           isHonored: answerTrue,

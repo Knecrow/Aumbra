@@ -278,7 +278,7 @@ class HallOfFameScreen extends StatelessWidget {
         child: TacticalPanel(
           rankColor: rankColor,
           showHeader: true,
-          tacticalTag: 'COLLECTION // ARMORY OF TROPHIES',
+          tacticalTag: 'ACHIEVEMENT BADGES',
           statusBadge: '${unlocked.length}/${kBadges.length} UNLOCKED',
           chamferSize: 14.0,
           padding: const EdgeInsets.all(16),
@@ -341,7 +341,7 @@ class HallOfFameScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                               child: Row(
                                 children: [
-                                  // Gaming Trophy/Badge Icon Disc
+                                  // Badge Icon Disc
                                   Container(
                                     width: 40,
                                     height: 40,
@@ -400,7 +400,7 @@ class HallOfFameScreen extends StatelessWidget {
 
                                   const SizedBox(width: 8),
 
-                                  // Gaming Status Pill / Lock Icon
+                                  // Status Pill / Lock Icon
                                   if (earned)
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -519,7 +519,7 @@ class HallOfFameScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
-                              'EARNED',
+                              'ACTIVE',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 9,
@@ -552,11 +552,16 @@ class HallOfFameScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRankColorGrid(BuildContext context, int currentRank, bool isDark,
-      Color textColor, Color subColor) {
+  Widget _buildRankColorGrid(
+    BuildContext context,
+    int currentRank,
+    bool isDark,
+    Color textColor,
+    Color subColor,
+  ) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -586,56 +591,92 @@ class HallOfFameScreen extends StatelessWidget {
               final isReached = currentRank >= rank.rankNumber;
               final color = rank.color;
 
-              return Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: isReached
-                          ? const Color(0xFF0F0F0F)
-                          : const Color(0xFF050505),
-                      borderRadius: BorderRadius.circular(12),
+              return GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (dCtx) => AlertDialog(
+                      backgroundColor: const Color(0xFF07090F),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(color: color, width: 1.2),
+                      ),
+                      title: Text(
+                        'RANK ${rank.rankNumber}: ${rank.name.toUpperCase()}',
+                        style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('DEPTH TIER: ${rank.depthLevel.toUpperCase()}', style: GoogleFonts.spaceMono(color: color, fontSize: 10, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 8),
+                          Text('Requirement: ${rank.completionsRequired} days completed (${rank.streakRequired}-day streak minimum)', style: const TextStyle(color: Color(0xFF8E9BA6), fontSize: 12, height: 1.4)),
+                          const SizedBox(height: 8),
+                          Text(isReached ? 'STATUS: UNLOCKED ✓' : 'STATUS: LOCKED 🔒', style: TextStyle(color: isReached ? AppColors.emeraldPrimary : const Color(0xFFFF4655), fontSize: 11, fontWeight: FontWeight.w800)),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(dCtx),
+                          style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.black, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+                          child: Text('CLOSE', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
+                        ),
+                      ],
                     ),
-                    child: Center(
-                      child: Container(
-                        width: 18,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: isReached ? color : color.withValues(alpha: 0.2),
-                          boxShadow: isReached
-                              ? [
-                                BoxShadow(
-                                  color: color.withValues(alpha: 0.4),
-                                  blurRadius: 6,
-                                ),
-                              ]
-                            : null,
+                  );
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: isReached
+                            ? const Color(0xFF0F0F0F)
+                            : const Color(0xFF050505),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            color: isReached ? color : color.withValues(alpha: 0.2),
+                            boxShadow: isReached
+                                ? [
+                                  BoxShadow(
+                                    color: color.withValues(alpha: 0.4),
+                                    blurRadius: 6,
+                                  ),
+                                ]
+                              : null,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      rank.name,
+                      style: TextStyle(
+                        color: isReached ? Colors.white : AppColors.darkDimText,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  rank.name,
-                  style: TextStyle(
-                    color: isReached ? Colors.white : AppColors.darkDimText,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _showBadgeDetailModal(
     BuildContext context,
