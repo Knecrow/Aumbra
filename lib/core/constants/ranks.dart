@@ -68,7 +68,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 1,
     name: 'Awakened',
-    color: Color(0xFF00E5FF), // Electric Cyan
+    color: Color(0xFF00F5D4), // Radianite Mint
     completionsRequired: 13,
     streakRequired: 11,
     taskCount: 5,
@@ -86,7 +86,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 3,
     name: 'Strider',
-    color: Color(0xFFB2FF59), // Acid Lime
+    color: Color(0xFFC6FF00), // Acid Volt Lime
     completionsRequired: 17,
     streakRequired: 14,
     taskCount: 5,
@@ -104,7 +104,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 5,
     name: 'Ascendant',
-    color: Color(0xFF7C4DFF), // Deep Indigo
+    color: Color(0xFF8E24AA), // Imperial Purple
     completionsRequired: 21,
     streakRequired: 17,
     taskCount: 6,
@@ -140,7 +140,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 9,
     name: 'Saint',
-    color: Color(0xFFFF4081), // Hot Neon Pink
+    color: Color(0xFFFF1493), // Deep Neon Rose Pink
     completionsRequired: 29,
     streakRequired: 23,
     taskCount: 7,
@@ -149,7 +149,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 10,
     name: 'Limitless',
-    color: Color(0xFF00BFA5), // Deep Teal / Aquamarine
+    color: Color(0xFF00897B), // Deep Obsidian Teal
     completionsRequired: 31,
     streakRequired: 25,
     taskCount: 7,
@@ -158,7 +158,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 11,
     name: 'Eternal',
-    color: Color(0xFFE040FB), // Vivid Magenta / Neon Orchid
+    color: Color(0xFF3D5AFE), // Cyber Electric Indigo
     completionsRequired: 33,
     streakRequired: 26,
     taskCount: 7,
@@ -167,8 +167,8 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 12,
     name: 'Transcendent',
-    color: Color(0xFFFF9100), // Sunfire Amber
-    trimColor: Color(0xFF00E5FF),
+    color: Color(0xFFFF3D00), // Molten Magma Coral
+    trimColor: Color(0xFF00F5D4),
     completionsRequired: 35,
     streakRequired: 28,
     taskCount: 8,
@@ -177,7 +177,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 13,
     name: 'Celestial',
-    color: Color(0xFF69FFDA), // Celestial Aqua Shimmer
+    color: Color(0xFF80D8FF), // Icy Diamond Cyan
     isShimmer: true,
     completionsRequired: 37,
     streakRequired: 29,
@@ -187,9 +187,9 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 14,
     name: 'Divine',
-    color: Color(0xFFEA80FC), // Aurora Pink-Violet
+    color: Color(0xFFEA80FC), // Aurora Orchid
     isGradient: true,
-    gradientColors: [Color(0xFF18FFFF), Color(0xFFEA80FC), Color(0xFFFF6D00)],
+    gradientColors: [Color(0xFF80D8FF), Color(0xFFEA80FC), Color(0xFFFF6D00)],
     completionsRequired: 40,
     streakRequired: 32,
     taskCount: 8,
@@ -198,7 +198,7 @@ const List<RankInfo> kRanks = [
   RankInfo(
     rankNumber: 15,
     name: 'Absolute',
-    color: Color(0xFFFFD700), // Sovereign Gold
+    color: Color(0xFFFFD700), // Sovereign Radiant Gold
     isCustomColor: true,
     completionsRequired: 0,
     streakRequired: 0,
