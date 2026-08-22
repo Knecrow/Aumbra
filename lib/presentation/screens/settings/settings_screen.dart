@@ -13,6 +13,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../widgets/tactical_panel.dart';
 import '../../widgets/tactical_hud_widgets.dart';
 import '../../widgets/tactical_icons.dart';
+import '../../widgets/tactical_particle_canvas.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback onSignOut;
@@ -64,9 +65,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      body: Container(
-        decoration: BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor)),
-        child: SafeArea(
+      body: TacticalParticleCanvas(
+        rankColor: rankColor,
+        particleCount: 18,
+        child: Container(
+          decoration: BoxDecoration(gradient: AppColors.buildRankAmbientGradient(rankColor)),
+          child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -410,7 +414,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ),
     ),
