@@ -54,7 +54,7 @@ class HallOfFameScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'HALL OF FAME // ARSENAL',
+                                'BADGES & RANKS',
                                 style: GoogleFonts.spaceMono(
                                   color: Colors.white,
                                   fontSize: 14,
@@ -65,7 +65,7 @@ class HallOfFameScreen extends StatelessWidget {
                             ],
                           ),
                           Text(
-                            'ACT 01',
+                            'SEASON 01',
                             style: GoogleFonts.spaceMono(
                               color: AppColors.getLightVariant(rankColor),
                               fontSize: 9.5,
@@ -76,7 +76,7 @@ class HallOfFameScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '${user.unlockedBadges.length}/${kBadges.length} TROPHIES UNLOCKED · ${user.unlockedTitles.length}/${kTitles.length} CALLSIGNS',
+                        '${user.unlockedBadges.length}/${kBadges.length} BADGES UNLOCKED · ${user.unlockedTitles.length}/${kTitles.length} TITLES EARNED',
                         style: GoogleFonts.spaceMono(
                           color: const Color(0xFF7A8394),
                           fontSize: 9.0,
@@ -96,7 +96,7 @@ class HallOfFameScreen extends StatelessWidget {
                   child: TacticalPanel(
                     rankColor: rankColor,
                     showHeader: true,
-                    tacticalTag: 'COMPETITIVE // ACT 01 RANK PYRAMID',
+                    tacticalTag: 'RANK PROGRESSION PYRAMID',
                     statusBadge: userProvider.currentRankInfo.name.toUpperCase(),
                     chamferSize: 14.0,
                     padding: const EdgeInsets.all(16),
@@ -468,7 +468,7 @@ class HallOfFameScreen extends StatelessWidget {
         child: TacticalPanel(
           rankColor: rankColor,
           showHeader: true,
-          tacticalTag: 'REPUTATION // AGENT CALLSIGNS',
+          tacticalTag: 'UNLOCKED TITLES',
           statusBadge: '${unlocked.length}/${kTitles.length} EARNED',
           chamferSize: 14.0,
           padding: const EdgeInsets.all(16),

@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: TacticalPanel(
                     rankColor: rankColor,
                     showHeader: true,
-                    tacticalTag: 'PROTOCOL: HUD · ACT 01',
+                    tacticalTag: 'DAILY DASHBOARD',
                     statusBadge: 'ONLINE',
                     chamferSize: 14.0,
                     chamferCorner: ChamferCorner.all,
@@ -99,12 +99,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // ── Top Row: Agent Crest, Codename, Shields, Streak ───
+                        // ── Top Row: Avatar, Name, Shields, Streak ───
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Left: Faceted Avatar with Progress Ring + Codename + Tactical Rank Badge
+                            // Left: Faceted Avatar with Progress Ring + Name + Rank Badge
                             GestureDetector(
                               onTap: () => showTacticalEditProfileDialog(context, userProvider, rankColor),
                               child: Row(
@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  // Agent Codename & Highlighted Tactical Rank Badge
+                                  // Name & Highlighted Tactical Rank Badge
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               ),
                             ),
 
-                            // Right: Tactical Armor Shields & Tactical Streak Pods
+                            // Right: Armor Shields & Streak Pods
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -212,12 +212,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
                         const SizedBox(height: 14),
 
-                        // ── Bottom Segmented Energy Meter (Valorant Tactical Style) ──
+                        // ── Bottom Segmented Energy Meter ──
                         TacticalSegmentedBar(
                           progress: ascProgress,
                           rankColor: rankColor,
-                          label: 'ASCENSION_GOAL',
-                          readoutText: '$userCompletions / $completionsReq PROTOCOLS',
+                          label: 'RANK_PROGRESS',
+                          readoutText: '$userCompletions / $completionsReq DAYS',
                           totalSegments: 14,
                           height: 7.0,
                         ),
@@ -331,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         TacticalPanel(
                           rankColor: const Color(0xFFFF4655), // Valorant Red
                           showHeader: true,
-                          tacticalTag: 'BOSS PROTOCOL // ASCENSION GATE',
+                          tacticalTag: 'WEEKLY ASCENSION CHALLENGE',
                           statusBadge: 'CRITICAL',
                           chamferSize: 12.0,
                           onTap: () => showTacticalBossDialog(context, questProvider, rankColor),

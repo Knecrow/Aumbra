@@ -239,10 +239,10 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // 1. Protocol / Loadout
+              // 1. Habits / Daily
               _NavTabItem(
                 glyphType: TacticalGlyphType.navProtocol,
-                label: 'PROTOCOL',
+                label: 'HABITS',
                 isSelected: _currentIndex == 0,
                 onTap: () => _onTabTap(0),
                 activeColor: lightRankColor,
@@ -250,10 +250,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 2. Career / Stats
+              // 2. Stats / Progress
               _NavTabItem(
                 glyphType: TacticalGlyphType.navCareer,
-                label: 'CAREER',
+                label: 'STATS',
                 isSelected: _currentIndex == 1,
                 onTap: () => _onTabTap(1),
                 activeColor: lightRankColor,
@@ -261,10 +261,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 3. Arsenal / Hall of Fame
+              // 3. Badges / Ranks
               _NavTabItem(
                 glyphType: TacticalGlyphType.navArsenal,
-                label: 'ARSENAL',
+                label: 'BADGES',
                 isSelected: _currentIndex == 2,
                 onTap: () => _onTabTap(2),
                 activeColor: lightRankColor,
@@ -272,10 +272,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 inactiveColor: inactiveColor,
               ),
 
-              // 4. Config / Settings
+              // 4. Settings
               _NavTabItem(
                 glyphType: TacticalGlyphType.navConfig,
-                label: 'CONFIG',
+                label: 'SETTINGS',
                 isSelected: _currentIndex == 3,
                 onTap: () => _onTabTap(3),
                 activeColor: lightRankColor,

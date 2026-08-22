@@ -100,8 +100,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               TacticalPanel(
                 rankColor: rankColor,
                 showHeader: true,
-                tacticalTag: 'AGENT // ACTIVE IDENTITY',
-                statusBadge: 'ONLINE',
+                tacticalTag: 'USER PROFILE',
+                statusBadge: 'ACTIVE',
                 chamferSize: 14.0,
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -172,8 +172,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     TacticalSegmentedBar(
                       progress: ascProgress,
                       rankColor: rankColor,
-                      label: 'PROTOCOL_EXP',
-                      readoutText: '$userCompletions / $completionsReq PROTOCOLS',
+                      label: 'RANK_EXP',
+                      readoutText: '$userCompletions / $completionsReq DAYS',
                       totalSegments: 14,
                       height: 6.0,
                     ),
@@ -186,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               TacticalPanel(
                 rankColor: rankColor,
                 showHeader: true,
-                tacticalTag: 'SUBSYSTEM // AI & CLOUD HUB',
+                tacticalTag: 'AI & CLOUD BACKUP',
                 statusBadge: user.cloudBackupEnabled ? 'SYNCED' : 'LOCAL',
                 chamferSize: 14.0,
                 padding: const EdgeInsets.all(16),
@@ -297,7 +297,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
                     _settingRow(
-                      'Export Chronicle as JSON',
+                      'Export Data as JSON',
                       Icons.file_download_outlined,
                       Colors.white,
                       AppColors.darkSubText,
@@ -322,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               TacticalPanel(
                 rankColor: rankColor,
                 showHeader: true,
-                tacticalTag: 'INTERFACE // VISUALS & ARMOR',
+                tacticalTag: 'APPEARANCE & SHIELDS',
                 statusBadge: 'ACTIVE',
                 chamferSize: 14.0,
                 padding: const EdgeInsets.all(16),
@@ -365,10 +365,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Integrity Shields',
+                              const Text('Streak Shields',
                                   style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
                               const SizedBox(height: 2),
-                              Text('Prevents streak loss (3/mo)',
+                              Text('Protects your streak if you miss a day (3/mo)',
                                   style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 9.5)),
                             ],
                           ),
@@ -384,17 +384,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 16),
 
-              // ─── PANEL 3: DOSSIER & SECURITY HUB ────────────────────────────
+              // ─── PANEL 3: ABOUT & SECURITY ────────────────────────────
               TacticalPanel(
                 rankColor: rankColor,
                 showHeader: true,
-                tacticalTag: 'SYSTEM // PROTOCOL DOSSIER',
+                tacticalTag: 'ABOUT & SECURITY',
                 statusBadge: 'SECURE',
                 chamferSize: 14.0,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    _settingRow('Aumbra Protocol v1.0.0', Icons.terminal_rounded, Colors.white, AppColors.darkSubText),
+                    _settingRow('Aumbra v1.0.0', Icons.info_outline_rounded, Colors.white, AppColors.darkSubText),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),
                     _settingRow('Privacy Policy', Icons.security_rounded, Colors.white, AppColors.darkSubText, onTap: () {}),
                     Divider(height: 16, color: Colors.white.withValues(alpha: 0.04)),

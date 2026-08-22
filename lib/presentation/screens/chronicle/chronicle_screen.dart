@@ -98,12 +98,12 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'CHRONICLE',
+                              'STATS & PROGRESS',
                               style: TextStyle(
                                 color: textColor,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: 1.5,
+                                letterSpacing: 1.2,
                               ),
                             ),
                           ],
@@ -111,14 +111,14 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                       ),
                     ),
 
-                    // ─── PANEL 1: COMBAT RECORD / CAREER SCOREBOARD ───────────────────
+                    // ─── PANEL 1: CAREER SCOREBOARD ───────────────────
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: TacticalPanel(
                           rankColor: rankColor,
                           showHeader: true,
-                          tacticalTag: 'TELEMETRY // CAREER COMBAT RECORD',
+                          tacticalTag: 'PERFORMANCE OVERVIEW',
                           statusBadge: 'ACS ${(user.totalQuestsCompleted * 25 + user.currentStreak * 10)}',
                           chamferSize: 14.0,
                           padding: const EdgeInsets.all(16),
@@ -128,7 +128,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                 children: [
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'PROTOCOLS SECURED',
+                                      'HABITS COMPLETED',
                                       user.totalQuestsCompleted.toString(),
                                       TacticalGlyphType.completed,
                                       rankColor,
@@ -137,7 +137,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                   Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.08)),
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'LONGEST COMBAT STREAK',
+                                      'BEST STREAK',
                                       '${user.longestStreak}D',
                                       TacticalGlyphType.streak,
                                       const Color(0xFFFF4655), // Valorant Red
@@ -153,7 +153,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                 children: [
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'ACTIVE SESSIONS',
+                                      'DAYS ACTIVE',
                                       userProvider.daysSinceStart.toString(),
                                       TacticalGlyphType.body,
                                       const Color(0xFF00E676),
@@ -162,7 +162,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                   Container(width: 1, height: 48, color: Colors.white.withValues(alpha: 0.08)),
                                   Expanded(
                                     child: _buildMetricTile(
-                                      'CONTRACT ASCENSION',
+                                      'RANK PROGRESS',
                                       '${(ascProgress * 100).round()}%',
                                       TacticalGlyphType.navArsenal,
                                       rankColor,
@@ -185,7 +185,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                         child: TacticalPanel(
                           rankColor: rankColor,
                           showHeader: true,
-                          tacticalTag: 'ANALYTICS // 7-DAY TRAJECTORY',
+                          tacticalTag: '7-DAY ACTIVITY TREND',
                           statusBadge: 'ACTIVE',
                           chamferSize: 14.0,
                           padding: const EdgeInsets.all(16),
@@ -234,7 +234,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                         child: TacticalPanel(
                           rankColor: rankColor,
                           showHeader: true,
-                          tacticalTag: 'ARCHIVE // MISSION LOGS',
+                          tacticalTag: 'COMPLETION HISTORY',
                           statusBadge: '${_history.length} LOGGED',
                           chamferSize: 14.0,
                           padding: const EdgeInsets.all(16),
@@ -248,7 +248,7 @@ class _ChronicleScreenState extends State<ChronicleScreen> {
                                   padding: EdgeInsets.symmetric(vertical: 24),
                                   child: Center(
                                     child: Text(
-                                      'No mission entries logged yet.',
+                                      'No entries logged yet.',
                                       style: TextStyle(color: AppColors.darkSubText, fontSize: 12),
                                     ),
                                   ),
