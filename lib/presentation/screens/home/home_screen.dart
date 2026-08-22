@@ -65,10 +65,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   String _getTimeGreeting() {
     final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 12) return 'DAWN FOCUS · ACT 01';
-    if (hour >= 12 && hour < 17) return 'MIDDAY MOMENTUM · ACT 01';
-    if (hour >= 17 && hour < 22) return 'EVENING ASCENSION · ACT 01';
-    return 'NIGHT REVIEW · ACT 01';
+    if (hour >= 5 && hour < 12) return 'DAWN FOCUS';
+    if (hour >= 12 && hour < 17) return 'MIDDAY MOMENTUM';
+    if (hour >= 17 && hour < 22) return 'EVENING ASCENSION';
+    return 'NIGHT REVIEW';
   }
 
   IconData _getRankAvatarIcon(int rank) {
