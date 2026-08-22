@@ -140,34 +140,8 @@ class HallOfFameScreen extends StatelessWidget {
               ),
               _buildTitlesList(context, user.unlockedTitles, isDark, textColor, subColor, rankColor),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
-              // ─── RANK COLOR PREVIEW ───────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 3,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: rankColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text('CLASSIFICATIONS',
-                          style: TextStyle(
-                              color: AppColors.darkSubText,
-                              fontSize: 11,
-                              letterSpacing: 1.5,
-                              fontWeight: FontWeight.w900)),
-                    ],
-                  ),
-                ),
-              ),
-              _buildRankColorGrid(context, user.currentRank, isDark, textColor, subColor),
+              // ─── 4. ALL 15 RANK TIERS (TACTICAL PANEL) ─────────────────────
+              _buildRankColorGrid(context, user.currentRank, isDark, textColor, subColor, rankColor),
 
               const SliverToBoxAdapter(child: SizedBox(height: 110)),
             ],
@@ -558,24 +532,18 @@ class HallOfFameScreen extends StatelessWidget {
     bool isDark,
     Color textColor,
     Color subColor,
+    Color rankColor,
   ) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Container(
+        child: TacticalPanel(
+          rankColor: rankColor,
+          showHeader: true,
+          tacticalTag: 'ALL 15 RANK TIERS',
+          statusBadge: 'TIERS 01 - 15',
+          chamferSize: 14.0,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.darkCard,
-            gradient: AppColors.darkCardGradient,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -583,12 +551,13 @@ class HallOfFameScreen extends StatelessWidget {
               crossAxisCount: 5,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.72,
             ),
             itemCount: kRanks.length,
             itemBuilder: (ctx, i) {
               final rank = kRanks[i];
               final isReached = currentRank >= rank.rankNumber;
+              final isCurrent = currentRank == rank.rankNumber;
               final color = rank.color;
 
               return GestureDetector(
@@ -601,74 +570,161 @@ class HallOfFameScreen extends StatelessWidget {
                         borderRadius: BorderRadius.zero,
                         side: BorderSide(color: color, width: 1.2),
                       ),
-                      title: Text(
-                        'RANK ${rank.rankNumber}: ${rank.name.toUpperCase()}',
-                        style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                      title: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.2),
+                              border: Border.all(color: color, width: 1),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${rank.rankNumber}',
+                                style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            rank.name.toUpperCase(),
+                            style: GoogleFonts.rajdhani(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                          ),
+                        ],
                       ),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('DEPTH TIER: ${rank.depthLevel.toUpperCase()}', style: GoogleFonts.spaceMono(color: color, fontSize: 10, fontWeight: FontWeight.w700)),
-                          const SizedBox(height: 8),
-                          Text('Requirement: ${rank.completionsRequired} days completed (${rank.streakRequired}-day streak minimum)', style: const TextStyle(color: Color(0xFF8E9BA6), fontSize: 12, height: 1.4)),
-                          const SizedBox(height: 8),
-                          Text(isReached ? 'STATUS: UNLOCKED ✓' : 'STATUS: LOCKED 🔒', style: TextStyle(color: isReached ? AppColors.emeraldPrimary : const Color(0xFFFF4655), fontSize: 11, fontWeight: FontWeight.w800)),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.15),
+                              border: Border.all(color: color.withValues(alpha: 0.6), width: 0.8),
+                            ),
+                            child: Text(
+                              'DEPTH LEVEL: ${rank.depthLevel.toUpperCase()}',
+                              style: GoogleFonts.spaceMono(color: color, fontSize: 9.5, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Progression Requirement:',
+                            style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 10, fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${rank.completionsRequired} days completed (${rank.streakRequired}-day streak required)',
+                            style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Text(
+                                'STATUS: ',
+                                style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 10, fontWeight: FontWeight.w700),
+                              ),
+                              Text(
+                                isCurrent
+                                    ? 'CURRENT RANK ★'
+                                    : (isReached ? 'UNLOCKED ✓' : 'LOCKED 🔒'),
+                                style: TextStyle(
+                                  color: isCurrent
+                                      ? color
+                                      : (isReached ? AppColors.emeraldPrimary : const Color(0xFFFF4655)),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       actions: [
                         ElevatedButton(
                           onPressed: () => Navigator.pop(dCtx),
-                          style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.black, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: color,
+                            foregroundColor: Colors.black,
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          ),
                           child: Text('CLOSE', style: GoogleFonts.spaceMono(fontWeight: FontWeight.w900, fontSize: 11)),
                         ),
                       ],
                     ),
                   );
                 },
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: isReached
-                            ? const Color(0xFF0F0F0F)
-                            : const Color(0xFF050505),
-                        borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isReached ? const Color(0xFF0C0F17) : const Color(0xFF06070B),
+                    border: Border.all(
+                      color: isCurrent
+                          ? color
+                          : (isReached ? color.withValues(alpha: 0.45) : Colors.white.withValues(alpha: 0.06)),
+                      width: isCurrent ? 1.5 : 0.8,
+                    ),
+                    boxShadow: isCurrent
+                        ? [
+                            BoxShadow(
+                              color: color.withValues(alpha: 0.35),
+                              blurRadius: 8,
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Rank Number Pip
+                      Text(
+                        rank.rankNumber.toString().padLeft(2, '0'),
+                        style: GoogleFonts.spaceMono(
+                          color: isReached ? color : const Color(0xFF434D5D),
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                      child: Center(
+                      const SizedBox(height: 4),
+
+                      // Rank Core Crystal / Diamond
+                      Transform.rotate(
+                        angle: 0.785398, // 45 degrees diamond
                         child: Container(
-                          width: 18,
-                          height: 18,
+                          width: 14,
+                          height: 14,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: isReached ? color : color.withValues(alpha: 0.2),
+                            color: isReached ? color : const Color(0xFF141722),
                             boxShadow: isReached
                                 ? [
-                                  BoxShadow(
-                                    color: color.withValues(alpha: 0.4),
-                                    blurRadius: 6,
-                                  ),
-                                ]
-                              : null,
+                                    BoxShadow(
+                                      color: color.withValues(alpha: 0.6),
+                                      blurRadius: 6,
+                                    ),
+                                  ]
+                                : null,
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      rank.name,
-                      style: TextStyle(
-                        color: isReached ? Colors.white : AppColors.darkDimText,
-                        fontSize: 8,
-                        fontWeight: FontWeight.w700,
+                      const SizedBox(height: 6),
+
+                      // Rank Name
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                        child: Text(
+                          rank.name.toUpperCase(),
+                          style: TextStyle(
+                            color: isReached ? Colors.white : const Color(0xFF5A6372),
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
