@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../providers/user_provider.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/services/local_storage_service.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../widgets/tactical_panel.dart';
+import '../../widgets/tactical_particle_canvas.dart';
 
 // ── Onboarding accent colour ─────────────────────────────────────────────────
 const _kAccent = AppColors.goldPrimary; // Solar gold
@@ -42,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   void initState() {
     super.initState();
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
     _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeOut);
@@ -64,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     if (_currentPage < 7) {
       _fadeController.reset();
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
       _fadeController.forward();
@@ -108,59 +111,59 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
-      body: Stack(
-        children: [
-          // ── Ambient background glow ──────────────────────────────────────
-          Positioned.fill(
-            child: CustomPaint(painter: _AmbientPainter()),
-          ),
-
-          // ── Pages ────────────────────────────────────────────────────────
-          PageView(
-            controller: _pageController,
-            physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: (page) => setState(() => _currentPage = page),
-            children: [
-              _buildWelcomePage(),
-              _buildNamePage(),
-              _buildCareerPage(),
-              _buildInterestsPage(),
-              _buildFitnessPage(),
-              _buildDailyTimePage(),
-              _buildComputerPage(),
-              _buildApiKeyPage(),
-            ],
-          ),
-
-          // ── Progress indicator ────────────────────────────────────────────
-          if (_currentPage > 0)
-            Positioned(
-              top: 56,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(8, (i) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: i == _currentPage ? 20 : 6,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: i == _currentPage
-                          ? _kAccent
-                          : Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: i == _currentPage
-                          ? [BoxShadow(color: _kAccent.withValues(alpha: 0.6), blurRadius: 8)]
-                          : null,
-                    ),
-                  );
-                }),
-              ),
+      backgroundColor: const Color(0xFF06070B),
+      body: TacticalParticleCanvas(
+        rankColor: _kAccent,
+        particleCount: 22,
+        child: Stack(
+          children: [
+            // ── Pages ────────────────────────────────────────────────────────
+            PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: (page) => setState(() => _currentPage = page),
+              children: [
+                _buildWelcomePage(),
+                _buildNamePage(),
+                _buildCareerPage(),
+                _buildInterestsPage(),
+                _buildFitnessPage(),
+                _buildDailyTimePage(),
+                _buildComputerPage(),
+                _buildApiKeyPage(),
+              ],
             ),
-        ],
+
+            // ── Progress indicator ────────────────────────────────────────────
+            if (_currentPage > 0)
+              Positioned(
+                top: 56,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(8, (i) {
+                    final isCurrent = i == _currentPage;
+                    final isPassed = i < _currentPage;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: isCurrent ? 24 : 8,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isCurrent
+                            ? _kAccent
+                            : (isPassed ? _kAccent.withValues(alpha: 0.4) : Colors.white.withValues(alpha: 0.10)),
+                        boxShadow: isCurrent
+                            ? [BoxShadow(color: _kAccent.withValues(alpha: 0.6), blurRadius: 8)]
+                            : null,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -171,45 +174,44 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       opacity: _fadeAnimation,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 40),
-              // Logo
+              const SizedBox(height: 30),
+              // Faceted Solar Crest Logo
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 1200),
+                duration: const Duration(milliseconds: 1000),
                 curve: Curves.elasticOut,
                 builder: (context, value, child) =>
                     Transform.scale(scale: value, child: child),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Glow ring
+                    // Outer Aura Glow
                     Container(
-                      width: 110,
-                      height: 110,
+                      width: 100,
+                      height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: _kAccent.withValues(alpha: 0.4),
+                            color: _kAccent.withValues(alpha: 0.35),
                             blurRadius: 40,
-                            spreadRadius: 10,
+                            spreadRadius: 8,
                           ),
                         ],
                       ),
                     ),
-                    // Golden solar halo
+                    // Outer Rotated Diamond Frame
                     Transform.rotate(
-                      angle: 3.14159 / 4,
+                      angle: 0.785398, // 45 deg
                       child: Container(
-                        width: 76,
-                        height: 76,
+                        width: 68,
+                        height: 68,
                         decoration: BoxDecoration(
-                          color: _kAccent.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          color: const Color(0xFF0E111A),
                           border: Border.all(
                             color: _kAccent,
                             width: 1.5,
@@ -217,64 +219,76 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         ),
                       ),
                     ),
-                    const Icon(Icons.bolt_rounded, color: AppColors.goldLight, size: 36),
+                    // Inner Rotated Core
+                    Transform.rotate(
+                      angle: 0.785398,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: _kAccent.withValues(alpha: 0.18),
+                          border: Border.all(
+                            color: _kAccent.withValues(alpha: 0.7),
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.bolt_rounded, color: Colors.white, size: 30),
                   ],
                 ),
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 28),
               // Title
-              ShaderMask(
-                shaderCallback: (bounds) => AppColors.goldGradient.createShader(bounds),
-                child: const Text(
-                  'AUMBRA',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 42,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 12,
-                  ),
+              Text(
+                'AUMBRA',
+                style: GoogleFonts.rajdhani(
+                  color: Colors.white,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 12,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 4),
               Text(
                 'DISCIPLINE · POWER · ASCENSION',
-                style: TextStyle(
-                  color: AppColors.goldLight.withValues(alpha: 0.7),
-                  fontSize: 12,
-                  letterSpacing: 3.0,
-                  fontWeight: FontWeight.w800,
+                style: GoogleFonts.spaceMono(
+                  color: AppColors.getLightVariant(_kAccent),
+                  fontSize: 10.5,
+                  letterSpacing: 2.0,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 48),
-              // Glass info card
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.darkCard,
-                  gradient: AppColors.darkCardGradient,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              const SizedBox(height: 36),
+              // Tactical initialization panel
+              TacticalPanel(
+                rankColor: _kAccent,
+                showHeader: true,
+                tacticalTag: 'INITIALIZATION PROTOCOL',
+                statusBadge: 'STAGE 01',
+                chamferSize: 14.0,
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       'You\'ve been asleep long enough.\nIt\'s time to awaken.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: GoogleFonts.rajdhani(
                         color: Colors.white,
-                        fontSize: 17,
-                        height: 1.6,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        height: 1.4,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Divider(color: Colors.white.withValues(alpha: 0.06)),
                     const SizedBox(height: 12),
-                    const Text(
+                    Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                    const SizedBox(height: 12),
+                    Text(
                       'No competition. No subscriptions.\nOnly unwavering self-discipline.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: GoogleFonts.spaceMono(
                         color: AppColors.darkSubText,
-                        fontSize: 13,
+                        fontSize: 11.5,
                         height: 1.5,
                       ),
                     ),
@@ -283,7 +297,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
               const Spacer(),
               _buildNextButton('START YOUR JOURNEY'),
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
             ],
           ),
         ),
@@ -336,24 +350,24 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         child: Column(
           children: [
             const SizedBox(height: 16),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Beginner',
-                    style: TextStyle(color: AppColors.darkSubText, fontSize: 12)),
-                Text('Elite Discipline',
-                    style: TextStyle(color: AppColors.goldLight, fontSize: 12, fontWeight: FontWeight.w700)),
+                Text('BEGINNER',
+                    style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 10, fontWeight: FontWeight.w700)),
+                Text('ELITE DISCIPLINE',
+                    style: GoogleFonts.spaceMono(color: _kAccent, fontSize: 10, fontWeight: FontWeight.w700)),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             SliderTheme(
               data: SliderThemeData(
-                activeTrackColor: AppColors.goldPrimary,
-                inactiveTrackColor: AppColors.goldPrimary.withValues(alpha: 0.15),
-                thumbColor: AppColors.goldPrimary,
-                overlayColor: AppColors.goldPrimary.withValues(alpha: 0.2),
-                trackHeight: 4,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+                activeTrackColor: _kAccent,
+                inactiveTrackColor: _kAccent.withValues(alpha: 0.15),
+                thumbColor: _kAccent,
+                overlayColor: _kAccent.withValues(alpha: 0.2),
+                trackHeight: 3,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
               ),
               child: Slider(
                 value: _fitnessLevel,
@@ -367,16 +381,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             const SizedBox(height: 16),
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.goldPrimary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.goldPrimary.withValues(alpha: 0.3)),
+                  color: const Color(0xFF0C0F17),
+                  border: Border.all(color: _kAccent.withValues(alpha: 0.6), width: 1.0),
                 ),
                 child: Text(
                   '${_fitnessLevel.round()} / 10',
-                  style: const TextStyle(
-                    color: AppColors.goldLight,
+                  style: GoogleFonts.rajdhani(
+                    color: _kAccent,
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                   ),
@@ -405,16 +418,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           return GestureDetector(
             onTap: () => setState(() => _dailyTime = time),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 180),
               margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.goldPrimary.withValues(alpha: 0.14)
-                    : AppColors.darkCard,
-                borderRadius: BorderRadius.circular(16),
+                    ? _kAccent.withValues(alpha: 0.12)
+                    : const Color(0xFF0C0F17),
                 border: Border.all(
-                  color: isSelected ? AppColors.goldPrimary.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.05),
+                  color: isSelected ? _kAccent : Colors.white.withValues(alpha: 0.08),
+                  width: isSelected ? 1.4 : 0.8,
                 ),
               ),
               child: Row(
@@ -424,38 +437,34 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     children: [
                       Text(
                         labels[time] ?? '',
-                        style: TextStyle(
-                          color: isSelected ? AppColors.goldLight : Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
+                        style: GoogleFonts.rajdhani(
+                          color: isSelected ? Colors.white : const Color(0xFFADB5BD),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
                           letterSpacing: 1.0,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         sublabels[time] ?? '',
-                        style: TextStyle(
-                          color: isSelected ? AppColors.goldPrimary : AppColors.darkSubText,
-                          fontSize: 12,
+                        style: GoogleFonts.spaceMono(
+                          color: isSelected ? _kAccent : AppColors.darkSubText,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  AnimatedOpacity(
-                    opacity: isSelected ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Container(
-                      width: 22,
-                      height: 22,
+                  if (isSelected)
+                    Container(
+                      width: 20,
+                      height: 20,
                       decoration: const BoxDecoration(
-                        color: AppColors.goldPrimary,
-                        shape: BoxShape.circle,
+                        color: _kAccent,
                       ),
                       child: const Icon(Icons.check, color: Colors.black, size: 14),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -478,31 +487,31 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: GestureDetector(
                     onTap: () => setState(() => _hasComputer = true),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.all(24),
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: _hasComputer
-                            ? AppColors.goldPrimary.withValues(alpha: 0.14)
-                            : AppColors.darkCard,
-                        borderRadius: BorderRadius.circular(16),
+                            ? _kAccent.withValues(alpha: 0.12)
+                            : const Color(0xFF0C0F17),
                         border: Border.all(
-                          color: _hasComputer ? AppColors.goldPrimary.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.05),
+                          color: _hasComputer ? _kAccent : Colors.white.withValues(alpha: 0.08),
+                          width: _hasComputer ? 1.4 : 0.8,
                         ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             Icons.laptop_mac_rounded,
-                            size: 32,
-                            color: _hasComputer ? AppColors.goldPrimary : AppColors.darkSubText,
+                            size: 30,
+                            color: _hasComputer ? _kAccent : AppColors.darkSubText,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'YES',
-                            style: TextStyle(
-                              color: _hasComputer ? AppColors.goldLight : AppColors.darkSubText,
+                            style: GoogleFonts.spaceMono(
+                              color: _hasComputer ? Colors.white : AppColors.darkSubText,
                               fontWeight: FontWeight.w900,
-                              fontSize: 15,
+                              fontSize: 13,
                               letterSpacing: 1.0,
                             ),
                           ),
@@ -516,32 +525,32 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: GestureDetector(
                     onTap: () => setState(() => _hasComputer = false),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.all(24),
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: !_hasComputer
-                            ? AppColors.goldPrimary.withValues(alpha: 0.14)
-                            : AppColors.darkCard,
-                        borderRadius: BorderRadius.circular(16),
+                            ? _kAccent.withValues(alpha: 0.12)
+                            : const Color(0xFF0C0F17),
                         border: Border.all(
-                          color: !_hasComputer ? AppColors.goldPrimary.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.05),
+                          color: !_hasComputer ? _kAccent : Colors.white.withValues(alpha: 0.08),
+                          width: !_hasComputer ? 1.4 : 0.8,
                         ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             Icons.smartphone_rounded,
-                            size: 32,
-                            color: !_hasComputer ? AppColors.goldPrimary : AppColors.darkSubText,
+                            size: 30,
+                            color: !_hasComputer ? _kAccent : AppColors.darkSubText,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'MOBILE ONLY',
-                            style: TextStyle(
-                              color: !_hasComputer ? AppColors.goldLight : AppColors.darkSubText,
+                            style: GoogleFonts.spaceMono(
+                              color: !_hasComputer ? Colors.white : AppColors.darkSubText,
                               fontWeight: FontWeight.w900,
-                              fontSize: 13,
-                              letterSpacing: 1.0,
+                              fontSize: 11,
+                              letterSpacing: 0.8,
                             ),
                           ),
                         ],
@@ -566,19 +575,19 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             // Key field
             Container(
               decoration: BoxDecoration(
-                color: AppColors.darkCard,
-                borderRadius: BorderRadius.circular(14),
+                color: const Color(0xFF0C0F17),
+                border: Border.all(color: _kAccent.withValues(alpha: 0.5), width: 1.0),
               ),
               child: TextField(
                 controller: _apiKeyController,
                 obscureText: true,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 13),
                 decoration: const InputDecoration(
                   hintText: 'AIzaSy...',
                   hintStyle: TextStyle(color: AppColors.darkDimText),
-                  prefixIcon: Icon(Icons.key_outlined, color: AppColors.goldPrimary, size: 20),
+                  prefixIcon: Icon(Icons.key_outlined, color: _kAccent, size: 18),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
             ),
@@ -586,13 +595,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             // Link text
             RichText(
               text: TextSpan(
-                style: const TextStyle(color: AppColors.darkSubText, fontSize: 13),
+                style: GoogleFonts.spaceMono(color: AppColors.darkSubText, fontSize: 11),
                 children: [
                   const TextSpan(text: 'Get your free API key at '),
                   TextSpan(
                     text: 'aistudio.google.com',
                     style: const TextStyle(
-                      color: AppColors.goldPrimary,
+                      color: _kAccent,
                       decoration: TextDecoration.underline,
                     ),
                     recognizer: TapGestureRecognizer()
@@ -604,22 +613,22 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             const SizedBox(height: 14),
             // Skip note
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.darkCard,
-                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFF080A10),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppColors.goldPrimary, size: 16),
-                  SizedBox(width: 10),
+                  const Icon(Icons.info_outline, color: _kAccent, size: 16),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'You can skip this and add your key anytime in Settings.',
-                      style: TextStyle(
+                      style: GoogleFonts.spaceMono(
                         color: AppColors.darkSubText,
-                        fontSize: 12,
-                        height: 1.5,
+                        fontSize: 10.5,
+                        height: 1.4,
                       ),
                     ),
                   ),
@@ -633,19 +642,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: ElevatedButton(
                 onPressed: _completeOnboarding,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.goldPrimary,
+                  backgroundColor: _kAccent,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.all(18),
-                  elevation: 8,
-                  shadowColor: AppColors.goldPrimary.withValues(alpha: 0.4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  elevation: 6,
+                  shadowColor: _kAccent.withValues(alpha: 0.4),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
-                child: const Text(
+                child: Text(
                   'ENTER AUMBRA',
-                  style: TextStyle(
-                    fontSize: 15,
+                  style: GoogleFonts.rajdhani(
+                    fontSize: 16,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                   ),
@@ -668,43 +675,45 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       opacity: _fadeAnimation,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(28, 80, 28, 28),
+          padding: const EdgeInsets.fromLTRB(24, 76, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Icon badge
               Container(
-                width: 44,
-                height: 44,
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
-                  color: AppColors.goldPrimary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFF0E111A),
+                  border: Border.all(color: _kAccent, width: 1.2),
                 ),
-                child: Icon(icon, color: AppColors.goldPrimary, size: 22),
+                child: Center(
+                  child: Icon(icon, color: _kAccent, size: 20),
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               // Title
               Text(
                 title,
-                style: const TextStyle(
+                style: GoogleFonts.rajdhani(
                   color: Colors.white,
-                  fontSize: 26,
+                  fontSize: 28,
                   fontWeight: FontWeight.w900,
-                  height: 1.2,
+                  height: 1.15,
                   letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               // Subtitle
               Text(
                 subtitle,
-                style: const TextStyle(
+                style: GoogleFonts.spaceMono(
                   color: AppColors.darkSubText,
-                  fontSize: 13,
-                  height: 1.5,
+                  fontSize: 11.5,
+                  height: 1.4,
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               // Content
               Expanded(
                 child: SingleChildScrollView(
@@ -712,7 +721,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: child,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               if (showNext) _buildNextButton('CONTINUE'),
             ],
           ),
@@ -731,8 +740,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
-        borderRadius: BorderRadius.circular(14),
+        color: const Color(0xFF0C0F17),
+        border: Border.all(color: _kAccent.withValues(alpha: 0.5), width: 1.0),
       ),
       child: TextField(
         controller: controller,
@@ -742,10 +751,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         style: const TextStyle(color: Colors.white, fontSize: 15),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.darkDimText, fontSize: 14),
-          prefixIcon: Icon(icon, color: AppColors.goldPrimary, size: 20),
+          hintStyle: GoogleFonts.spaceMono(color: AppColors.darkDimText, fontSize: 13),
+          prefixIcon: Icon(icon, color: _kAccent, size: 18),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
@@ -758,52 +767,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       child: ElevatedButton(
         onPressed: _nextPage,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.goldPrimary,
+          backgroundColor: _kAccent,
           foregroundColor: Colors.black,
           padding: const EdgeInsets.all(16),
-          elevation: 6,
-          shadowColor: AppColors.goldPrimary.withValues(alpha: 0.3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          elevation: 4,
+          shadowColor: _kAccent.withValues(alpha: 0.3),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         ),
         child: Text(
           label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+          style: GoogleFonts.rajdhani(
+            fontSize: 15,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 2.0,
+          ),
         ),
       ),
     );
   }
-}
-
-// ── Ambient background painter ──────────────────────────────────────────────────
-class _AmbientPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Deep obsidian dark fill
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.darkBackground,
-    );
-
-    // Top-center solar gold glow
-    canvas.drawCircle(
-      Offset(size.width * 0.5, size.height * 0.15),
-      size.width * 0.55,
-      Paint()
-        ..color = AppColors.goldPrimary.withValues(alpha: 0.06)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 90),
-    );
-
-    // Bottom-center ambient amber glow
-    canvas.drawCircle(
-      Offset(size.width * 0.5, size.height * 0.85),
-      size.width * 0.45,
-      Paint()
-        ..color = AppColors.goldDark.withValues(alpha: 0.05)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 80),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
